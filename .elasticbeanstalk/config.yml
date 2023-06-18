@@ -1,6 +1,8 @@
 branch-defaults:
   kscBranch:
     environment: Thepoorking-env
+  master:
+    environment: Thepoorking-env
 environment-defaults:
   Thepoorking-env:
     branch: null
