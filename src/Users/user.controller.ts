@@ -44,6 +44,10 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     async userLogin(@Body() body : UserEntity) {
+        if(!body.userName || !body.userPwd) {
+            throw new Error('아이디나 비번이 없다')
+        }
+        return 
 
     }
 
@@ -56,6 +60,6 @@ export class UserController {
     @Post('login/kakao')
     @HttpCode(200)
     async kakaoLogin() {
-        
+
     }
 }

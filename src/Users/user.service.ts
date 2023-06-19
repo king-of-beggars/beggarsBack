@@ -21,6 +21,7 @@ export class UserService {
                 throw new Error('비밀번호가 넘어오지 않음')
             }
             SignupDto.userPwd = await bcrypt.hash(SignupDto.userPwd,12)
+            console.log(SignupDto)
             const query = this.userRepository.create(
                 SignupDto
             )

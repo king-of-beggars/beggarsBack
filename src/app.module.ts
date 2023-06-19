@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserEntity from './Users/user.entity'
 import {UserModule} from './Users/user.module'
-
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
