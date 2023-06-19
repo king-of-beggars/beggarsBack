@@ -1,14 +1,12 @@
 branch-defaults:
-  kscBranch:
-    environment: Thepoorking-env
   master:
-    environment: Thepoorking-env
+    environment: Gfdgdgdgdfg-env
 environment-defaults:
-  Thepoorking-env:
+  Gfdgdgdgdfg-env:
     branch: null
     repository: null
 global:
-  application_name: thepoorking
+  application_name: gfdgdgdgdfg
   default_ec2_keyname: poorkingKeypair
   default_platform: Docker running on 64bit Amazon Linux 2
   default_region: ap-northeast-2
