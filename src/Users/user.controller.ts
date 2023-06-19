@@ -40,5 +40,22 @@ export class UserController {
         }
     }
 
- 
+    
+    @Post('login')
+    @HttpCode(200)
+    async userLogin(@Body() body : UserEntity) {
+
+    }
+
+    @Post('logout')
+    @HttpCode(200)
+    async userLogout() {
+
+    }
+
+    @Post('login/kakao')
+    @HttpCode(200)
+    async kakaoLogin() {
+        
+    }
 }
