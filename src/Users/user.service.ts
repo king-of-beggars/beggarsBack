@@ -15,7 +15,7 @@ export class UserService {
     ){}
 
     //회원가입 서비스
-    async userSignup(SignupDto : SignupDto) {
+    async userSignup(SignupDto : SignupDto) : Promise<any> {
 
             if(!SignupDto.userPwd) {
                 throw new Error('비밀번호가 넘어오지 않음')
@@ -30,7 +30,7 @@ export class UserService {
     }
 
     //유저아이디로 db체크
-    async userByName(userName : string) {
+    async userByName(userName : string) : Promise<UserEntity> {
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
         }
@@ -41,7 +41,7 @@ export class UserService {
     }
 
     //유저닉네임으로 db체크
-    async userByNickname(userNickname: string) {
+    async userByNickname(userNickname: string) : Promise<UserEntity> {
         if(!userNickname) {
             throw new Error('닉네임이 넘어오지 않음')
         }
@@ -54,16 +54,7 @@ export class UserService {
         
     }
 
-    //유저아이디, 패스워드 DB확인
-    async userPwdCheck(inputPwd:string, comparePwd:string) {
-        if(!inputPwd || !comparePwd) {
-            throw new Error('비밀번호가 넘어오지 않음')
-        }
-        const result = await bcrypt.compare(
-            inputPwd, comparePwd
-        )
-        return result
-    }
+    
  
 
 
