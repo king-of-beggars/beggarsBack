@@ -1,12 +1,12 @@
 branch-defaults:
   master:
-    environment: Gfdgdgdgdfg-env
+    environment: dssdfsdf
 environment-defaults:
-  Gfdgdgdgdfg-env:
+  dssdfsdf:
     branch: null
     repository: null
 global:
-  application_name: gfdgdgdgdfg
+  application_name: poor
   default_ec2_keyname: poorkingKeypair
   default_platform: Docker running on 64bit Amazon Linux 2
   default_region: ap-northeast-2
