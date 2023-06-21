@@ -6,11 +6,13 @@ import { AuthService } from './auth.service'
 import { UserEntity } from './user.entity'
 import { LocalAuthenticationGuard } from './passport/local/local.guard'
 import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';
+import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 
 @Controller('/api/user')
 export class UserController {
     constructor(private readonly userService: UserService,
-                private readonly authService: AuthService
+                private readonly authService: AuthService,
+                private readonly kakaoStrategy: KakaoStrategy
         ) {}
 
     @Post('signup')
@@ -70,7 +72,8 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            return [accessToken,refreshToken];
+            req.res.setHeader([refreshToken,accessToken])
+            return `로그인 완료`
     }
 
     @Post('logout')
@@ -82,7 +85,7 @@ export class UserController {
     @Get('login/kakao')
     @UseGuards(KakaoAuthenticationGuard)
     @HttpCode(200)
-    async kakaoLogin(@Query('code') code) {
-        
+    async kakaoLogin(@Req() req : any, @Query('code') code) {
+        return `로그인 완료`
     }
 }
