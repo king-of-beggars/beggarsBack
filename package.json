@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs/bull": "^10.0.0",
+    "@nestjs/bull-workspace": "github:nestjs/bull",
     "@nestjs/cache-manager": "^2.0.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",

@@ -1,16 +1,18 @@
-import { Controller,Post, Body, HttpCode, UseGuards } from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
 import { AuthService } from './auth.service'
 import { UserEntity } from './user.entity'
 import { LocalAuthenticationGuard } from './passport/local/local.guard'
-
+import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';
+import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 
 @Controller('/api/user')
 export class UserController {
     constructor(private readonly userService: UserService,
-                private readonly authService: AuthService
+                private readonly authService: AuthService,
+                private readonly kakaoStrategy: KakaoStrategy
         ) {}
 
     @Post('signup')
@@ -60,28 +62,18 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
-    async userLogin(@Body() body : UserEntity) {
-
-            if(!body.userName || !body.userPwd) {
-                throw new Error('아이디나 비번이 없다')
-            }
-            //아이디 확인
-            const byName : UserEntity = await this.userService.userByName(body.userName)
-            .catch(e=>{throw new Error('아이디가 DB에 없습니다')})
-
-            //DB 데이터 확인
-            const pwdCheck = await this.authService.userPwdCheck(body.userPwd,byName.userPwd)
-
-            if(!pwdCheck) {
-                throw new Error('비밀번호가 일치하지 않습니다')
-            }
+    async userLogin(@Req() req : any) {
+            console.log(typeof req)
+            const { user } = req
+            console.log(user.userId)
             let tokenDto = new TokenDto();
-            tokenDto.userId = byName.userId
-            tokenDto.userName = byName.userName
-            tokenDto.userNickname = byName.userNickname
+            tokenDto.userId = user.userId
+            tokenDto.userName = user.userName
+            tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            return 
+            req.res.setHeader([refreshToken,accessToken])
+            return `로그인 완료`
     }
 
     @Post('logout')
@@ -90,9 +82,10 @@ export class UserController {
 
     }
 
-    @Post('login/kakao')
+    @Get('login/kakao')
+    @UseGuards(KakaoAuthenticationGuard)
     @HttpCode(200)
-    async kakaoLogin() {
-
+    async kakaoLogin(@Req() req : any, @Query('code') code) {
+        return `로그인 완료`
     }
 }

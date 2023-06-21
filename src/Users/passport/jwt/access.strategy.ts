@@ -6,4 +6,4 @@ import { Strategy } from 'passport-jwt';
 export class AccessStrategy extends PassportStrategy(Strategy) {
     
 
-}
+} 

@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import Redis from 'ioredis';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config'
+import { UserService } from './user.service';
 
 @Injectable()
 export class AuthService {
@@ -14,25 +15,38 @@ export class AuthService {
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
         private readonly jwtService: JwtService,
-        private readonly configService : ConfigService
-        
+        private readonly configService : ConfigService,
+        private readonly userService : UserService
     ){}
 
 
-    //유저아이디, 패스워드 DB확인
-    async userPwdCheck(inputPwd:string, comparePwd:string) : Promise<boolean> {
-        if(!inputPwd || !comparePwd) {
-            throw new Error('비밀번호가 넘어오지 않음')
+    //패스워드 DB확인
+    async userCheck(userName: string, userPwd:string) : Promise<UserEntity> {
+        
+        if(!userName || !userPwd) {
+            throw new Error('아이디나 비번이 없다')
         }
+        //아이디 확인
+        const byName : UserEntity = await this.userService.userByName(userName)
+        .catch(e=>{
+            throw new Error('아이디가 DB에 없습니다')
+        })
+
+        //DB 데이터 확인
         const result = await bcrypt.compare(
-            inputPwd, comparePwd
+            userPwd, byName.userPwd
         )
-        return result
+
+        if(!result) {
+            throw new Error('비밀번호가 일치하지 않습니다')
+        }
+
+        return byName
     }
 
     //액세스 토큰 발급
     async setAccessToken(tokenDto : TokenDto) {
-        const accessToken = this.jwtService.sign(tokenDto, { 
+        const accessToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
             secret :this.configService.get('ACCESS_KEY'), 
             expiresIn : this.configService.get('ACCESS_TIME')
         })
@@ -41,7 +55,8 @@ export class AuthService {
     
     //리프레시 토큰 발급
     async setRefreshToken(tokenDto : TokenDto) {
-        const refreshToken = this.jwtService.sign(tokenDto, { 
+        
+        const refreshToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
             secret :this.configService.get('REFRESH_KEY'), 
             expiresIn : this.configService.get('REFRESH_TIME')
         })
@@ -49,7 +64,21 @@ export class AuthService {
 
     }
 
-    //토큰 저장
+    kakaoLogin(id_token : any) {
+        const dbCheck = this.userService.userByName(id_token.id)
+        let tokenDto : TokenDto;
+        dbCheck.then((user)=>{
+            tokenDto.userId = user.userId
+            tokenDto.userName = user.userName
+            tokenDto.userNickname = user.userNickname
+        }).catch((err) => {
+            return `회원가입 페이지로 ${id_token}`
+
+        })
+        const refreshToken = this.setRefreshToken(tokenDto)
+        const accessToken = this.setAccessToken(tokenDto)
+        return [accessToken,refreshToken];
+    }
     
 
 
