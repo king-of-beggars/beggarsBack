@@ -60,7 +60,7 @@ export class UserController {
             throw new Error('중복된 닉네임입니다')      
 
         } catch(err) {
-            throw new Error('예상치 못한 오류')
+            throw new Error(err)
         }
     }
 

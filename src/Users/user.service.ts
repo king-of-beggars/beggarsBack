@@ -64,12 +64,12 @@ export class UserService {
         if(!userNickname) {
             throw new Error('닉네임이 넘어오지 않음')
         }
-
-        const query = await this.userRepository.findOne({
+        console.log(userNickname)
+        const query = this.userRepository.findOne({
           where: {userNickname}
         }) 
 
-         return query
+         return query 
         
     }
 
