@@ -4,13 +4,12 @@ import UserEntity  from './user.entity'
 import {Repository, In} from 'typeorm'
 import { TokenDto } from './dto/token.dto'
 import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config'
 import { UserService } from './user.service';
 
 @Injectable()
-export class AuthService {
+export class AuthService { 
     constructor(
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
@@ -55,29 +54,13 @@ export class AuthService {
     
     //리프레시 토큰 발급
     async setRefreshToken(tokenDto : TokenDto) {
-        
+        console.log(`${tokenDto} 213`)
         const refreshToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
             secret :this.configService.get('REFRESH_KEY'), 
             expiresIn : this.configService.get('REFRESH_TIME')
         })
         return `Bearer ${refreshToken}`
 
-    }
-
-    kakaoLogin(id_token : any) {
-        const dbCheck = this.userService.userByName(id_token.id)
-        let tokenDto : TokenDto;
-        dbCheck.then((user)=>{
-            tokenDto.userId = user.userId
-            tokenDto.userName = user.userName
-            tokenDto.userNickname = user.userNickname
-        }).catch((err) => {
-            return `회원가입 페이지로 ${id_token}`
-
-        })
-        const refreshToken = this.setRefreshToken(tokenDto)
-        const accessToken = this.setAccessToken(tokenDto)
-        return [accessToken,refreshToken];
     }
     
 

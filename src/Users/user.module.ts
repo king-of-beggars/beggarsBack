@@ -9,6 +9,7 @@ import { UserController } from './user.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './passport/local/local.strategy';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
+// import { RedisService } from './redis.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
@@ -18,7 +19,7 @@ import { KakaoStrategy } from './passport/kakao/kakao.strategy';
   providers: [
     UserService, 
     AuthService, 
-    JwtService, 
+    JwtService,
     ConfigService,
     LocalStrategy,
     KakaoStrategy

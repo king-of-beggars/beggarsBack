@@ -7,8 +7,22 @@ import {UserModule} from './Users/user.module'
 import { CacheModule } from '@nestjs/cache-manager';  
 import { redisStore } from 'cache-manager-redis-yet'
 import { BullModule } from '@nestjs/bull';
+import { ClusterModule } from '@liaoliaots/nestjs-redis';
+import { CommentModule } from './Comments/comment.module';
+import { BoardModule } from './Boards/board.module';
 @Module({
   imports: [
+    // ClusterModule.forRootAsync({
+    //   useFactory: () => ({
+    //   config : {
+    //     nodes : [{host :process.env.REDIS_HOST,
+    //               port : Number(process.env.REDIS_PORT)}],
+    //     slotsRefreshTimeout : 100000,
+    //     enableReadyCheck: true,
+    //     dnsLookup :(address, callback) => callback(null, address)
+    //   }
+    // }) 
+    //}),
     TypeOrmModule.forRoot({
         type:'mysql',
         host: process.env.DB_HOST,
@@ -21,6 +35,8 @@ import { BullModule } from '@nestjs/bull';
         logging:true
     }),
     UserModule,
+    CommentModule,
+    BoardModule,
     // CacheModule.registerAsync({
     //   useFactory : async() => ({
     //       store: await redisStore({
@@ -31,15 +47,6 @@ import { BullModule } from '@nestjs/bull';
     //       })
     //     })
     // })
-    BullModule.forRootAsync({
-      useFactory: async () => ({
-        redis: {
-          host: process.env.REDIS_HOST,
-          port: Number(process.env.REDIS_PORT),
-        },
-      })
-    })
-
   ],
   controllers: [AppController],
   providers: [AppService],

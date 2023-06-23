@@ -4,6 +4,7 @@ import UserEntity  from './user.entity'
 import {Repository, In} from 'typeorm'
 import { SignupDto } from './dto/signup.dto'
 import * as bcrypt from 'bcrypt';
+import { SocialSignupDto } from './dto/socialSignup.dto'
 
 @Injectable()
 export class UserService {
@@ -29,15 +30,33 @@ export class UserService {
         
     }
 
+    //소셜 회원가입 서비스
+    async socialSignup(SignupDto : SocialSignupDto) : Promise<any> {
+
+        const query = this.userRepository.create(
+            SignupDto
+        )
+        await this.userRepository.save(query)
+        return query
+    
+}
+
     //유저아이디로 db체크
     async userByName(userName : string) : Promise<UserEntity> {
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
         }
-        const query = this.userRepository.findOne({
+        const query = await this.userRepository.findOne({
             where:{userName}
         })
-        return query
+        console.log(query)
+        if(query===null) {
+            const temp = new UserEntity()
+            temp.userName = userName
+            console.log(`dd${temp}`)
+            return temp
+        }
+        return query;
     }
 
     //유저닉네임으로 db체크
@@ -53,9 +72,5 @@ export class UserService {
          return query
         
     }
-
-    
- 
-
 
 }

@@ -1,23 +1,18 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+// import { ClusterService,InjectCluster, DEFAULT_CLUSTER_NAMESPACE } from '@liaoliaots/nestjs-redis';
+// import { Injectable } from '@nestjs/common';
+// import { Cluster } from 'ioredis';
 
-@Injectable()
-export class RedisCacheService {
-  constructor(private readonly cache: Cache) {}
+// @Injectable()
+// export class RedisService {
+//     private readonly defaultClusterClient: Cluster
+//   constructor(
+//         private readonly clusterService: ClusterService
+//   ) {
+//     this.defaultClusterClient = this.clusterService.getClient()
+//   }
 
-  async get(key: string): Promise<any> {
-    return await this.cache.get(key);
-  }
-
-  async set(key: string, value: any, option?: any) {
-    await this.cache.set(key, value, option);
-  }
-
-  async reset() {
-    await this.cache.reset();
-  }
-
-  async del(key: string) {
-    await this.cache.del(key);
-  }
-}
+//   async ping(): Promise<string> {
+//      // ioredis 에서 사용하듯이 사용하면 된다 !
+//      return await this.defaultClusterClient.ping()
+//    }
+// } 
