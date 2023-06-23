@@ -118,11 +118,14 @@ export class UserController {
             if(nickCheck) {
                 throw new Error('다른 닉네임을 지정해주세요')
             }
+            SignupDto.userLoginType = 'kakao'
+            SignupDto.userType = 1
             const userInfo = await this.userService.socialSignup(SignupDto)
             let tokenDto = new TokenDto();
             tokenDto.userId = userInfo.userId
             tokenDto.userName = userInfo.userId
             tokenDto.userNickname = userInfo.userNickname
+
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
             req.res.setHeader('refreshToken', refreshToken)
