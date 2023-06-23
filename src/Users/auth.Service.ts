@@ -18,7 +18,6 @@ export class AuthService {
         private readonly userService : UserService
     ){}
 
-
     //패스워드 DB확인
     async userCheck(userName: string, userPwd:string) : Promise<UserEntity> {
         
@@ -46,8 +45,10 @@ export class AuthService {
     //액세스 토큰 발급
     async setAccessToken(tokenDto : TokenDto) {
         const accessToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
-            secret :this.configService.get('ACCESS_KEY'), 
-            expiresIn : this.configService.get('ACCESS_TIME')
+            secret : 'kmjpoorking', 
+            expiresIn : '1h'
+            // secret :this.configService.get('ACCESS_KEY'), 
+            // expiresIn : this.configService.get('ACCESS_TIME')
         })
         return `Bearer ${accessToken}`
     }
@@ -56,8 +57,10 @@ export class AuthService {
     async setRefreshToken(tokenDto : TokenDto) {
         console.log(`${tokenDto} 213`)
         const refreshToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
-            secret :this.configService.get('REFRESH_KEY'), 
-            expiresIn : this.configService.get('REFRESH_TIME')
+            secret : 'kingofpoor', 
+            expiresIn : '7d'
+            // secret :this.configService.get('REFRESH_KEY'), 
+            // expiresIn : this.configService.get('REFRESH_TIME')
         })
         return `Bearer ${refreshToken}`
 
