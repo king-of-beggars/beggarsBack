@@ -4,12 +4,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserEntity from './Users/user.entity'
 import {UserModule} from './Users/user.module'
-import { CacheModule } from '@nestjs/cache-manager';  
-import { redisStore } from 'cache-manager-redis-yet'
-import { BullModule } from '@nestjs/bull';
-import { ClusterModule } from '@liaoliaots/nestjs-redis';
-import { CommentModule } from './Comments/comment.module';
-import { BoardModule } from './Boards/board.module';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -34,9 +28,7 @@ import { BoardModule } from './Boards/board.module';
         entities : [UserEntity],
         logging:true
     }),
-    UserModule,
-    CommentModule,
-    BoardModule,
+    UserModule
     // CacheModule.registerAsync({
     //   useFactory : async() => ({
     //       store: await redisStore({
