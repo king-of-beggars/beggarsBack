@@ -1,8 +1,12 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete } from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param } from '@nestjs/common';
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard'
+import { BoardService } from './board.service';
 
 @Controller('api/board')
 export class BoardController {
+    constructor(
+        private readonly boardService : BoardService
+    ){}
 
     @Get('noway')
     async nowayList() {
@@ -16,8 +20,8 @@ export class BoardController {
 
     @UseGuards(AccessAuthenticationGuard)
     @Post(':cashbookId')
-    async boardInput() {
-
+    async boardInput(@Param() cashbookId : number, @Body() boardText : string) {
+        this.boardService.getByCashlistId(cashbookId)
     }
 
     @Get(':boardId')
