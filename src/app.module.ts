@@ -4,6 +4,13 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserEntity from './Users/user.entity'
 import {UserModule} from './Users/user.module'
+<<<<<<< HEAD
+=======
+import { CacheModule } from '@nestjs/cache-manager';  
+import { redisStore } from 'cache-manager-redis-yet'
+import { CommentModule } from './Comments/comment.module';
+import { BoardModule } from './Boards/board.module';
+>>>>>>> master
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
