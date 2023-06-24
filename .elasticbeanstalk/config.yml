@@ -1,14 +1,14 @@
 branch-defaults:
   tempUser:
-    environment: NodeVer-env
+    environment: Dockerenv-env
 environment-defaults:
-  NodeVer-env:
+  Dockerenv-env:
     branch: null
     repository: null
 global:
-  application_name: nodeVer
+  application_name: dockerenv
   default_ec2_keyname: poorkingKeypair
-  default_platform: Node.js 18 running on 64bit Amazon Linux 2
+  default_platform: Docker running on 64bit Amazon Linux 2
   default_region: ap-northeast-2
   include_git_submodules: true
   instance_profile: null
