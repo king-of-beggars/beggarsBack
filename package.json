@@ -6,7 +6,6 @@
   },
   "description": "<p align=\"center\">\r   <a href=\"http://nestjs.com/\" target=\"blank\"><img src=\"https://nestjs.com/img/logo-small.svg\" width=\"200\" alt=\"Nest Logo\" /></a>\r </p>",
   "scripts" : {
-    "start" : "npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": ".eslintrc.js",
