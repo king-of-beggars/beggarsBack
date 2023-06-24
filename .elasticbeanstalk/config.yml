@@ -1,20 +1,19 @@
 branch-defaults:
   tempUser:
-    environment: dssdfsdf
+    environment: NodeVer-env
 environment-defaults:
-  dssdfsdf:
+  NodeVer-env:
     branch: null
     repository: null
 global:
-  application_name: poor
+  application_name: nodeVer
   default_ec2_keyname: poorkingKeypair
-  default_platform: Docker running on 64bit Amazon Linux 2
+  default_platform: Node.js 18 running on 64bit Amazon Linux 2
   default_region: ap-northeast-2
   include_git_submodules: true
   instance_profile: null
   platform_name: null
   platform_version: null
   profile: eb-cli
-  repository: null
   sc: git
   workspace_type: Application
