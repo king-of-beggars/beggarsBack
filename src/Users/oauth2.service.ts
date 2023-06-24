@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config'
 import { UserService } from './user.service';
 
 @Injectable()
-export class AuthService { 
+export class AuthService {  
     constructor(
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
