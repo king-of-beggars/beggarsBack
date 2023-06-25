@@ -4,13 +4,15 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import UserEntity from './Users/user.entity'
 import {UserModule} from './Users/user.module'
-<<<<<<< HEAD
-=======
 import { CacheModule } from '@nestjs/cache-manager';  
 import { redisStore } from 'cache-manager-redis-yet'
-import { CommentModule } from './Comments/comment.module';
-import { BoardModule } from './Boards/board.module';
->>>>>>> master
+import { BoardEntity } from './Boards/entity/board.entity';
+import { CommentEntity } from './Comments/entity/comment.entity';
+import { LikeEntity } from './Comments/entity/like.entity';
+import { CashbookEntity } from './Cashlists/entity/cashbook.entity';
+import { CashListEntity } from './Cashlists/entity/cashList.entity';
+import { CashActivityEntity } from './Cashlists/entity/cashactivity.entity';
+import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -32,7 +34,15 @@ import { BoardModule } from './Boards/board.module';
         password: process.env.DB_PASSWORD,
         database: 'poorking', 
         synchronize:true,
-        entities : [UserEntity],
+        entities : [
+                  UserEntity,
+                  BoardEntity,
+                  CommentEntity,
+                  CashbookEntity,
+                  CashListEntity,
+                  CashActivityEntity,
+                  CashDetailEntity
+                  ],
         logging:true
     }),
     UserModule

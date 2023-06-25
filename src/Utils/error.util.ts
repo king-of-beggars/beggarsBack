@@ -1,3 +1,5 @@
-export class ErrorUtil extends Error {
+import { HttpException } from "@nestjs/common";
+
+export class ErrorUtil extends HttpException {
     
 }

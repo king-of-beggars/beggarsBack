@@ -11,10 +11,6 @@ export class BoardService {
         //pirvate cashlistRepository :Repository<CashlistEntity>
     ){}
 
-    async getByCashlistId(cashbookId : number) : Promise<any> {
-        cashbookId
-    }
-
     async deleteByboardId(boardId : number) {
 
     }

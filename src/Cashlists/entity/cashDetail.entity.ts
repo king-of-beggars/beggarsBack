@@ -1,0 +1,26 @@
+import { createPublicKey } from 'crypto'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm'
+
+import { CashbookEntity } from './cashbook.entity'
+@Entity('cashDetail')
+export class CashDetailEntity {
+    @PrimaryGeneratedColumn()
+    public cashDetailId : number
+
+    @Column()
+    public cashDetailText : string
+
+    @Column()
+    public cashDetailValue : number
+
+    @CreateDateColumn({ type: 'timestamp' })
+    public cashDetailCreatedAt : Date
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    public cashDetailUpdatedAt : Date
+
+    @OneToOne(()=>CashbookEntity)
+    @JoinColumn({name:'cashbookId'})
+    public cashbookId : CashbookEntity
+
+}
