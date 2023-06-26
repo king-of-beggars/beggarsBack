@@ -12,7 +12,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
         super({
             //clientID: process.env.KAKAO_ID,
             clientID : '2ad53ec39ebaac5ba8a250967f431977',
-            callbackURL: 'http://localhost:3000/api/user/login/kakao',
+            callbackURL: 'https:/poorking.shop/api/user/login/kakao',
         })
 
     }
