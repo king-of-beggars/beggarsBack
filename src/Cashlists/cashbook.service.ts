@@ -13,7 +13,7 @@ export class CashbookService {
         private readonly cashbookEntity : Repository<CashbookEntity>
     ){}
 
-    async getcashbookAndDetail(cashbookId : CashbookEntity) : Promise<CashbookEntity> {
+    async getcashbookAndDetail(cashbookId : unknown) : Promise<CashbookEntity> {
 
         return await this.cashbookEntity
         .createQueryBuilder('cashbook')

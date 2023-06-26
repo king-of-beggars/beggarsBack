@@ -19,7 +19,7 @@ export class BoardController {
         paginationDto.boardTypes = 1
         this.boardService.getListAll(paginationDto)
         .then((result)=>{
-            return result})
+            return `data: ${result}`})
         .catch((e)=>{throw new Error('잘못된 요청(페이지,리미트) 입니다')})
     }
 
@@ -28,7 +28,7 @@ export class BoardController {
         paginationDto.boardTypes = 0
         this.boardService.getListAll(paginationDto)
         .then((result)=>{
-            return result})
+            return `data: ${result}`})
         .catch((e)=>{throw new Error('잘못된 요청(페이지,리미트) 입니다')})
     }
 
@@ -52,14 +52,26 @@ export class BoardController {
 
     @Get(':boardId')
     async boardDetail(@Param() params : any) {
+        //주요정보
         const result = await this.boardService.getBoardDetail(params.boardId)
+        console.log(result)
+        //디테일
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
-        
+        result['cashbookDetail'] = detail
+        return `
+        data : ${result}
+        `
     }
 
     //@UseGuards(AccessAuthenticationGuard)
     @Delete(':boardId')
-    async boardDelete() {
+    async boardDelete(@Param() params : any) {
+        const result = await this.boardService.deleteByboardId(params.boardId)
+        if(result) {
+            return `삭제에 성공하였습니다`
+        } else {
+            throw new Error('존재하지 않는 게시글입니다')
+        }
         
     }
 }

@@ -4,13 +4,16 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { BoardEntity } from "./entity/board.entity";
 import { PostBoardDto } from "./dto/postBoard.dto";
 import { PaginationDto } from "./dto/pagination.dto";
-
+import { CashDetailEntity } from "src/Cashlists/entity/cashDetail.entity";
+import { CashbookService } from "src/Cashlists/cashbook.service";
+import { CashbookEntity } from "src/Cashlists/entity/cashbook.entity";
 @Injectable()
 export class BoardService {
     constructor(
         @InjectRepository(BoardEntity)
-        private boardRepository : Repository<BoardEntity>
+        private boardRepository : Repository<BoardEntity>,
         //pirvate cashlistRepository :Repository<CashlistEntity>
+        private readonly cashbookService : CashbookService
     ){}
     
     async postBoard(postBoardDto : PostBoardDto) {
@@ -27,7 +30,14 @@ export class BoardService {
         })
     } 
     async deleteByboardId(boardId : number) {
-
+        try {
+            return this.boardRepository.createQueryBuilder()
+            .delete()
+            .where({boardId:boardId})
+        } catch(e) {
+            throw new Error('DB접속에러')
+        }
+        
     }
 
     async getListAll(paginationDTO : PaginationDto) {
@@ -46,18 +56,21 @@ export class BoardService {
         .createQueryBuilder('board')
         .leftJoin('board.userId','user')
         .leftJoin('board.comments','comment')
-        .select(['board','comment','cashbook','user.userId','user.userNickname','user.userName'])
+        .select(['board','comment','user.userId','user.userNickname','user.userName'])
         .where('board.boardId=:boardId',{boardId : boardId})
         .getOne()
 
     }
 
     async getDetailByBoardId(boardId : number) {
-        return await this.boardRepository
+        const boards = await this.boardRepository
         .createQueryBuilder('board')
-        .innerJoinAndSelect('board.cashbookId','cashbook.cashbookId')
+        .leftJoinAndSelect('board.cashbookId','cashbook')
         .where('board.boardId=:boardId',{boardId : boardId})
-        .getMany()
+        .getOne()
+        const cashbookId  = boards.cashbookId.cashbookId
+        return await this.cashbookService.getcashbookAndDetail(cashbookId)
+        
     }
     
 

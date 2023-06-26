@@ -6,6 +6,9 @@ import { BoardEntity } from 'src/Boards/entity/board.entity'
 @Entity('Cashbook')
 export class CashbookEntity {
     @PrimaryGeneratedColumn()
+    @OneToOne(()=> BoardEntity, {
+        cascade:true
+    })
     public cashbookId : number
 
     @Column()
