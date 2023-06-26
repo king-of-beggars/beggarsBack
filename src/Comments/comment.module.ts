@@ -11,13 +11,14 @@ import { BoardController} from 'src/Boards/board.controller'
 import { BoardService } from 'src/Boards/board.service'
 import { CommentService } from './comment.service';
 import { LikeController } from './like.controller';
+import { CommentController } from './comment.controller';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity,BoardEntity,CommentEntity,LikeEntity]),
     PassportModule,
 
   ],
-  controllers: [BoardController,LikeController], 
+  controllers: [CommentController], 
   providers: [
     CommentService
   ], 

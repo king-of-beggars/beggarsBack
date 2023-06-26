@@ -52,7 +52,7 @@ import { CommentModule } from './Comments/comment.module';
     UserModule,
     BoardModule,
     CashbookModule,
-    CommentModule
+    //CommentModule
     // CacheModule.registerAsync({
     //   useFactory : async() => ({
     //       store: await redisStore({
