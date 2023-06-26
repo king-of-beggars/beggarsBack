@@ -1,6 +1,7 @@
+import { CashbookEntity } from 'src/Cashlists/entity/cashbook.entity'
 import { CommentEntity } from 'src/Comments/entity/comment.entity'
 import UserEntity from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, OneToOne } from 'typeorm'
 
 @Entity('Board')
 export class BoardEntity {
@@ -29,4 +30,10 @@ export class BoardEntity {
         cascade:true
     })
     public comments? : CommentEntity[]
+
+    @OneToOne(()=>CashbookEntity,
+              (cashbook : CashbookEntity) => cashbook.cashbookId)
+    @JoinColumn({name : 'cashbookId'})
+    public cashbookId : CashbookEntity
+
 }

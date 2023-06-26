@@ -17,7 +17,9 @@ import { CashActivityEntity } from './entity/cashactivity.entity';
     TypeOrmModule.forFeature([UserEntity,CashListEntity,CashDetailEntity,CashbookEntity,CashActivityEntity]),
     PassportModule
   ],
-  controllers: [CashbookContoller], 
+  controllers: [
+    CashbookContoller
+  ], 
   providers: [
     CashbookService
   ], 

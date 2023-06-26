@@ -1,13 +1,10 @@
 import UserEntity from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 import { CashDetailEntity } from './cashDetail.entity'
 
 @Entity('Cashbook')
 export class CashbookEntity {
     @PrimaryGeneratedColumn()
-    @OneToOne(()=> CashDetailEntity, {
-        cascade:true
-    })
     public cashbookId : number
 
     @Column()
@@ -31,4 +28,7 @@ export class CashbookEntity {
     @ManyToOne(()=>UserEntity, (user : UserEntity)=>user.userId)
     @JoinColumn({name:'userId'})
     public userId : UserEntity
+
+    @OneToMany(()=>CashDetailEntity, (detail : CashDetailEntity)=> detail.cashbookId)
+    public detail? : CashDetailEntity[]; 
 }

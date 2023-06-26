@@ -10,9 +10,12 @@ import { BoardController} from 'src/Boards/board.controller'
 import { BoardService } from 'src/Boards/board.service'
 import { UserModule } from 'src/Users/user.module';
 import { CashbookModule } from 'src/Cashlists/cashbook.module';
+import { CashbookEntity } from 'src/Cashlists/entity/cashbook.entity';
+import { CashDetailEntity } from 'src/Cashlists/entity/cashDetail.entity';
+import { AccessStrategy } from 'src/Users/passport/jwt/access.strategy';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity,BoardEntity,CommentEntity]),
+    TypeOrmModule.forFeature([UserEntity,BoardEntity,CommentEntity,CashbookEntity,CashDetailEntity]),
     PassportModule,
     UserModule,
     CashbookModule

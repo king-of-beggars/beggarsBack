@@ -1,19 +1,27 @@
 import { Injectable } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { Repository, Join } from "typeorm";
 import { CashDetailEntity } from "./entity/cashDetail.entity";
 import { CashbookEntity } from "./entity/cashbook.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+
 @Injectable()
 export class CashbookService {
     constructor(
-        private readonly cashDetailEntity : Repository<CashDetailEntity>
+        @InjectRepository(CashDetailEntity)
+        private readonly cashDetailEntity : Repository<CashDetailEntity>,
+        @InjectRepository(CashbookEntity)
+        private readonly cashbookEntity : Repository<CashbookEntity>
     ){}
 
-    getDetailByCashbookId(cashbookId : number){
-        this.cashDetailEntity.findOne({
-            // where : {'cashbookId':cashbookId}
-        })
+    async getcashbookAndDetail(cashbookId : CashbookEntity) : Promise<CashbookEntity> {
 
+        return await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .innerJoinAndSelect('cashbook.detail','cashDetail')
+        .innerJoinAndSelect('cashbook.userId','user.userId')
+        .where('cashbook.cashbookId=:cashbookId', {cashbookId})
+        .getOne()
+        
     }
-
 
 }

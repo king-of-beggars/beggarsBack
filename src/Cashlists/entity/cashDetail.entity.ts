@@ -1,5 +1,5 @@
 import { createPublicKey } from 'crypto'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm'
 
 import { CashbookEntity } from './cashbook.entity'
 @Entity('cashDetail')
@@ -19,7 +19,7 @@ export class CashDetailEntity {
     @UpdateDateColumn({ type: 'timestamp' })
     public cashDetailUpdatedAt : Date
 
-    @OneToOne(()=>CashbookEntity)
+    @ManyToOne(()=>CashbookEntity, (cashbook:CashbookEntity)=>cashbook.cashbookId)
     @JoinColumn({name:'cashbookId'})
     public cashbookId : CashbookEntity
 

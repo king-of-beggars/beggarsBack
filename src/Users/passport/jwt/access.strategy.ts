@@ -5,5 +5,5 @@ import { Strategy } from 'passport-jwt';
 @Injectable()
 export class AccessStrategy extends PassportStrategy(Strategy) {
     
-
+    
 } 

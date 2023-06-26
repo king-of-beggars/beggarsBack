@@ -13,6 +13,8 @@ import { CashbookEntity } from './Cashlists/entity/cashbook.entity';
 import { CashListEntity } from './Cashlists/entity/cashList.entity';
 import { CashActivityEntity } from './Cashlists/entity/cashactivity.entity';
 import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
+import { BoardModule } from './Boards/board.module';
+import { CashbookModule } from './Cashlists/cashbook.module';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -41,11 +43,14 @@ import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
                   CashbookEntity,
                   CashListEntity,
                   CashActivityEntity,
-                  CashDetailEntity
+                  CashDetailEntity,
+                  LikeEntity
                   ],
         logging:true
     }),
-    UserModule
+    UserModule,
+    BoardModule,
+    CashbookModule
     // CacheModule.registerAsync({
     //   useFactory : async() => ({
     //       store: await redisStore({
