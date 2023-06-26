@@ -92,16 +92,16 @@ export class UserController {
     @HttpCode(200)
     async kakaoLogin(@Query() code, @Req() req : any) {
         const { user } = req
+        if(!user.userId) {
+            req.res.setHeader('loginSuccess',false)
+            req.res.setHeader('userName',user)
+            return '회원가입을 하세요'
+        }
         let tokenDto = new TokenDto();
         tokenDto.userId = user.userId
         tokenDto.userName = user.userName
         tokenDto.userNickname = user.userNickname
-        if(!tokenDto.userId) {
-            req.res.setHeader('loginSuccess',false)
-            req.res.setHeader('userName',tokenDto.userName)
-            console.log(req.res)
-            return '회원가입을 하세요'
-        }
+        
         const refreshToken = await this.authService.setRefreshToken(tokenDto)
         const accessToken = await this.authService.setAccessToken(tokenDto)
         req.res.setHeader('refreshToken', refreshToken)

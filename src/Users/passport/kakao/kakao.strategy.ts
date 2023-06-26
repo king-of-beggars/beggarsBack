@@ -12,24 +12,25 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
         super({
             //clientID: process.env.KAKAO_ID,
             clientID : '2ad53ec39ebaac5ba8a250967f431977',
-            callbackURL: 'https://poorkingapi.shop/api/user/login/kakao',
+            callbackURL: 'https://poorkingapi.shop/api/user/login/kakao'
         })
 
     }
     async validate(accessToken: string, refreshToken: string, id_token : any, profile: any, done: Function) : Promise<any> {
-            const dbCheck = this.userService.userByName(id_token.id)
+            const user = await this.userService.userByName(id_token.id)
 
             let tokenDto : TokenDto;
-            dbCheck.then((user)=>{
-                tokenDto.userId = user.userId
-                tokenDto.userName = user.userName
-                tokenDto.userNickname = user.userNickname
-                return tokenDto;
-            }).catch((err) => {
-                console.log(err)
-                tokenDto.userName = id_token.id
-                return tokenDto;
-            })
+            if (user) {
+                tokenDto = {
+                  userId: user.userId,
+                  userName: user.userName,
+                  userNickname: user.userNickname,
+                };
+              } else {
+                return id_token.id;
+              }
+          
+              
                               
     }  
 }
