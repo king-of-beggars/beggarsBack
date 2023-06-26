@@ -1,4 +1,4 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query } from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Res, Redirect } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
@@ -89,13 +89,14 @@ export class UserController {
 
     @Get('login/kakao')
     @UseGuards(KakaoAuthenticationGuard)
+    @Redirect('http://localhost:3000')
     @HttpCode(200)
-    async kakaoLogin(@Query() code, @Req() req : any) {
+    async kakaoLogin(@Query() code, @Req() req : any, @Res() res: Response) {
         const { user } = req
         if(!user.userId) {
             req.res.setHeader('loginSuccess',false)
             req.res.setHeader('userName',user)
-            return '회원가입을 하세요'
+            return '로그인 완료'
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)
