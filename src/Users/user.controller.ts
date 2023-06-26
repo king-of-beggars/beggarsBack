@@ -97,13 +97,9 @@ export class UserController {
             req.res.setHeader('userName',user)
             return '회원가입을 하세요'
         }
-        let tokenDto = new TokenDto();
-        tokenDto.userId = user.userId
-        tokenDto.userName = user.userName
-        tokenDto.userNickname = user.userNickname
         
-        const refreshToken = await this.authService.setRefreshToken(tokenDto)
-        const accessToken = await this.authService.setAccessToken(tokenDto)
+        const refreshToken = await this.authService.setRefreshToken(user)
+        const accessToken = await this.authService.setAccessToken(user)
         req.res.setHeader('refreshToken', refreshToken)
         req.res.setHeader('accessToken', accessToken)
         return `로그인 완료`
