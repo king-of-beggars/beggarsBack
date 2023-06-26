@@ -11,7 +11,7 @@ import { CashDetailEntity } from './entity/cashDetail.entity';
 import { CashbookService } from './cashbook.service';
 import { CashbookContoller } from './cashbook.controller';
 import { CashbookEntity } from './entity/cashbook.entity';
-import { CashActivityEntity } from './entity/cashActivity.entity';
+import { CashActivityEntity } from './entity/cashactivity.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity,CashListEntity,CashDetailEntity,CashbookEntity,CashActivityEntity]),

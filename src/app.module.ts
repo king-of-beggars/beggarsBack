@@ -11,7 +11,7 @@ import { CommentEntity } from './Comments/entity/comment.entity';
 import { LikeEntity } from './Comments/entity/like.entity';
 import { CashbookEntity } from './Cashlists/entity/cashbook.entity';
 import { CashListEntity } from './Cashlists/entity/cashList.entity';
-import { CashActivityEntity } from './Cashlists/entity/cashActivity.entity';
+import { CashActivityEntity } from './Cashlists/entity/cashactivity.entity';
 import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
 import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
