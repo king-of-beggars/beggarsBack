@@ -1,7 +1,7 @@
 import { createPublicKey } from 'crypto'
 import UserEntity from 'src/Users/user.entity'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn } from 'typeorm'
-import { CashActivityEntity } from './cashactivity.entity'
+import { CashActivityEntity } from './cashActivity.entity'
 
 @Entity('CashList')
 export class CashListEntity {
