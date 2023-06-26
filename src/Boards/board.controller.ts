@@ -51,9 +51,11 @@ export class BoardController {
     }
 
     @Get(':boardId')
-    async boardDetail(@Param() params) {
-
-
+    async boardDetail(@Param() params : any) {
+        const result = await this.boardService.getBoardDetail(params.boardId)
+        const detail = await this.boardService.getDetailByBoardId(params.boardId)
+        console.log(result)
+        console.log(detail)
     }
 
     //@UseGuards(AccessAuthenticationGuard)

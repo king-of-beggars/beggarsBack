@@ -1,6 +1,7 @@
 import UserEntity from 'src/Users/user.entity'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 import { CashDetailEntity } from './cashDetail.entity'
+import { BoardEntity } from 'src/Boards/entity/board.entity'
 
 @Entity('Cashbook')
 export class CashbookEntity {
@@ -31,4 +32,6 @@ export class CashbookEntity {
 
     @OneToMany(()=>CashDetailEntity, (detail : CashDetailEntity)=> detail.cashbookId)
     public detail? : CashDetailEntity[]; 
+    
+
 }

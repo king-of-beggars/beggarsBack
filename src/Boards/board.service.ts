@@ -40,6 +40,25 @@ export class BoardService {
         .getMany()
 
     }
+
+    async getBoardDetail(boardId : number) {
+        return await this.boardRepository
+        .createQueryBuilder('board')
+        .leftJoin('board.userId','user')
+        .leftJoin('board.comments','comment')
+        .select(['board','comment','cashbook','user.userId','user.userNickname','user.userName'])
+        .where('board.boardId=:boardId',{boardId : boardId})
+        .getOne()
+
+    }
+
+    async getDetailByBoardId(boardId : number) {
+        return await this.boardRepository
+        .createQueryBuilder('board')
+        .innerJoinAndSelect('board.cashbookId','cashbook.cashbookId')
+        .where('board.boardId=:boardId',{boardId : boardId})
+        .getMany()
+    }
     
 
 

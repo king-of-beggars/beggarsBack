@@ -2,6 +2,7 @@ import { createPublicKey } from 'crypto'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm'
 
 import { CashbookEntity } from './cashbook.entity'
+import { BoardEntity } from 'src/Boards/entity/board.entity'
 @Entity('cashDetail')
 export class CashDetailEntity {
     @PrimaryGeneratedColumn()

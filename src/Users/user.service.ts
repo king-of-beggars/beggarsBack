@@ -49,13 +49,6 @@ export class UserService {
         const query = await this.userRepository.findOne({
             where:{userName}
         })
-        console.log(query)
-        if(query===null) {
-            const temp = new UserEntity()
-            temp.userName = userName
-            console.log(`dd${temp}`)
-            return temp
-        }
         return query;
     }
 
