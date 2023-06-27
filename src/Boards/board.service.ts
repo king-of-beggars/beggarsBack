@@ -45,6 +45,7 @@ export class BoardService {
         .createQueryBuilder('board')
         .innerJoinAndSelect('board.cashbookId','cashbook')
         .where('board.boardTypes=:boardTypes', {boardTypes:paginationDTO.boardTypes})
+        .orderBy('board.boardCreatedAt',"DESC")
         .skip((paginationDTO.page-1)*paginationDTO.limit)
         .take(paginationDTO.limit)
         .getMany()

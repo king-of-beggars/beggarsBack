@@ -1,4 +1,4 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Res, Redirect } from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Res, Redirect, PayloadTooLargeException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
@@ -89,14 +89,19 @@ export class UserController {
 
     @Get('login/kakao')
     @UseGuards(KakaoAuthenticationGuard)
-    @Redirect('http://localhost:3000')
     @HttpCode(200)
-    async kakaoLogin(@Query() code, @Req() req : any, @Res() res: Response) {
+    async kakaoLogin(@Query() code, @Req() req : any, @Res() res: any) {
         const { user } = req
+        if(!user.userName) {
+            throw new Error('잘못된 접근입니다')
+        }
         if(!user.userId) {
-            req.res.setHeader('loginSuccess',false)
-            req.res.setHeader('userName',user)
-            return '로그인 완료'
+            const loginSuccess = false
+            await req.res.setHeader('loginSuccess',false)
+            await req.res.setHeader('userName',user)
+            await req.res.setHeader('Set-Cookie', ['mycookie=hello; Samesite=none; domain=http://localhost:3000'])
+            console.log('로그인')
+            return res.redirect(`http://localhost:3000?loginSuccess=${loginSuccess}`)
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)
