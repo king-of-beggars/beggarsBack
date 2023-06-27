@@ -8,6 +8,7 @@ import { LocalAuthenticationGuard } from './passport/local/local.guard'
 import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { SocialSignupDto } from './dto/socialSignup.dto'
+import * as bcrypt from 'bcrypt';
 
 @Controller('/api/user')
 export class UserController {
@@ -68,7 +69,7 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
-    async userLogin(@Req() req : any) {
+    async userLogin(@Req() req : any, @Res() res : any) {
             const { user } = req
             let tokenDto = new TokenDto();
             tokenDto.userId = user.userId
@@ -76,15 +77,27 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            req.res.setHeader('refreshToken', refreshToken)
-            req.res.setHeader('accessToken', accessToken)
-            return `로그인 완료`
+            await res.cookie('acceessToken', accessToken, {
+                host:'https://beggars-front.vercel.app',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            await res.cookie('refreshToken', refreshToken, {
+                host:'https://beggars-front.vercel.app',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            return `data : ${TokenDto}`
     }
 
     @Post('logout')
     @HttpCode(200)
-    async userLogout() {
-        return `로그아웃`
+    async userLogout(@Res() res : any) {
+        res.clearCookie("accessToken")
+        res.clearCookie("refreshToken")
+        return `로그아웃 완료`
     }
 
     @Get('login/kakao')
@@ -97,23 +110,40 @@ export class UserController {
         }
         if(!user.userId) {
             const loginSuccess = false
-            await req.res.setHeader('loginSuccess',false)
-            await req.res.setHeader('userName',user)
-            await req.res.setHeader('Set-Cookie', ['mycookie=hello; Samesite=none; domain=http://localhost:3000'])
+            //await req.res.setHeader('loginSuccess',false)
+            //await req.res.setHeader('userName',user)
+            const userName = await bcrypt.hash(user.userName,12)
+            //await req.res.setHeader('Set-Cookie', ['mycookie=hello; Samesite=none; domain=http://localhost:3000'])
             console.log('로그인')
-            return res.redirect(`http://localhost:3000?loginSuccess=${loginSuccess}`)
+            return res.redirect(`https://beggars-front.vercel.app?loginSuccess=${loginSuccess}&uid=${userName}`)
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)
         const accessToken = await this.authService.setAccessToken(user)
-        req.res.setHeader('refreshToken', refreshToken)
-        req.res.setHeader('accessToken', accessToken)
-        return `로그인 완료`
+        await res.cookie('acceessToken', accessToken, {
+            host:'https://beggars-front.vercel.app',
+            sameSite : 'none',
+            secure : 'true',
+            httpOnly : 'false'
+        })
+        await res.cookie('refreshToken', refreshToken, {
+            host:'https://beggars-front.vercel.app',
+            sameSite : 'none',
+            secure : 'true',
+            httpOnly : 'false'
+        })
+
+        //req.res.setHeader('refreshToken', refreshToken)
+        //req.res.setHeader('accessToken', accessToken)
+        
+        const userInfo = await bcrypt.hash(user,12)
+
+        return res.redirect(`https://beggars-front.vercel.app?info=${userInfo}`)
     }
 
     @Post('signup/social')
     @HttpCode(201)
-    async signupSocial(@Body() SignupDto : SocialSignupDto, @Req() req) {
+    async signupSocial(@Body() SignupDto : SocialSignupDto, @Req() req, @Res() res : any) {
         try {
             const nickCheck = await this.userService.userByNickname(SignupDto.userNickname)
             console.log(nickCheck)
@@ -130,9 +160,19 @@ export class UserController {
 
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            req.res.setHeader('refreshToken', refreshToken)
-            req.res.setHeader('accessToken', accessToken)
-            return '회원가입이 완료됐습니다'
+            await res.cookie('acceessToken', accessToken, {
+                host:'https://beggars-front.vercel.app',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            await res.cookie('refreshToken', refreshToken, {
+                host:'https://beggars-front.vercel.app',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            return res.redirect(`https://beggars-front.vercel.app?info=${userInfo}`)
         } catch(err) {
             throw new Error(err);
         }
