@@ -53,6 +53,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     BoardModule,
     CashbookModule,
+    CommentModule,
     ConfigModule.forRoot({
       isGlobal : true
     })

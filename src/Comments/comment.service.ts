@@ -10,10 +10,12 @@ export class CommentService {
     constructor(
         @InjectRepository(CommentEntity)
         private readonly commentEntity : Repository<CommentEntity>,
+        
         private readonly userService : UserService
     ){}
 
     async postComment(postCommentDto : PostCommentDto) {
+
         const query = this.commentEntity.create(
             postCommentDto
         )
