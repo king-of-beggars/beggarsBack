@@ -53,8 +53,12 @@ export class CashbookService {
         }
     }
 
-    async getCashbookByDate() {
-
+    async getCashbookByDate(date : Date) {
+         return await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .where('DATE(cashbook.cashbookCreatedAt)=:date',{date})
+        .getMany()
+        
     }
 
 }

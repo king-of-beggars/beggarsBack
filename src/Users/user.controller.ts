@@ -1,4 +1,4 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Res, Redirect, PayloadTooLargeException } from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Redirect, PayloadTooLargeException, Res } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
@@ -9,6 +9,7 @@ import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { SocialSignupDto } from './dto/socialSignup.dto'
 import * as bcrypt from 'bcrypt';
+import {Response} from 'express'
 
 @Controller('/api/user')
 export class UserController {
@@ -51,8 +52,10 @@ export class UserController {
 
     @Post('nickCheck')
     @HttpCode(200)
-    async userNickCheck(@Body() body : UserEntity)  {
+    async userNickCheck(@Req() req, @Body() body : UserEntity)  {
+
         try {
+            console.log(req)
             const byNickname = await this.userService.userByNickname(body.userNickname)
             if(!byNickname) {
                 return '사용 가능한 닉네임입니다'
@@ -69,7 +72,7 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
-    async userLogin(@Req() req : any, @Res() res : any) {
+    async userLogin(@Req() req : any, @Res() res : Response) {
             const { user } = req
             let tokenDto = new TokenDto();
             tokenDto.userId = user.userId
@@ -77,19 +80,23 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            await res.cookie('acceessToken', accessToken, {
-                host:'https://beggars-front.vercel.app',
+    
+            res.cookie('accessToken', accessToken, {
+                host:'http://localhost:3000',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
+
             })
-            await res.cookie('refreshToken', refreshToken, {
-                host:'https://beggars-front.vercel.app',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
-            })
-            return `data : ${TokenDto}`
+
+            // await req.res.cookie('refreshToken', refreshToken, {
+            //     //host:'https://beggars-front.vercel.app',
+            //     host:'http://localhost:3000',
+            //     sameSite : 'none',
+            //     secure : 'true',
+            //     httpOnly : 'false'
+            // })
+            return res.send('asdasd')
     }
 
     @Post('logout')
@@ -177,5 +184,15 @@ export class UserController {
             throw new Error(err);
         }
     }
+
+
+    async setCookie(refreshToken : unknown, accessToken : unknown) {
+
+    }
+
+    async getCookie() {
+
+    }
+
 
 }

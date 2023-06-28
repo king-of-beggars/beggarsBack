@@ -5,6 +5,7 @@ import {Repository, In} from 'typeorm'
 import { SignupDto } from './dto/signup.dto'
 import * as bcrypt from 'bcrypt';
 import { SocialSignupDto } from './dto/socialSignup.dto'
+import TokenDto from './dto/token.dto';
 
 @Injectable()
 export class UserService {
@@ -64,6 +65,29 @@ export class UserService {
 
          return query 
         
+    }
+
+    async pointCheck(userId:number) {
+        const result = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.userPoint'])
+        .where('user.userId = :userId', {userId})
+        .getOne()
+        return Number(result.userPoint)
+    }
+
+    async pointInput(point : number) {
+        const userId = 1
+        let userPoint : number = await this.pointCheck(userId)
+        console.log(userPoint)
+        userPoint = userPoint + point
+        console.log(userPoint)
+        return await this.userRepository
+        .createQueryBuilder('user')
+        .update()
+        .set({userPoint:userPoint})
+        .where('userId = :userId',{userId})
+        .execute()
     }
 
 }

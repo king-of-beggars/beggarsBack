@@ -16,6 +16,7 @@ import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
 import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -52,6 +53,9 @@ import { CommentModule } from './Comments/comment.module';
     UserModule,
     BoardModule,
     CashbookModule,
+    ConfigModule.forRoot({
+      isGlobal : true
+    })
     //CommentModule
     // CacheModule.registerAsync({
     //   useFactory : async() => ({

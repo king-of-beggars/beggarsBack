@@ -30,7 +30,7 @@ export class UserEntity {
     @Column({default:0})
     public userType: number;
     
-    @Column({nullable:true})
+    @Column({nullable:true, default:0})
     public userPoint: number;
 
     @Column({nullable:true})

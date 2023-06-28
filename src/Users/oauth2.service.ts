@@ -45,11 +45,12 @@ export class AuthService {
     //액세스 토큰 발급
     async setAccessToken(tokenDto : TokenDto) {
         const accessToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
-            secret : 'kmjpoorking', 
-            expiresIn : '1h'
-            // secret :this.configService.get('ACCESS_KEY'), 
-            // expiresIn : this.configService.get('ACCESS_TIME')
+            secret : process.env.SECRET_KEY, 
+            expiresIn : process.env.ACCESS_TIME
         })
+        console.log(accessToken)
+        const test = await this.jwtService.verify(accessToken,{secret:process.env.SECRET_KEY})
+        console.log(test)
         return `Bearer ${accessToken}`
     }
     
@@ -57,10 +58,8 @@ export class AuthService {
     async setRefreshToken(tokenDto : TokenDto) {
         console.log(`${tokenDto} 213`)
         const refreshToken = this.jwtService.sign(JSON.parse(JSON.stringify(tokenDto)), { 
-            secret : 'kingofpoor', 
-            expiresIn : '7d'
-            // secret :this.configService.get('REFRESH_KEY'), 
-            // expiresIn : this.configService.get('REFRESH_TIME')
+            secret : process.env.SECRET_KEY, 
+            expiresIn : process.env.REFRESH_TIME
         })
         return `Bearer ${refreshToken}`
 

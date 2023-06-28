@@ -14,8 +14,9 @@ export class CashbookContoller {
     //디폴트는 오늘로
     @Get('/')
     async cashList(@Query() query) {
-        const date = query.date
-        
+        const date : Date = query.date
+        const result = this.cashbookService.getCashbookByDate(date)
+        return `data : ${result}`
     }
 
     @Get(':cashbookId')
