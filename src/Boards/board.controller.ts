@@ -38,7 +38,6 @@ export class BoardController {
     }
 
     @Post(':cashbookId')
-    //@UseGuards(AccessAuthenticationGuard)
     async boardInput(@Param() postBoardDto : PostBoardDto, @Body() body : PostBoardDto) {
 
         let boardTypes : number;

@@ -48,9 +48,7 @@ export class AuthService {
             secret : process.env.SECRET_KEY, 
             expiresIn : process.env.ACCESS_TIME
         })
-        console.log(accessToken)
         const test = await this.jwtService.verify(accessToken,{secret:process.env.SECRET_KEY})
-        console.log(test)
         return `Bearer ${accessToken}`
     }
     
