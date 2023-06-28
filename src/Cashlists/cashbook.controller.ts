@@ -3,6 +3,7 @@ import { CashbookService } from './cashbook.service';
 import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
 import { CashbookEntity } from './entity/cashbook.entity';
+import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
 
 @Controller('api/cashbook')
 export class CashbookContoller {
@@ -13,6 +14,7 @@ export class CashbookContoller {
 
     //디폴트는 오늘로
     @Get('/')
+    @UseGuards(AccessAuthenticationGuard)
     async cashList(@Query() query) {
         const date : Date = query.date
         const result = this.cashbookService.getCashbookByDate(date)

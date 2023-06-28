@@ -29,6 +29,7 @@ export class BoardService {
             throw new Error('한 게시글에 칭찬/싫어요를 2개 등록할 수 없습니다')
         })
     } 
+
     async deleteByboardId(boardId : number) {
         try {
             return this.boardRepository.createQueryBuilder()
@@ -41,15 +42,20 @@ export class BoardService {
     }
 
     async getListAll(paginationDTO : PaginationDto) {
-        return await this.boardRepository
+        const result =  await this.boardRepository
         .createQueryBuilder('board')
-        .innerJoinAndSelect('board.cashbookId','cashbook')
+        .leftJoin('board.cashbookId','cashbook')
+        //.innerJoinAndSelect('cashbookId.cashbookId','cashdetail')
+        .leftJoin('board.userId','user')
+        .select(['board','cashbook','user.userNickname','user.userName'])
         .where('board.boardTypes=:boardTypes', {boardTypes:paginationDTO.boardTypes})
         .orderBy('board.boardCreatedAt',"DESC")
         .skip((paginationDTO.page-1)*paginationDTO.limit)
         .take(paginationDTO.limit)
         .getMany()
 
+        console.log(result)
+        return result;
     }
 
     async getBoardDetail(boardId : number) {
@@ -72,8 +78,6 @@ export class BoardService {
         const cashbookId  = boards.cashbookId.cashbookId
         return await this.cashbookService.getcashbookAndDetail(cashbookId)
         
-    }
-    
-
+    }   
 
 }

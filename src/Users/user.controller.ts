@@ -82,13 +82,12 @@ export class UserController {
             const accessToken = await this.authService.setAccessToken(tokenDto)
     
             res.cookie('accessToken', accessToken, {
-                host:'http://localhost:3000',
+                host:'https://beggars-front.vercel.app/',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
-
             })
-
+            res.setHeader('useName', user)
             // await req.res.cookie('refreshToken', refreshToken, {
             //     //host:'https://beggars-front.vercel.app',
             //     host:'http://localhost:3000',
@@ -96,7 +95,7 @@ export class UserController {
             //     secure : 'true',
             //     httpOnly : 'false'
             // })
-            return res.send('asdasd')
+            return res.redirect('https://beggars-front.vercel.app')
     }
 
     @Post('logout')
