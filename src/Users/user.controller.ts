@@ -10,6 +10,7 @@ import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { SocialSignupDto } from './dto/socialSignup.dto'
 import * as bcrypt from 'bcrypt';
 import {Response} from 'express'
+import {HttpStatus} from 'httpstatus'
 
 @Controller('/api/user')
 export class UserController {
@@ -80,22 +81,26 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-    
             res.cookie('accessToken', accessToken, {
-                host:'https://beggars-front.vercel.app/',
+                host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
-            res.setHeader('useName', user)
-            // await req.res.cookie('refreshToken', refreshToken, {
-            //     //host:'https://beggars-front.vercel.app',
+            // await res.setHeader('user', user, {
             //     host:'http://localhost:3000',
             //     sameSite : 'none',
             //     secure : 'true',
             //     httpOnly : 'false'
             // })
-            return res.redirect('https://beggars-front.vercel.app')
+            // await req.res.cookie('refreshToken', refreshToken, {
+            //     //host:'https://beggars-front.vercel.app',
+            //     host:'http://localhost:3000',
+            //     sameSite : 'none',
+            //     secure : 'true', 
+            //     httpOnly : 'false'
+            // })
+            return res.json({user:user})
     }
 
     @Post('logout')
