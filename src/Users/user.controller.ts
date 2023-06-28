@@ -107,7 +107,9 @@ export class UserController {
                 secure : 'true',
                 httpOnly : 'false'
             })
-            res.setHeader('userNickname', user.userNickname, {
+            
+            const nickname : string = await this.userService.hashNick(user.userNickname)
+            res.setHeader('userNickname', nickname, {
                 host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',
