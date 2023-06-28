@@ -90,4 +90,9 @@ export class UserService {
         .execute()
     }
 
+    async hashNick(nickname:string) {
+
+        return await bcrypt.hash(nickname,10)
+    }
+
 }
