@@ -88,12 +88,8 @@ export class UserController {
                 secure : 'true',
                 httpOnly : 'false'
             })
-            await res.setHeader('user', user, {
-                host:'http://localhost:3000',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
-            })
+            await res.setHeader('user', [user.userId,user.userName,user.userNickname])
+            
             // await req.res.cookie('refreshToken', refreshToken, {
             //     //host:'https://beggars-front.vercel.app',
             //     host:'http://localhost:3000',
