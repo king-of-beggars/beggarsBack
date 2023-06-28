@@ -101,8 +101,18 @@ export class UserController {
                 secure : 'true',
                 httpOnly : 'false'
             })
-            res.setHeader('userId', user.userId)
-            res.setHeader('userNickname', user.userNickname)
+            res.setHeader('userId', user.userId, {
+                host:'http://localhost:3000/',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            res.setHeader('userNickname', user.userNickname, {
+                host:'http://localhost:3000/',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
             // await req.res.cookie('refreshToken', refreshToken, {
             //     //host:'https://beggars-front.vercel.app',
             //     host:'http://localhost:3000',
