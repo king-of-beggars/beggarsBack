@@ -17,6 +17,7 @@ export class UserController {
     constructor(private readonly userService: UserService,
                 private readonly authService: AuthService
         ) {}
+    
 
     @Post('signup')
     @HttpCode(201)
@@ -69,7 +70,7 @@ export class UserController {
         }
     }
 
-    
+
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
@@ -81,18 +82,18 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            res.cookie('accessToken', accessToken, {
+            await res.cookie('accessToken', accessToken, {
                 host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
-            // await res.setHeader('user', user, {
-            //     host:'http://localhost:3000',
-            //     sameSite : 'none',
-            //     secure : 'true',
-            //     httpOnly : 'false'
-            // })
+            await res.setHeader('user', user, {
+                host:'http://localhost:3000',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
             // await req.res.cookie('refreshToken', refreshToken, {
             //     //host:'https://beggars-front.vercel.app',
             //     host:'http://localhost:3000',
@@ -100,7 +101,7 @@ export class UserController {
             //     secure : 'true', 
             //     httpOnly : 'false'
             // })
-            return res.json({user:user})
+            return res.redirect('http://localhost:3000')
     }
 
     @Post('logout')
