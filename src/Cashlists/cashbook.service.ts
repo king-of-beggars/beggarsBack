@@ -61,4 +61,10 @@ export class CashbookService {
         
     }
 
+    async addValue(value : number) {
+         this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .update()
+    }
+
 }
