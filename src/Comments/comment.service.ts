@@ -6,12 +6,16 @@ import { PostCommentDto } from "./dto/postComment.dto";
 import UserEntity from "src/Users/user.entity";
 import { UserService } from "src/Users/user.service";
 import { EntityManager } from "typeorm";
+import { LikeEntity } from "./entity/like.entity";
 
 @Injectable()
 export class CommentService {
     constructor(
         @InjectRepository(CommentEntity)
         private readonly commentEntity : Repository<CommentEntity>,
+
+        @InjectRepository(LikeEntity)
+        private readonly likeEntity : Repository<LikeEntity>,
         
         private readonly userService : UserService,
 
@@ -41,4 +45,12 @@ export class CommentService {
 
 
     }
+
+    // async postLike(userId : UserEntity, commentId : CommentEntity) {
+    //     this.likeEntity.create({
+    //         userId : userId,
+    //         commentId : commentId
+    //     })
+
+    // }
 }

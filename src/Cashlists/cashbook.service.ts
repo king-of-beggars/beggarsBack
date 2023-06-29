@@ -4,6 +4,8 @@ import { CashDetailEntity } from "./entity/cashDetail.entity";
 import { CashbookEntity } from "./entity/cashbook.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PostDetailDto } from "./dto/postDetail.dto";
+import UserEntity from "src/Users/user.entity";
+import { ValueUpdateDto } from "./dto/valueUpdate.dto";
 
 @Injectable()
 export class CashbookService {
@@ -25,7 +27,7 @@ export class CashbookService {
         
     }
 
-    async getDetail(cashbookId : number) {
+    async getDetail(cashbookId : number) : Promise<CashDetailEntity[]> {
 
         return await this.cashDetailEntity
         .createQueryBuilder('cashDetail')
@@ -34,7 +36,7 @@ export class CashbookService {
         .getMany()
     }
 
-    async postDetail(postDetailDto : PostDetailDto) {
+    async postDetail(postDetailDto : PostDetailDto) : Promise<any> {
         const query = this.cashDetailEntity
         .create(
             postDetailDto
@@ -42,7 +44,7 @@ export class CashbookService {
         return await this.cashDetailEntity.save(query)
     }
 
-    async deleteDetail(cashDetailId : number) {
+    async deleteDetail(cashDetailId : CashDetailEntity) : Promise<any> {
         try {
             return this.cashDetailEntity
             .createQueryBuilder('cashDetail')
@@ -53,18 +55,44 @@ export class CashbookService {
         }
     }
 
-    async getCashbookByDate(date : Date) {
+    async getCashbookByDate(date : Date, userId : UserEntity) : Promise<CashbookEntity[]> {
          return await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .where('DATE(cashbook.cashbookCreatedAt)=:date',{date})
+        .andWhere('cashbook.userId=:userId',{userId})
+        .orderBy('cashbook.cashbookCreatedAt','DESC')
         .getMany()
         
     }
 
-    async addValue(value : number) {
-         this.cashbookEntity
+    async addValue(valueUpdate : ValueUpdateDto) {
+         await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .update()
+        .set({cashbookNowValue : () => `cashbookNowValue + ${valueUpdate.cashDetailValue}`})
+        .where('cashbookId=:cashbookId',{cashbookId : valueUpdate.cashbookId})
+        .execute()
+    }
+
+    async getCashbookDuringDate(endDate : Date, userId : UserEntity) {
+        const day : number = endDate.getDay() + 1 + 7
+        const startDate = new Date(endDate.getDate() - day)
+        return await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .select()
+        .where('cashbookCreatedAt > :startDate',{startDate})
+        .andWhere('cashbookCreatedAt <= :endDate',{endDate})
+        .andWhere('cashbook.userId=:userId',{userId})
+        .getMany()
+
+    }
+
+    async getOneDetail(cashDetailId : CashDetailEntity) {
+        return await this.cashDetailEntity
+        .createQueryBuilder('cashDetail')
+        .select()
+        .where('cashDetailId=:cashDetailId',{cashDetailId})
+        .getOne()
     }
 
 }
