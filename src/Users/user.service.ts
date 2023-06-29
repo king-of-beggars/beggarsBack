@@ -47,9 +47,12 @@ export class UserService {
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
         }
-        const query = await this.userRepository.findOne({
-            where:{userName}
-        })
+        const query = await this.userRepository
+                     .createQueryBuilder('user')
+                     .select(['user.userId','user.userName','user.userNickname'])
+                     .where('user.userName=:userName', {userName})
+                     .getOne()
+        console.log(query)
         return query;
     }
 
@@ -90,9 +93,23 @@ export class UserService {
         .execute()
     }
 
-    async hashNick(nickname:string) {
+    async encodeNick(nickname:string) {
+        return encodeURIComponent(nickname)
+    }
 
-        return await bcrypt.hash(nickname,10)
+    async userSignupDate(userId : UserEntity) {
+        const now : string = new Date().toISOString().split('T')[0]
+        const nowdate = new Date(now)    
+        let date = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.userCreatedAt'])
+        .where('user.userId=:userId',{userId})
+        .getOne()
+        const tempdate : string = new Date(date.userCreatedAt).toISOString().split('T')[0]
+        const signupdate : Date = new Date(tempdate)
+        const diffDate = nowdate.getTime() - signupdate.getTime()
+        return Math.abs(diffDate / (1000*60*60*24))
+
     }
 
 }

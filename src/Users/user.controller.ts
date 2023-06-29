@@ -23,22 +23,31 @@ export class UserController {
     @HttpCode(201)
     async userSignup(@Body() SignupDto : SignupDto, @Req() req, @Res() res : Response) {
         try {
-            const userInfo = await this.userService.userSignup(SignupDto)
+            const user = await this.userService.userSignup(SignupDto)
             let tokenDto = new TokenDto();
-            tokenDto.userId = userInfo.userId
-            tokenDto.userName = userInfo.userId
-            tokenDto.userNickname = userInfo.userNickname
+            tokenDto.userId = user.userId
+            tokenDto.userName = user.userName
+            tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            await res.cookie('accessToken', accessToken, {
+            res.cookie('refreshToken', refreshToken, {
                 host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
-            res.setHeader('userId', userInfo.userId)
-            res.setHeader('userNickname', userInfo.userNickname)
-            return '회원가입이 완료됐습니다'
+
+            res.cookie('accessToken', accessToken, {
+                host:'http://localhost:3000/',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            res.setHeader('userId', user.userId)
+            
+            const nickname : string = await this.userService.encodeNick(user.userNickname)
+            res.setHeader('userNickname', nickname)
+            res.send('회원가입이 완료되었습니다')
         } catch(err) {
             throw new Error(err);
         }
@@ -101,27 +110,10 @@ export class UserController {
                 secure : 'true',
                 httpOnly : 'false'
             })
-            res.setHeader('userId', user.userId, {
-                host:'http://localhost:3000/',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
-            })
+            res.setHeader('userId', user.userId)
             
-            const nickname : string = await this.userService.hashNick(user.userNickname)
-            res.setHeader('userNickname', nickname, {
-                host:'http://localhost:3000/',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
-            })
-            // await req.res.cookie('refreshToken', refreshToken, {
-            //     //host:'https://beggars-front.vercel.app',
-            //     host:'http://localhost:3000',
-            //     sameSite : 'none',
-            //     secure : 'true', 
-            //     httpOnly : 'false'
-            // })
+            const nickname : string = await this.userService.encodeNick(user.userNickname)
+            res.setHeader('userNickname', nickname)
             //return res.redirect('http://localhost:3000')
             res.send('완료')
     }
@@ -155,23 +147,25 @@ export class UserController {
         
         const refreshToken = await this.authService.setRefreshToken(user)
         const accessToken = await this.authService.setAccessToken(user)
-        await res.cookie('acceessToken', accessToken, {
-            host:'http://localhost:3000',
-            sameSite : 'none',
-            secure : 'true',
-            httpOnly : 'false'
-        })
-        await res.cookie('refreshToken', refreshToken, {
-            host:'http://localhost:3000',
+        res.cookie('refreshToken', refreshToken, {
+            host:'http://localhost:3000/',
             sameSite : 'none',
             secure : 'true',
             httpOnly : 'false'
         })
 
+        res.cookie('accessToken', accessToken, {
+            host:'http://localhost:3000/',
+            sameSite : 'none',
+            secure : 'true',
+            httpOnly : 'false'
+        })
         res.setHeader('userId', user.userId)
-        res.setHeader('userNickname', user.userNickname)
         
-        const userInfo = await bcrypt.hash(user,12)
+        const nickname : string = await this.userService.encodeNick(user.userNickname)
+        res.setHeader('userNickname', nickname)
+        
+      
 
         return res.redirect(`https://localhost:3000`)
     }
@@ -187,42 +181,35 @@ export class UserController {
             }
             SignupDto.userLoginType = 'kakao'
             SignupDto.userType = 1
-            const userInfo = await this.userService.socialSignup(SignupDto)
+            const user = await this.userService.socialSignup(SignupDto)
             let tokenDto = new TokenDto();
-            tokenDto.userId = userInfo.userId
-            tokenDto.userName = userInfo.userName
-            tokenDto.userNickname = userInfo.userNickname
+            tokenDto.userId = user.userId
+            tokenDto.userName = user.userName
+            tokenDto.userNickname = user.userNickname
 
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            await res.cookie('acceessToken', accessToken, {
-                host:'https://beggars-front.vercel.app',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
-            })
-            await res.cookie('refreshToken', refreshToken, {
-                host:'https://beggars-front.vercel.app',
+            res.cookie('refreshToken', refreshToken, {
+                host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
 
-            res.setHeader('userId', userInfo.userId)
-            res.setHeader('userNickname', userInfo.userNickname)
+            res.cookie('accessToken', accessToken, {
+                host:'http://localhost:3000/',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            res.setHeader('userId', user.userId)
+            
+            const nickname : string = await this.userService.encodeNick(user.userNickname)
+            res.setHeader('userNickname', nickname)
             return res.redirect(`http://localhost:3000`)
         } catch(err) {
             throw new Error(err);
         }
-    }
-
-
-    async setCookie(refreshToken : unknown, accessToken : unknown) {
-
-    }
-
-    async getCookie() {
-
     }
 
 

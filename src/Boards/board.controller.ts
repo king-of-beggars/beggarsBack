@@ -60,10 +60,10 @@ export class BoardController {
 
     @Get(':boardId')
     @UseGuards(AccessAuthenticationGuard)
-    async boardDetail(@Param() params : any) {
+    async boardDetail(@Param() params : any, @Req() req) {
+        console.log(req)
         //주요정보
         const result = await this.boardService.getBoardDetail(params.boardId)
-        console.log(result)
         //디테일
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
         result['cashbookDetail'] = detail

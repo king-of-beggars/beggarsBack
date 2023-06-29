@@ -1,10 +1,13 @@
-import { Controller, Post, Delete } from "@nestjs/common";
+import { Controller, Post, Delete, Param, Req, Body } from "@nestjs/common";
+import { CommentEntity } from "./entity/comment.entity";
 
 @Controller('api/like')
 export class LikeController {
 
     @Post(':commentId')
-    async postLike() {
+    async postLike(@Param() params : CommentEntity, @Req() req : any) {
+        let { user } = req
+        
 
     }
 

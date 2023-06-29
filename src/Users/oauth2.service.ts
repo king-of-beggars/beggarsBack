@@ -49,7 +49,7 @@ export class AuthService {
             expiresIn : process.env.ACCESS_TIME
         })
         const test = await this.jwtService.verify(accessToken,{secret:process.env.SECRET_KEY})
-        return `Bearer ${accessToken}`
+        return `${accessToken}`
     }
     
     //리프레시 토큰 발급
@@ -59,7 +59,7 @@ export class AuthService {
             secret : process.env.SECRET_KEY, 
             expiresIn : process.env.REFRESH_TIME
         })
-        return `Bearer ${refreshToken}`
+        return `${refreshToken}`
 
     }
     

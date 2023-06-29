@@ -75,6 +75,9 @@ export class BoardService {
         .leftJoinAndSelect('board.cashbookId','cashbook')
         .where('board.boardId=:boardId',{boardId : boardId})
         .getOne()
+        if(!boards) {
+            throw new Error('매칭되는 데이터가 없습니다')
+        }
         const cashbookId  = boards.cashbookId.cashbookId
         return await this.cashbookService.getcashbookAndDetail(cashbookId)
         
