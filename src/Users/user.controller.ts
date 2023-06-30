@@ -11,6 +11,7 @@ import { SocialSignupDto } from './dto/socialSignup.dto'
 import * as bcrypt from 'bcrypt';
 import {Response} from 'express'
 import {HttpStatus} from 'httpstatus'
+import { AccessAuthenticationGuard } from './passport/jwt/access.guard';
 
 @Controller('/api/user')
 export class UserController {
@@ -69,6 +70,7 @@ export class UserController {
 
     @Post('nickCheck')
     @HttpCode(200)
+    @UseGuards(AccessAuthenticationGuard)
     async userNickCheck(@Req() req, @Body() body : UserEntity)  {
 
         try {
@@ -140,9 +142,14 @@ export class UserController {
             //await req.res.setHeader('userName',user)
             res.setHeader('userNaming', user.userName)
             res.setHeader('loginSuccess', 'false')
-            //await req.res.setHeader('Set-Cookie', ['mycookie=hello; Samesite=none; domain=http://localhost:3000'])
             console.log('로그인')
-            return res.redirect(`http://localhost:3000`)
+            res.cookie('userName', user.userName, {
+                host:'http://localhost:3000/',
+                sameSite : 'none',
+                secure : 'true',
+                httpOnly : 'false'
+            })
+            return res.redirect(`http://localhost:3000?loginSuccess=false`)
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)

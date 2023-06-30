@@ -95,12 +95,14 @@ export class CashbookService {
         startDate.setDate(endDate.getDate() - day)
         const query = await this.cashbookEntity
         .createQueryBuilder('cashbook')
-        .select(['cashbook.cashbookCreatedAt','cashbook.cashbookNowValue','cashbook.cashbookGoalValue'])
+        .select(['DATE(cashbook.cashbookCreatedAt)','SUM(cashbook.cashbookNowValue)','SUM(cashbook.cashbookGoalValue)'])
         .where('cashbook.cashbookCreatedAt > :startDate',{startDate})
         .andWhere('cashbook.cashbookCreatedAt <= :endDate',{endDate})
         .andWhere('cashbook.userId=:userId',{userId})
         .orderBy('cashbook.cashbookCreatedAt','DESC')
+        .groupBy('DATE(cashbook.cashbookCreatedAt)')
         .getMany()
+        console.log(query)
         let array = new Array(14).fill(null)
         let result = array.map((_, e)=>{
             let date = new Date()
@@ -117,9 +119,7 @@ export class CashbookService {
             console.log(querydate)
             query[i].cashbookGoalValue >=query[i].cashbookNowValue ? trueResult[querydate] = true : trueResult[querydate] = false
         }
-
         return trueResult;
-        
     }
 
     async getOneDetail(cashDetailId : CashDetailEntity) : Promise<CashDetailEntity> {
