@@ -23,14 +23,14 @@ export class BoardController {
     
         paginationDto.boardTypes = 1
         const result = this.boardService.getListAll(paginationDto)
-        return `data : ${result}`
+        return result
     }
 
     @Get('goodjob')
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
         const result = await this.boardService.getListAll(paginationDto)
-        return `data : ${result}`
+        return result
     }
 
     @Post(':cashbookId')
