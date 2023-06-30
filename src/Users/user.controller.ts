@@ -70,7 +70,6 @@ export class UserController {
 
     @Post('nickCheck')
     @HttpCode(200)
-    @UseGuards(AccessAuthenticationGuard)
     async userNickCheck(@Req() req, @Body() body : UserEntity)  {
 
         try {
