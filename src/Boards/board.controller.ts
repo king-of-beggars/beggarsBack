@@ -22,19 +22,15 @@ export class BoardController {
     async nowayList(@Query() paginationDto : PaginationDto) {
     
         paginationDto.boardTypes = 1
-        this.boardService.getListAll(paginationDto)
-        .then((result)=>{
-            return `data: ${result}`})
-        .catch((e)=>{throw new Error('잘못된 요청(페이지,리미트) 입니다')})
+        const result = this.boardService.getListAll(paginationDto)
+        return `data : ${result}`
     }
 
     @Get('goodjob')
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
-        this.boardService.getListAll(paginationDto)
-        .then((result)=>{
-            return `data: ${result}`})
-        .catch((e)=>{throw new Error('잘못된 요청(페이지,리미트) 입니다')})
+        const result = await this.boardService.getListAll(paginationDto)
+        return `data : ${result}`
     }
 
     @Post(':cashbookId')
