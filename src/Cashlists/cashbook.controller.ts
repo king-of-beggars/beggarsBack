@@ -68,7 +68,7 @@ export class CashbookContoller {
     async cashList(@Query() query, @Req() req : any) {
         //const { user } = req
         const date : Date = query.date
-        const result = this.cashbookService.getCashbookByDate(date,4)
+        const result = this.cashbookService.getCashbookByDate(date,1)
         return result
     }
 
