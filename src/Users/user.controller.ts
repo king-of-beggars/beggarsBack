@@ -32,14 +32,14 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
             res.cookie('refreshToken', refreshToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
 
             res.cookie('accessToken', accessToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
@@ -99,14 +99,14 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
             res.cookie('refreshToken', refreshToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
 
             res.cookie('accessToken', accessToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
@@ -141,25 +141,25 @@ export class UserController {
             //await req.res.setHeader('loginSuccess',false)
             //await req.res.setHeader('userName',user)
             res.cookie('userName', user, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
-            return res.redirect(`http://localhost:3000?loginSuccess=false`)
+            return res.redirect(`https://beggars-front.vercel.app?loginSuccess=false`)
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)
         const accessToken = await this.authService.setAccessToken(user)
         res.cookie('refreshToken', refreshToken, {
-            host:'http://localhost:3000/',
+            host:'https://beggars-front.vercel.app',
             sameSite : 'none',
             secure : 'true',
             httpOnly : 'false'
         })
 
         res.cookie('accessToken', accessToken, {
-            host:'http://localhost:3000/',
+            host:'https://beggars-front.vercel.app',
             sameSite : 'none',
             secure : 'true',
             httpOnly : 'false'
@@ -169,7 +169,7 @@ export class UserController {
         const nickname : string = await this.userService.encodeNick(user.userNickname)
         res.setHeader('userNickname', nickname)
         
-        return res.redirect(`https://localhost:3000`)
+        return res.redirect(`https://beggars-front.vercel.app`)
     }
 
     @Post('signup/social')
@@ -192,14 +192,14 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
             res.cookie('refreshToken', refreshToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
             })
 
             res.cookie('accessToken', accessToken, {
-                host:'http://localhost:3000/',
+                host:'https://beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : 'true',
                 httpOnly : 'false'
@@ -208,7 +208,7 @@ export class UserController {
             
             const nickname : string = await this.userService.encodeNick(user.userNickname)
             res.setHeader('userNickname', nickname)
-            return res.redirect(`http://localhost:3000`)
+            return res.redirect(`https://beggars-front.vercel.app`)
         } catch(err) {
             throw new Error(err);
         }
