@@ -100,16 +100,16 @@ export class UserController {
             const accessToken = await this.authService.setAccessToken(tokenDto)
             res.cookie('refreshToken', refreshToken, {
                 host:'https://beggars-front.vercel.app',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
+                sameSite : 'None',
+                secure : 'True',
+                httpOnly : 'False'
             })
 
             res.cookie('accessToken', accessToken, {
                 host:'https://beggars-front.vercel.app',
-                sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
+                sameSite : 'None',
+                secure : 'True',
+                httpOnly : 'False'
             })
             res.setHeader('userId', user.userId)
             
