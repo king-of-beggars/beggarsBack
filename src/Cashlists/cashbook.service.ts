@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Repository, Join } from "typeorm";
+import { Repository, Join  } from "typeorm";
 import { CashDetailEntity } from "./entity/cashDetail.entity";
 import { CashbookEntity } from "./entity/cashbook.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectRepository ,  } from "@nestjs/typeorm";
 import { PostDetailDto } from "./dto/postDetail.dto";
 import UserEntity from "src/Users/user.entity";
 import { ValueUpdateDto } from "./dto/valueUpdate.dto";
@@ -95,14 +95,14 @@ export class CashbookService {
         startDate.setDate(endDate.getDate() - day)
         const query = await this.cashbookEntity
         .createQueryBuilder('cashbook')
-        .select(['DATE(cashbook.cashbookCreatedAt) as Date','SUM(cashbook.cashbookNowValue)','SUM(cashbook.cashbookGoalValue)'])
-        .where('cashbook.cashbookCreatedAt > :startDate',{startDate})
-        .andWhere('cashbook.cashbookCreatedAt <= :endDate',{endDate})
-        .andWhere('cashbook.userId=:userId',{userId})
-        .orderBy('cashbook.cashbookCreatedAt','DESC')
-        .groupBy('Date')
+        .select(['date(cashbookCreatedAt) as cashbookCreatedAt','cashbookCategory','SUM(cashbookNowValue) as cashbookNowValue','SUM(cashbookGoalValue) as cashbookGoalValue'])
+        .where('cashbookCreatedAt > :startDate',{startDate})
+        .andWhere('cashbookCreatedAt <= :endDate',{endDate})
+        .andWhere('userId=:userId',{userId})
+        .groupBy('date(cashbookCreatedAt)')
+        .addGroupBy('cashbookCategory')
         .getMany()
-        console.log(query)
+        console.log(`####${query}`)
         let array = new Array(14).fill(null)
         let result = array.map((_, e)=>{
             let date = new Date()
