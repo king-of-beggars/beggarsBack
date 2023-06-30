@@ -69,7 +69,7 @@ export class CashbookContoller {
         const { user } = req
         const date : Date = query.date
         const result = this.cashbookService.getCashbookByDate(date,user.userId)
-        return `data : ${result}`
+        return result
     }
 
     @Get(':cashbookId')
@@ -80,7 +80,7 @@ export class CashbookContoller {
 
             throw new Error('정상적으로 불러올 수 없습니다')
         }
-        return `data : ${result}`
+        return result
     }
 
     @Post(":cashDetailId")

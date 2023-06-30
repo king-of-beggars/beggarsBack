@@ -62,9 +62,7 @@ export class BoardController {
         //디테일
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
         result['cashbookDetail'] = detail
-        return `
-        data : ${result}
-        `
+        return result
     }
 
     //@UseGuards(AccessAuthenticationGuard)
