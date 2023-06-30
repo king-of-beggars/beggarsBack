@@ -10,29 +10,27 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './passport/local/local.strategy';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { AccessStrategy } from './passport/jwt/access.strategy';
+import { NaverStrategy } from './passport/naver/naver.strategy';
 // import { RedisService } from './redis.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
     PassportModule,
     JwtModule.register({
-      secret : process.env.SECRET_KEY
-    })
+      secret: process.env.SECRET_KEY,
+    }),
   ],
-  controllers: [UserController], 
+  controllers: [UserController],
   providers: [
-    UserService, 
-    AuthService, 
+    UserService,
+    AuthService,
     JwtService,
     ConfigService,
     LocalStrategy,
     KakaoStrategy,
     AccessStrategy,
-  ], 
-  exports: [
-    UserService, 
-    AuthService, 
-    JwtService,
+    NaverStrategy,
   ],
-}) 
-export class UserModule {}   
+  exports: [UserService, AuthService, JwtService],
+})
+export class UserModule {}
