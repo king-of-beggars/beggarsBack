@@ -18,7 +18,8 @@ export class BoardController {
         private readonly userService : UserService
     ){}
 
-    @Get('noway')
+    
+    @Post('noway')
     async nowayList(@Query() paginationDto : PaginationDto) {
     
         paginationDto.boardTypes = 1
@@ -26,7 +27,8 @@ export class BoardController {
         return result
     }
 
-    @Get('goodjob')
+
+    @Post('goodjob')
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
         const result = await this.boardService.getListAll(paginationDto)

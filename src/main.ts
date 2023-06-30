@@ -1,11 +1,11 @@
 require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookie from 'cookie-parser'
+let cookieParser = require('cookie-parser')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors:true});
-  app.use(cookie())
+  app.use(cookieParser())
   app.enableCors({
     origin : [
     'http://localhost:3000',
