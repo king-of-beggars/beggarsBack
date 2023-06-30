@@ -54,7 +54,6 @@ export class BoardController {
     }
 
     @Get(':boardId')
-    @UseGuards(AccessAuthenticationGuard)
     async boardDetail(@Param() params : any, @Req() req) {
         console.log(req)
         //주요정보

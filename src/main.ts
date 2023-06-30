@@ -15,7 +15,7 @@ async function bootstrap() {
     ],
     credentials:true,
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    exposedHeaders : ['Set-Cookie','userId','userNickname']
+    exposedHeaders : ['Set-Cookie','userId','userNickname'],
   });
   await app.listen(3000);
 }

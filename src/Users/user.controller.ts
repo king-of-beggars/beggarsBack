@@ -102,14 +102,16 @@ export class UserController {
                 host:'https://beggars-front.vercel.app',
                 sameSite : 'None',
                 secure : 'True',
-                httpOnly : 'False'
+                httpOnly : 'False',
+                path : '/'
             })
 
             res.cookie('accessToken', accessToken, {
                 host:'https://beggars-front.vercel.app',
                 sameSite : 'None',
                 secure : 'True',
-                httpOnly : 'False'
+                httpOnly : 'False',
+                path : '/'
             })
             res.setHeader('userId', user.userId)
             
