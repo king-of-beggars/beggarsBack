@@ -121,7 +121,12 @@ export class UserController {
 
     @Post('logout')
     @HttpCode(200)
-    async userLogout(@Res() res : Response) {
+    @UseGuards(AccessAuthenticationGuard)
+    async userLogout(@Req() req : any ,@Res() res : Response) {
+        const { user } = req
+        console.log('#############',user)
+        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        console.log(req)
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         return `로그아웃 완료`
@@ -147,7 +152,7 @@ export class UserController {
                 httpOnly : 'false'
             })
 
-            res.setHeader('Set-Cookie',`userName=${user}; Path=/; host=https://beggars-front.vercel.app; sameSite=none; secure=true; httpOnly=false;`)
+            res.setHeader('Set-Cookie',`userName=${user}; Path=/; host=https://beggars-front.vercel.app; sameSite=None; secure=true; httpOnly=false;`)
             return res.redirect(`https://beggars-front.vercel.app?loginSuccess=false`)
         }
         

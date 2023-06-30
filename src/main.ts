@@ -13,9 +13,9 @@ async function bootstrap() {
     'https://beggars-front.vercel.app',
     'https://https://www.thunderclient.com'
     ],
+    credentials:true,
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    exposedHeaders : ['Set-Cookie','userId','userNickname'],
-    credentials:true
+    exposedHeaders : ['Set-Cookie','userId','userNickname']
   });
   await app.listen(3000);
 }
