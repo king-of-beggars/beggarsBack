@@ -146,6 +146,9 @@ export class UserController {
                 secure : 'true',
                 httpOnly : 'false'
             })
+
+            res.setHeader('Set-Cookie',`userName=${user}; Path=/; host=https://beggars-front.vercel.app;
+            sameSite=none; secure=true; httpOnly=false;`)
             return res.redirect(`https://beggars-front.vercel.app?loginSuccess=false`)
         }
         
@@ -178,7 +181,6 @@ export class UserController {
         console.log('#######',req)
         console.log('#######',res)
         try {
-            { }
             const nickCheck = await this.userService.userByNickname(body.userNickname)
             console.log(nickCheck)
             if(nickCheck) {
