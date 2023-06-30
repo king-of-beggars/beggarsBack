@@ -66,9 +66,9 @@ export class CashbookContoller {
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
     async cashList(@Query() query, @Req() req : any) {
-        const { user } = req
+        //const { user } = req
         const date : Date = query.date
-        const result = this.cashbookService.getCashbookByDate(date,user.userId)
+        const result = this.cashbookService.getCashbookByDate(date,4)
         return result
     }
 
