@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Repository, Join  } from "typeorm";
+import { Repository, Join ,EntityManager , QueryBuilder } from "typeorm";
 import { CashDetailEntity } from "./entity/cashDetail.entity";
 import { CashbookEntity } from "./entity/cashbook.entity";
-import { InjectRepository ,  } from "@nestjs/typeorm";
+import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { PostDetailDto } from "./dto/postDetail.dto";
 import UserEntity from "src/Users/user.entity";
 import { ValueUpdateDto } from "./dto/valueUpdate.dto";
@@ -20,7 +20,9 @@ export class CashbookService {
         @InjectRepository(CashListEntity)
         private readonly cashListEntity : Repository<CashListEntity>,
         @InjectRepository(CashActivityEntity)
-        private readonly cashactivityEntity : Repository<CashActivityEntity>
+        private readonly cashactivityEntity : Repository<CashActivityEntity>,
+        @InjectEntityManager()
+        private entityManager : EntityManager
     ){}
 
     async getcashbookAndDetail(cashbookId : unknown) : Promise<CashbookEntity> {
@@ -69,7 +71,7 @@ export class CashbookService {
         }
     }
 
-    async getCashbookByDate(date : Date, userId : UserEntity) : Promise<CashbookEntity[]> {
+    async getCashbookByDate(date : Date, userId : Number) : Promise<CashbookEntity[]> {
          return await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .select()
@@ -93,7 +95,12 @@ export class CashbookService {
         const day : number = endDate.getDay() + 7 + 1
         let startDate = new Date();
         startDate.setDate(endDate.getDate() - day)
+        //const queryBulder = new QueryBuilder()
         const query = await this.cashbookEntity
+        // .query(
+        //     'SELECT Date(cashbookCreatedAt), cashbookCategory, cashbookNowValue, cashbookGoalValue FROM cashbook where userId = ? and\
+        //     cashbookCreatedAt > ? and cashbookCreatedAt <= ? group by Date'
+        // )
         .createQueryBuilder('cashbook')
         .select(['date(cashbookCreatedAt) as cashbookCreatedAt','cashbookCategory','SUM(cashbookNowValue) as cashbookNowValue','SUM(cashbookGoalValue) as cashbookGoalValue'])
         .where('cashbookCreatedAt > :startDate',{startDate})
