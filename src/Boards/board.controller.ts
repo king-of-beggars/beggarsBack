@@ -42,7 +42,6 @@ export class BoardController {
 
         let boardTypes : number;
         let message : string;
-        let point;
         const cashbook  = await this.cashbookService.getcashbookAndDetail(postBoardDto.cashbookId)
         cashbook.cashbookNowValue > cashbook.cashbookGoalValue ? boardTypes = 1 : boardTypes = 0
         postBoardDto.boardText = body.boardText
@@ -51,8 +50,8 @@ export class BoardController {
         await this.boardService.postBoard(postBoardDto)
 
         cashbook.cashbookNowValue > cashbook.cashbookGoalValue ? 
-        await this.userService.pointInput(3) :
-        await this.userService.pointInput(20)
+        await this.userService.pointInput(3,Number(cashbook.userId)) :
+        await this.userService.pointInput(20,Number(cashbook.userId))
         
         boardTypes==0 ? message=`자랑하기 등록이 완료됐습니다` : message=`혼나러가기 등록이 완료됐습니다`
         return message;

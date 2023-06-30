@@ -66,7 +66,7 @@ export class UserEntity {
     })
     public comments? : CommentEntity[]
 
-    @OneToMany(()=>LikeEntity, (like : LikeEntity)=>like.users, {
+    @OneToMany(()=>LikeEntity, (like : LikeEntity)=>like.userId, {
         cascade:true
     })
     public likes? : LikeEntity[]

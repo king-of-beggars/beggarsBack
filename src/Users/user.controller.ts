@@ -120,7 +120,7 @@ export class UserController {
 
     @Post('logout')
     @HttpCode(200)
-    async userLogout(@Res() res : any) {
+    async userLogout(@Res() res : Response) {
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         return `로그아웃 완료`
@@ -165,8 +165,6 @@ export class UserController {
         const nickname : string = await this.userService.encodeNick(user.userNickname)
         res.setHeader('userNickname', nickname)
         
-      
-
         return res.redirect(`https://localhost:3000`)
     }
 

@@ -16,7 +16,7 @@ export class BoardService {
         private readonly cashbookService : CashbookService
     ){}
     
-    async postBoard(postBoardDto : PostBoardDto) {
+    async postBoard(postBoardDto : PostBoardDto) : Promise<any> {
         if(!postBoardDto) {
             throw new Error('올바르지 않은 데이터입니다')
         }
@@ -30,7 +30,7 @@ export class BoardService {
         })
     } 
 
-    async deleteByboardId(boardId : number) {
+    async deleteByboardId(boardId : number) : Promise<any> {
         try {
             return this.boardRepository.createQueryBuilder()
             .delete()
@@ -41,7 +41,7 @@ export class BoardService {
         
     }
 
-    async getListAll(paginationDTO : PaginationDto) {
+    async getListAll(paginationDTO : PaginationDto) : Promise<BoardEntity[]> {
         const result =  await this.boardRepository
         .createQueryBuilder('board')
         .leftJoin('board.cashbookId','cashbook')
@@ -58,7 +58,7 @@ export class BoardService {
         return result;
     }
 
-    async getBoardDetail(boardId : number) {
+    async getBoardDetail(boardId : number) : Promise<BoardEntity> {
         return await this.boardRepository
         .createQueryBuilder('board')
         .leftJoin('board.userId','user')
@@ -69,7 +69,7 @@ export class BoardService {
 
     }
 
-    async getDetailByBoardId(boardId : number) {
+    async getDetailByBoardId(boardId : number) : Promise<CashbookEntity> {
         const boards = await this.boardRepository
         .createQueryBuilder('board')
         .leftJoinAndSelect('board.cashbookId','cashbook')

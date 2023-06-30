@@ -25,6 +25,6 @@ export class CommentEntity {
     public boardId : BoardEntity
 
     @OneToMany
-    (()=>LikeEntity, (like : LikeEntity)=> like.comments)
+    (()=>LikeEntity, (like : LikeEntity)=> like.commentId)
     public likes? : LikeEntity[]
 }

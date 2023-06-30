@@ -44,17 +44,36 @@ export class UserService {
 
     //유저아이디로 db체크
     async userByName(userName : string) : Promise<UserEntity> {
+
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
         }
+
         const query = await this.userRepository
                      .createQueryBuilder('user')
                      .select(['user.userId','user.userName','user.userNickname'])
                      .where('user.userName=:userName', {userName})
                      .getOne()
-        console.log(query)
+
         return query;
     }
+
+    //유저 아이디로 pwd 반환
+    async allListByName(userName : string) : Promise<UserEntity> {
+
+        if(!userName) {
+            throw new Error('아이디가 넘어오지 않음')
+        }
+
+        const query = await this.userRepository
+                     .createQueryBuilder('user')
+                     .select()
+                     .where('user.userName=:userName', {userName})
+                     .getOne()
+                     
+        return query;
+    }
+
 
     //유저닉네임으로 db체크
     async userByNickname(userNickname: string) : Promise<UserEntity> {
@@ -70,7 +89,7 @@ export class UserService {
         
     }
 
-    async pointCheck(userId:number) {
+    async pointCheck(userId:number) : Promise<number> {
         const result = await this.userRepository
         .createQueryBuilder('user')
         .select(['user.userPoint'])
@@ -79,8 +98,7 @@ export class UserService {
         return Number(result.userPoint)
     }
 
-    async pointInput(point : number) {
-        const userId = 1
+    async pointInput(userId : number, point : number) {
         let userPoint : number = await this.pointCheck(userId)
         console.log(userPoint)
         userPoint = userPoint + point

@@ -10,19 +10,19 @@ export class LikeEntity {
 
     @ManyToOne(()=>CommentEntity, (comment:CommentEntity)=>comment.commentId)
     @JoinColumn({name:'commentId'})
-    public comments : CommentEntity
+    public commentId : CommentEntity
 
     @ManyToOne(()=>UserEntity, (user:UserEntity)=>user.userId)
     @JoinColumn({name:'userId'})
-    public users : UserEntity
+    public userId : UserEntity
 
-    @Column({default:true})
-    public lickCheck : number
+    @Column({default:1})
+    public likeCheck : number
 
-    @Column({type:'timestamp'})
+    @CreateDateColumn({type:'timestamp'})
     public likeCreatedAt : Date
 
-    @Column({type:'timestamp'})
+    @UpdateDateColumn({type:'timestamp'})
     public likeUpdatedAt : Date
     
 }

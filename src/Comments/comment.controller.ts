@@ -24,7 +24,7 @@ export class CommentController {
             boardId : params,
             commentText : commentText
         }
-        return await this.commentService.postComment(postCommentDto)
+        return await this.commentService.postComment(postCommentDto,user.userId)
 
     }
 

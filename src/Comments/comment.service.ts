@@ -22,7 +22,7 @@ export class CommentService {
         private readonly entityManager : EntityManager
     ){}
 
-    async postComment(postCommentDto : PostCommentDto) {
+    async postComment(postCommentDto : PostCommentDto, userId : number) {
         this.entityManager.transaction(async (manager)=> {
 
         })
@@ -30,7 +30,7 @@ export class CommentService {
         const query = this.commentEntity.create(
             postCommentDto
         )
-        await this.userService.pointInput(1)
+        await this.userService.pointInput(userId,1)
         return await this.commentEntity.save(query);
         
     }
@@ -46,11 +46,22 @@ export class CommentService {
 
     }
 
-    // async postLike(userId : UserEntity, commentId : CommentEntity) {
-    //     this.likeEntity.create({
-    //         userId : userId,
-    //         commentId : commentId
-    //     })
+    async postLike(userId : UserEntity, commentId : CommentEntity) {
+        let query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select()
+        .where('like.userId=:userId',{userId})
+        .andWhere('like.commentId',{commentId})
+        .getOne()
+        if(!query) {
+            query = this.likeEntity.create({
+                userId : userId,
+                commentId : commentId
+            })
+        } else {
+            query.likeCheck===1 ? query.likeCheck = 0 : query.likeCheck = 1  
+        }
+        return this.likeEntity.save(query)
 
-    // }
+    }
 }

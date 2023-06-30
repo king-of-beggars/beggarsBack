@@ -11,8 +11,8 @@ export class LikeController {
     @Post(':commentId')
     async postLike(@Param() params : CommentEntity, @Req() req : any) {
         let { user } = req
-        //this.commentService.postLike(user.userId,params)
-
+        await this.commentService.postLike(user.userId,params)
+        return `좋아요 완료`
     }
 
 }

@@ -13,6 +13,7 @@ import { CashbookContoller } from './cashbook.controller';
 import { CashbookEntity } from './entity/cashbook.entity';
 import { CashActivityEntity } from './entity/cashactivity.entity';
 import { UserService } from 'src/Users/user.service';
+import { AutoCreateService } from './autocreate.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity,CashListEntity,CashDetailEntity,CashbookEntity,CashActivityEntity]),
@@ -23,10 +24,13 @@ import { UserService } from 'src/Users/user.service';
   ], 
   providers: [
     CashbookService,
-    UserService
+    UserService,
+    AutoCreateService
   ], 
   exports: [
-    CashbookService
+    CashbookService,
+    AutoCreateService
+
   ],
 }) 
 export class CashbookModule {}   

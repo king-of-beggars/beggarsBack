@@ -25,11 +25,11 @@ export class AuthService {
             throw new Error('아이디나 비번이 없다')
         }
         //아이디 확인
-        const byName : UserEntity = await this.userService.userByName(userName)
+        const byName : UserEntity = await this.userService.allListByName(userName)
         .catch(e=>{
             throw new Error('아이디가 DB에 없습니다')
         })
-
+        //console.log(byName)
         //DB 데이터 확인
         const result = await bcrypt.compare(
             userPwd, byName.userPwd

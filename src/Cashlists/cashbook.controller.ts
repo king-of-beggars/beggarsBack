@@ -7,6 +7,7 @@ import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
 import { UserService } from 'src/Users/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
 import { CashDetailEntity } from './entity/cashDetail.entity';
+import { FrameDto } from './dto/frame.dto';
 
 @Controller('api/cashbook')
 export class CashbookContoller {
@@ -23,20 +24,46 @@ export class CashbookContoller {
         const nowdate : Date = new Date(date)
         //1. 몇 일 째 되는 날
         const dateValue : number = await this.userService.userSignupDate(user.userId)
+        console.log(dateValue)
         //2. 2주 데이터, 남은 날은 null 처리
-        const twoweek = this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
-        //3. 당일 유저 별 총합목표, 총합소비
-        const moneyValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
-        console.log(moneyValue)
+        const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
+
+        //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
+        const totalValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
+        console.log(totalValue)
         return `data : {
-            ${dateValue},
-            ${twoweek},
+            signupDay : ${dateValue},
+            twoweek : ${twoweek},
+            totalValue : ${totalValue}
         }`
     }
 
 
+    @Post('frame')
+    async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
+        const { user } = req
+        let frameDto = new FrameDto()
+        frameDto = {
+            cashCategory : body.cashCategory,
+            cashName : body.cashName,
+            cashListGoalValue : body.cashListGoalValue,
+            userId : user.userId
+        }
 
-    //디폴트는 오늘로
+
+        //이 부분 트랜잭션 해야하는데 어떡하지
+        const frame = await this.cashbookService.frameCreate(frameDto)
+        
+        return `프레임 생성 완료`
+    }
+
+    @Put('frame/:cashListId')
+    async cashFrameUpdate (@Req() req : any) {
+        const { user } = req
+
+    }
+
+    //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
     @UseGuards(AccessAuthenticationGuard)
     async cashList(@Query() query, @Req() req : any) {
@@ -67,13 +94,7 @@ export class CashbookContoller {
             cashDetailValue : body.cashDetailValue
         };
 
-        let valueUpdateDto = new ValueUpdateDto()
-        valueUpdateDto = {
-            cashbookId : params,
-            cashDetailValue : body.cashDetailValue
-        }
         const result = await this.cashbookService.postDetail(postDetailDto);
-        await this.cashbookService.addValue(valueUpdateDto)
         if(!result) {
             throw new Error('정상적으로 입력되지 않았습니다')
         }

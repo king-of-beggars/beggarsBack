@@ -6,6 +6,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PostDetailDto } from "./dto/postDetail.dto";
 import UserEntity from "src/Users/user.entity";
 import { ValueUpdateDto } from "./dto/valueUpdate.dto";
+import { FrameDto } from "./dto/frame.dto";
+import { CashListEntity } from "./entity/cashList.entity";
+import { CashActivityEntity } from "./entity/cashactivity.entity";
 
 @Injectable()
 export class CashbookService {
@@ -13,7 +16,11 @@ export class CashbookService {
         @InjectRepository(CashDetailEntity)
         private readonly cashDetailEntity : Repository<CashDetailEntity>,
         @InjectRepository(CashbookEntity)
-        private readonly cashbookEntity : Repository<CashbookEntity>
+        private readonly cashbookEntity : Repository<CashbookEntity>,
+        @InjectRepository(CashListEntity)
+        private readonly cashListEntity : Repository<CashListEntity>,
+        @InjectRepository(CashActivityEntity)
+        private readonly cashactivityEntity : Repository<CashActivityEntity>
     ){}
 
     async getcashbookAndDetail(cashbookId : unknown) : Promise<CashbookEntity> {
@@ -41,6 +48,13 @@ export class CashbookService {
         .create(
             postDetailDto
         )
+
+        let valueUpdateDto = new ValueUpdateDto()
+        valueUpdateDto = {
+            cashbookId : postDetailDto.cashbookId,
+            cashDetailValue : postDetailDto.cashDetailValue
+        }
+        await this.addValue(valueUpdateDto)
         return await this.cashDetailEntity.save(query)
     }
 
@@ -58,15 +72,16 @@ export class CashbookService {
     async getCashbookByDate(date : Date, userId : UserEntity) : Promise<CashbookEntity[]> {
          return await this.cashbookEntity
         .createQueryBuilder('cashbook')
-        .where('DATE(cashbook.cashbookCreatedAt)=:date',{date})
+        .select()
+        .where('DATE(cashbook.cashbookCreatedAt)=DATE(:date)',{date})
         .andWhere('cashbook.userId=:userId',{userId})
         .orderBy('cashbook.cashbookCreatedAt','DESC')
         .getMany()
         
     }
 
-    async addValue(valueUpdate : ValueUpdateDto) {
-         await this.cashbookEntity
+    async addValue(valueUpdate : ValueUpdateDto) : Promise<any> {
+         return await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .update()
         .set({cashbookNowValue : () => `cashbookNowValue + ${valueUpdate.cashDetailValue}`})
@@ -74,25 +89,98 @@ export class CashbookService {
         .execute()
     }
 
-    async getCashbookDuringDate(endDate : Date, userId : UserEntity) {
-        const day : number = endDate.getDay() + 1 + 7
-        const startDate = new Date(endDate.getDate() - day)
-        return await this.cashbookEntity
+    async getCashbookDuringDate(endDate : Date, userId : UserEntity) : Promise<CashDetailEntity[]>  {
+        const day : number = endDate.getDay() + 7 + 1
+        let startDate = new Date();
+        startDate.setDate(endDate.getDate() - day)
+        const query = await this.cashbookEntity
         .createQueryBuilder('cashbook')
-        .select()
-        .where('cashbookCreatedAt > :startDate',{startDate})
-        .andWhere('cashbookCreatedAt <= :endDate',{endDate})
+        .select(['cashbook.cashbookCreatedAt','cashbook.cashbookNowValue','cashbook.cashbookGoalValue'])
+        .where('cashbook.cashbookCreatedAt > :startDate',{startDate})
+        .andWhere('cashbook.cashbookCreatedAt <= :endDate',{endDate})
         .andWhere('cashbook.userId=:userId',{userId})
+        .orderBy('cashbook.cashbookCreatedAt','DESC')
         .getMany()
+        let array = new Array(14).fill(null)
+        let result = array.map((_, e)=>{
+            let date = new Date()
+            date.setDate(date.getDate() - e)
+            let string = date.toISOString().split('T')[0]
+            let obj = {}
+            obj[string] = null
+            return obj
+        })
+        result = result.reverse()
+        let trueResult = Object.assign({}, ...result)
+        for(let i=0; i<query.length; i++) {
+            const querydate = query[i].cashbookCreatedAt.toISOString().split('T')[0]
+            console.log(querydate)
+            query[i].cashbookGoalValue >=query[i].cashbookNowValue ? trueResult[querydate] = true : trueResult[querydate] = false
+        }
 
+        return trueResult;
+        
     }
 
-    async getOneDetail(cashDetailId : CashDetailEntity) {
+    async getOneDetail(cashDetailId : CashDetailEntity) : Promise<CashDetailEntity> {
         return await this.cashDetailEntity
         .createQueryBuilder('cashDetail')
         .select()
         .where('cashDetailId=:cashDetailId',{cashDetailId})
         .getOne()
     }
+    
+    async frameActivityCreate(cashEntity : CashListEntity) {
+        let date = new Date()
 
+        const query =  this.cashactivityEntity.create({
+            cashListId : cashEntity,
+            cashRestartDate : date,
+            cashUpdateDate : date
+        })
+
+        return await this.cashactivityEntity.save(query)
+    }
+
+    async cashbookCreate(frameDto : FrameDto) {
+        const query = this.cashbookEntity.create({
+            cashbookCategory : frameDto.cashCategory,
+            cashbookName : frameDto.cashName,
+            cashbookGoalValue : frameDto.cashListGoalValue
+        })
+        return await this.cashbookEntity.save(query)
+
+    }
+
+    async frameCreate(frameDto : FrameDto) {
+        if(!frameDto) {
+            throw new Error('서비스 단으로 데이터가 넘어오지 않음')
+        }
+
+        const frame  = this.cashListEntity.create(
+            frameDto
+        )
+        const query : CashListEntity = await this.cashListEntity.save(frame)
+
+        if(!frame) {
+            throw new Error('프레임 생성 에러')
+        }
+
+        const activity = await this.frameActivityCreate(query)
+        if(!activity) {
+            throw new Error('액티비티 생성 에러')
+        }
+        const cashbook = await this.cashbookCreate(frameDto)
+        if(!cashbook) {
+            throw new Error('캐시북 생성 에러')
+        }
+        return frame
+    }
+
+    async allCashlist() : Promise<CashListEntity[]> {
+        return await this.cashListEntity
+        .createQueryBuilder('cashlist')
+        .select()
+        .getMany()
+    }
 }
