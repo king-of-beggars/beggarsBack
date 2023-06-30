@@ -18,8 +18,7 @@ export class BoardController {
         private readonly userService : UserService
     ){}
 
-    
-    @Post('noway')
+    @Get('noway')
     async nowayList(@Query() paginationDto : PaginationDto) {
     
         paginationDto.boardTypes = 1
@@ -27,8 +26,7 @@ export class BoardController {
         return result
     }
 
-
-    @Post('goodjob')
+    @Get('goodjob')
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
         const result = await this.boardService.getListAll(paginationDto)
@@ -55,7 +53,7 @@ export class BoardController {
         return message;
     }
 
-    @Get(':boardId')
+    @Get('detail/:boardId')
     async boardDetail(@Param() params : any, @Req() req) {
         console.log(req)
         //주요정보
