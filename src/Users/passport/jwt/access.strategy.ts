@@ -18,7 +18,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
         super({
             jwtFromRequest : ExtractJwt.fromExtractors([
                 (request : Request) => {
-                    console.log(request.headers)
+                    console.log(`cookiegetget : ${request.cookies}`)
                     let token = request.headers['set-cookie'][0]
                     if(token) {
                         token = token.split(',')[1]
