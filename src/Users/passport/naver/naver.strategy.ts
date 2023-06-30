@@ -9,8 +9,8 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UserService) {
     super({
       clientID: process.env.NAVER_ID,
-      //callbackURL: 'https://poorkingapi.shop/api/user/login/naver',
-      callbackURL: 'https://localhost:3000/api/user/login/naver',
+      callbackURL: 'https://poorkingapi.shop/api/user/login/naver',
+      // callbackURL: 'https://localhost:3000/api/user/login/naver',
       clientSecret: process.env.NAVER_CLIENT_SECRET,
     });
   }
