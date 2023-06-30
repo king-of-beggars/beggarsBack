@@ -133,17 +133,15 @@ export class UserController {
     @HttpCode(200)
     async kakaoLogin(@Query() code, @Req() req : any, @Res() res: Response) {
         const { user } = req
-        if(!user.userName) {
+        console.log(user)
+        if(!user) {
             throw new Error('잘못된 접근입니다')
         }
         if(!user.userId) {
             const loginSuccess = false
             //await req.res.setHeader('loginSuccess',false)
             //await req.res.setHeader('userName',user)
-            res.setHeader('userNaming', user.userName)
-            res.setHeader('loginSuccess', 'false')
-            console.log('로그인')
-            res.cookie('userName', user.userName, {
+            res.cookie('userName', user, {
                 host:'http://localhost:3000/',
                 sameSite : 'none',
                 secure : 'true',

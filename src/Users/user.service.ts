@@ -5,7 +5,6 @@ import {Repository, In} from 'typeorm'
 import { SignupDto } from './dto/signup.dto'
 import * as bcrypt from 'bcrypt';
 import { SocialSignupDto } from './dto/socialSignup.dto'
-import TokenDto from './dto/token.dto';
 
 @Injectable()
 export class UserService {
