@@ -1,5 +1,5 @@
 import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Redirect, PayloadTooLargeException, Res } from '@nestjs/common';
-import { SignupDto } from './dto/signup.dto'
+import { SignupDto} from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
 import { AuthService } from './oauth2.service'
@@ -174,15 +174,25 @@ export class UserController {
 
     @Post('signup/social')
     @HttpCode(201)
-    async signupSocial(@Body() SignupDto : SocialSignupDto, @Req() req, @Res() res : Response) {
+    async signupSocial(@Body() body : any, @Req() req, @Res() res : Response) {
+        console.log('#######',req)
+        console.log('#######',res)
         try {
-            const nickCheck = await this.userService.userByNickname(SignupDto.userNickname)
+            { }
+            const nickCheck = await this.userService.userByNickname(body.userNickname)
             console.log(nickCheck)
             if(nickCheck) {
                 throw new Error('다른 닉네임을 지정해주세요')
             }
-            SignupDto.userLoginType = 'kakao'
-            SignupDto.userType = 1
+            let SignupDto : SocialSignupDto
+
+            SignupDto = {
+                userName : 'asdasd',
+                userNickname : body.userNickname,
+                userLoginType : 'kakao',
+                userType : 1
+            }
+
             const user = await this.userService.socialSignup(SignupDto)
             let tokenDto = new TokenDto();
             tokenDto.userId = user.userId
