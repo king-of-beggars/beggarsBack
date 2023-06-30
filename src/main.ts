@@ -14,7 +14,7 @@ async function bootstrap() {
     'https://https://www.thunderclient.com'
     ],
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    exposedHeaders : ['Set-Cookie'],
+    exposedHeaders : ['Set-Cookie','userId','userNickname'],
     credentials:true
   });
   await app.listen(3000);
