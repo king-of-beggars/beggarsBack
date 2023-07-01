@@ -4,14 +4,13 @@ import { AppModule } from './app.module';
 let cookieParser = require('cookie-parser')
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {cors:true});
+  const app = await NestFactory.create(AppModule);
   app.use(cookieParser())
   app.enableCors({
     origin : [
     'http://localhost:3000',
     'http://127.0.0.1:5500',
-    'https://beggars-front.vercel.app',
-    'https://https://www.thunderclient.com'
+    'https://beggars-front.vercel.app'
     ],
     credentials:true,
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
