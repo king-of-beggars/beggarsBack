@@ -98,6 +98,9 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
+
+
+            res.setHeader('Access-Control-Allow-Origin', 'https://beggars-front.vercel.app')
             res.cookie('refreshToken', refreshToken, {
                 domain:'beggars-front.vercel.app',
                 sameSite : 'none',
