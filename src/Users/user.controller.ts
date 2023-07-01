@@ -101,16 +101,16 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain:'https://beggars-front.vercel.app',
                 sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'False',
+                secure : true,
+                httpOnly : false,
                 path : '/'
             })
 
             res.cookie('accessToken', accessToken, {
                 domain:'https://beggars-front.vercel.app',
                 sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'False',
+                secure : true,
+                httpOnly : false,
                 path : '/'
             })
             res.setHeader('userId', user.userId)
