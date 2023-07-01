@@ -102,6 +102,7 @@ export class UserController {
 
             res.setHeader('Access-Control-Allow-Origin', 'https://beggars-front.vercel.app')
             res.cookie('refreshToken', refreshToken, {
+                domain : 'poorkingapi.shop',
                 sameSite : 'none',
                 secure : true,
                 httpOnly : false,
@@ -109,6 +110,7 @@ export class UserController {
             })
 
             res.cookie('accessToken', accessToken, {
+                domain : 'poorkingapi.shop',
                 sameSite : 'none',
                 secure : true, 
                 httpOnly : false,
