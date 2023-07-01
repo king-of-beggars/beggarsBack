@@ -102,7 +102,6 @@ export class UserController {
 
             res.setHeader('Access-Control-Allow-Origin', 'https://beggars-front.vercel.app')
             res.cookie('refreshToken', refreshToken, {
-                domain:'beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : true,
                 httpOnly : false,
@@ -110,9 +109,8 @@ export class UserController {
             })
 
             res.cookie('accessToken', accessToken, {
-                domain:'beggars-front.vercel.app',
                 sameSite : 'none',
-                secure : true,
+                secure : true, 
                 httpOnly : false,
                 path : '/'
             })
