@@ -99,7 +99,7 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
             res.cookie('refreshToken', refreshToken, {
-                domain:'https://beggars-front.vercel.app',
+                domain:'beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : true,
                 httpOnly : false,
@@ -107,7 +107,7 @@ export class UserController {
             })
 
             res.cookie('accessToken', accessToken, {
-                domain:'https://beggars-front.vercel.app',
+                domain:'beggars-front.vercel.app',
                 sameSite : 'none',
                 secure : true,
                 httpOnly : false,
