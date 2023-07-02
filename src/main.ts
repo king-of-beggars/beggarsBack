@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser())
   app.enableCors({
-    origin : 'https://beggars-front-eight.vercel.app/',
+    origin : ['https://beggars-front-eight.vercel.app/','deeplake-beggars-front.vercel.app','dev-beggars-front-eight.vercel.app'],
     credentials:true,
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
     exposedHeaders : ['Set-Cookie','userId','userNickname'],
