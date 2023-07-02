@@ -134,7 +134,7 @@ export class UserController {
         console.log(req)
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
-        return res.redirect('https://beggars-front.vercel.app')
+        return res.send('로그아웃 완료');
     }
 
     @Get('login/kakao')
