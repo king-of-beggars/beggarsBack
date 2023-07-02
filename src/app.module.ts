@@ -36,7 +36,8 @@ import { ConfigModule } from '@nestjs/config';
         port: 3306,
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
-        database: 'poorking', 
+        database: 'poorking',
+        timezone: 'Asia/Seoul',
         synchronize:true,
         entities : [
                   UserEntity,

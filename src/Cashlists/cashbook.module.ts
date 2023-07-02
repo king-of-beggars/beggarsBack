@@ -14,10 +14,12 @@ import { CashbookEntity } from './entity/cashbook.entity';
 import { CashActivityEntity } from './entity/cashactivity.entity';
 import { UserService } from 'src/Users/user.service';
 import { AutoCreateService } from './autocreate.service';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity,CashListEntity,CashDetailEntity,CashbookEntity,CashActivityEntity]),
-    PassportModule
+    PassportModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [
     CashbookContoller

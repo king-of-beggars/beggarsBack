@@ -34,8 +34,8 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : 'true',
-                httpOnly : 'false'
+                secure : true,
+                httpOnly : false
             })
 
             res.cookie('accessToken', accessToken, {
@@ -99,7 +99,7 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
 
-            
+
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
@@ -125,7 +125,6 @@ export class UserController {
 
     @Post('logout')
     @HttpCode(200)
-    @UseGuards(AccessAuthenticationGuard)
     async userLogout(@Req() req : any ,@Res() res : Response) {
         const { user } = req
         console.log('#############',user)

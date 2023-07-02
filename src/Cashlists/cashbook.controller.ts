@@ -8,6 +8,7 @@ import { UserService } from 'src/Users/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
 import { CashDetailEntity } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
+import * as moment from 'moment-timezone';
 
 @Controller('api/cashbook')
 export class CashbookContoller {
@@ -21,8 +22,11 @@ export class CashbookContoller {
     async mainPage(@Req() req : any) {
         const { user } = req
         console.log(user)
-        const date : string = new Date().toISOString().split('T')[0]
-        const nowdate : Date = new Date(date)
+        let tempdate = moment().tz("Asia/Seoul")
+        console.log(tempdate)
+        let nowdate = tempdate.toDate()
+        let nowdate2 = new Date()
+        nowdate2.setHours(nowdate.getHours() + 9)
         //1. 몇 일 째 되는 날
         const dateValue : number = await this.userService.userSignupDate(user.userId)
         console.log(dateValue)
@@ -30,16 +34,19 @@ export class CashbookContoller {
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
         console.log(twoweek)
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
-        const totalValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
-        console.log(`#####토탈밸류 ${totalValue}`)
+        const totalValue = await this.cashbookService.getCashbookByDate(nowdate2,user.userId)
+        console.log(nowdate2)
+        console.log(totalValue)
         let total = {
             cashbookNowValue : 0,
             cashbookGoalValue : 0
         }
-        for(let i=0; totalValue.length<i; i++) {
+        for(let i=0; totalValue.length>i; i++) {
+            console.log(totalValue[i].cashbookGoalValue)
             total.cashbookNowValue += totalValue[i].cashbookNowValue
-            total. cashbookGoalValue += totalValue[i].cashbookGoalValue
+            total.cashbookGoalValue += totalValue[i].cashbookGoalValue
         }
+        console.log(total)
         return `
             signupDay : ${dateValue},
             twoweek : ${twoweek},

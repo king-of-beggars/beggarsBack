@@ -18,10 +18,18 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
         super({
             jwtFromRequest : ExtractJwt.fromExtractors([
                 (request : Request) => {
-                    let token = request.headers.cookie
+                    // let token = request.headers.cookie
+                    // if(token) {
+                    //     token = token.split(';')[1]
+                    //     token = token.split('=')[1]
+                    // } 
+                    // console.log(token)
+                    let token = request.headers['set-cookie'][0]
                     if(token) {
-                        token = token.split(';')[1]
+                        token = token.split(',')[1]
                         token = token.split('=')[1]
+                        token = token.split(' ')[0]
+                        token = token.replace(';','')
                     } 
                     console.log(token)
                     const test = jwtService.verify(token,{secret : this.configServcie.get('SECRET_KEY')})
@@ -36,6 +44,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
     }
     async validate(payload : any) {
         console.log('유효성실행')
+        console.log(this.userService.userByName(payload.userName))
         return this.userService.userByName(payload.userName);
     }
     
