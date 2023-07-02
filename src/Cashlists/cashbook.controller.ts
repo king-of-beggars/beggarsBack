@@ -30,12 +30,21 @@ export class CashbookContoller {
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
         const totalValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
-        console.log(totalValue)
-        return `data : {
+        console.log(`#####토탈밸류 ${totalValue}`)
+        let total = {
+            cashbookNowValue : 0,
+            cashbookGoalValue : 0
+        }
+        for(let i=0; totalValue.length<i; i++) {
+            total.cashbookNowValue += totalValue[i].cashbookNowValue
+            total. cashbookGoalValue += totalValue[i].cashbookGoalValue
+        }
+        return `
             signupDay : ${dateValue},
             twoweek : ${twoweek},
-            totalValue : ${totalValue}
-        }`
+            groupByCategory : ${totalValue},
+            total : ${total}
+        `
     }
 
 
@@ -44,6 +53,7 @@ export class CashbookContoller {
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
         let frameDto = new FrameDto()
+        console.log(user);
         frameDto = {
             cashCategory : body.cashCategory,
             cashName : body.cashName,
@@ -85,6 +95,7 @@ export class CashbookContoller {
     }
 
     @Post(":cashDetailId")
+    @UseGuards(AccessAuthenticationGuard)
     async postDetail(@Param() params : CashbookEntity, @Body() body : PostDetailDto) {
 
         let postDetailDto = new PostDetailDto();
