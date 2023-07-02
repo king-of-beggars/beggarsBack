@@ -72,12 +72,14 @@ export class CashbookService {
     }
 
     async getCashbookByDate(date : Date, userId : Number) : Promise<CashbookEntity[]> {
+        console.log(date)
          return await this.cashbookEntity
         .createQueryBuilder('cashbook')
-        .select()
-        .where('DATE(cashbook.cashbookCreatedAt)=DATE(:date)',{date})
-        .andWhere('cashbook.userId=:userId',{userId})
-        .orderBy('cashbook.cashbookCreatedAt','DESC')
+        .select(['cashbookCategory','cashbookNowValue', 'cashbookGoalValue'])
+        .where('Date(cashbookCreatedAt)=Date(:date)',{date})
+        .andWhere('userId=:userId',{userId})
+        .groupBy('cashbookCategory')
+        .orderBy('cashbookCreatedAt','DESC')
         .getMany()
         
     }

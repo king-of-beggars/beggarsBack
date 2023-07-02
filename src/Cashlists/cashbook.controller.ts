@@ -19,7 +19,8 @@ export class CashbookContoller {
     @Get('/main')
     @UseGuards(AccessAuthenticationGuard)
     async mainPage(@Req() req : any) {
-        const { user } = req 
+        const { user } = req
+        console.log(user)
         const date : string = new Date().toISOString().split('T')[0]
         const nowdate : Date = new Date(date)
         //1. 몇 일 째 되는 날
@@ -27,7 +28,6 @@ export class CashbookContoller {
         console.log(dateValue)
         //2. 2주 데이터, 남은 날은 null 처리
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
-
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
         const totalValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
         console.log(totalValue)
@@ -40,6 +40,7 @@ export class CashbookContoller {
 
 
     @Post('frame')
+    @UseGuards(AccessAuthenticationGuard)
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
         let frameDto = new FrameDto()
