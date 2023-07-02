@@ -78,6 +78,7 @@ export class CashbookContoller {
 
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
+    @UseGuards(AccessAuthenticationGuard)
     async cashList(@Query() query, @Req() req : any) {
         const { user } = req
         const date : Date = query.date
