@@ -73,14 +73,21 @@ export class CashbookService {
 
     async getCashbookByDate(date : Date, userId : Number) : Promise<CashbookEntity[]> {
         console.log(date)
-         return await this.cashbookEntity
-        .createQueryBuilder('cashbook')
-        .select(['cashbookCategory','cashbookNowValue', 'cashbookGoalValue'])
-        .where('Date(cashbookCreatedAt)=Date(:date)',{date})
-        .andWhere('userId=:userId',{userId})
-        .groupBy('cashbookCategory')
-        .orderBy('cashbookCreatedAt','DESC')
-        .getMany()
+        //  return await this.cashbookEntity
+        // .createQueryBuilder('cashbook')
+        // .select(['cashbookCategory','cashbookNowValue', 'cashbookGoalValue'])
+        // .where('Date(cashbookCreatedAt)=Date(:date)', {date})
+        // .andWhere('cashbook.userId=:userId', {userId})
+        // .groupBy('cashbookCategory')
+        // .orderBy('cashbookCreatedAt','DESC')
+        // .getMany()
+        return await this.cashbookEntity.query(
+            `SELECT cashbookCategory, cashbookNowValue, cashbookGoalValue 
+             FROM Cashbook 
+             WHERE DATE(cashbookCreatedAt) = DATE(?) 
+             AND userId = ? 
+             GROUP BY cashbookCategory 
+             ORDER BY cashbookCreatedAt DESC`,[date, userId]);
         
     }
 
@@ -93,7 +100,7 @@ export class CashbookService {
         .execute()
     }
 
-    async getCashbookDuringDate(endDate : Date, userId : UserEntity) : Promise<CashDetailEntity[]>  {
+    async getCashbookDuringDate(endDate : Date, userId : UserEntity) : Promise<any> {
         const day : number = endDate.getDay() + 7 + 1
         let startDate = new Date();
         startDate.setDate(endDate.getDate() - day)
@@ -103,31 +110,48 @@ export class CashbookService {
         //     'SELECT Date(cashbookCreatedAt), cashbookCategory, cashbookNowValue, cashbookGoalValue FROM cashbook where userId = ? and\
         //     cashbookCreatedAt > ? and cashbookCreatedAt <= ? group by Date'
         // )
-        .createQueryBuilder('cashbook')
-        .select(['date(cashbookCreatedAt) as cashbookCreatedAt','cashbookCategory','SUM(cashbookNowValue) as cashbookNowValue','SUM(cashbookGoalValue) as cashbookGoalValue'])
-        .where('cashbookCreatedAt > :startDate',{startDate})
-        .andWhere('cashbookCreatedAt <= :endDate',{endDate})
-        .andWhere('userId=:userId',{userId})
-        .groupBy('date(cashbookCreatedAt)')
-        .addGroupBy('cashbookCategory')
-        .getMany()
+        .query(
+            'select Date(cashbookCreatedAt) as dt, cashbookCategory, cashbookNowValue, cashbookGoalValue from Cashbook\
+             where cashbookCreatedAt > ? and cashbookCreatedAt <= ? and userId = ? group by dt ,cashbookCategory order by Date(cashbookCreatedAt)',
+             [startDate,endDate,userId]
+
+        )
+        // .createQueryBuilder('cashbook')
+        // .select(['date(cashbookCreatedAt) as cashbookCreatedAt','cashbookCategory','SUM(cashbookNowValue) as cashbookNowValue','SUM(cashbookGoalValue) as cashbookGoalValue'])
+        // .where('cashbookCreatedAt > :startDate',{startDate})
+        // .andWhere('cashbookCreatedAt <= :endDate',{endDate})
+        // .andWhere('userId=:userId',{userId})
+        // .groupBy('date(cashbookCreatedAt)')
+        // .addGroupBy('cashbookCategory')
+        // .getMany()
         console.log(`####${query}`)
+
         let array = new Array(14).fill(null)
         let result = array.map((_, e)=>{
             let date = new Date()
             date.setDate(date.getDate() - e)
             let string = date.toISOString().split('T')[0]
-            let obj = {}
-            obj[string] = null
-            return obj
+            // let obj = {}
+            // obj[string] = null
+            return string
         })
         result = result.reverse()
-        let trueResult = Object.assign({}, ...result)
-        for(let i=0; i<query.length; i++) {
-            const querydate = query[i].cashbookCreatedAt.toISOString().split('T')[0]
-            console.log(querydate)
-            query[i].cashbookGoalValue >=query[i].cashbookNowValue ? trueResult[querydate] = true : trueResult[querydate] = false
-        }
+        console.log(result)
+        let flag = false;
+        let trueResult = result.reduce((result, key, i) => ({...result, [key]: array[i]}), {});
+        // console.log(trueResult)
+        //     for(let a=0; query.length< a; a++) {
+        //         if(query[a]['cashbookGoalValue'])
+        //     }
+        
+
+
+        // let trueResult = Object.assign({}, ...result)
+        // for(let i=0; i<query.length; i++) {
+        //     const querydate = query[i].cashbookCreatedAt.toISOString().split('T')[0]
+        //     console.log(querydate)
+        //     query[i].cashbookGoalValue >=query[i].cashbookNowValue ? trueResult[querydate] = true : trueResult[querydate] = false
+        // }
         return trueResult;
     }
 
@@ -155,7 +179,8 @@ export class CashbookService {
         const query = this.cashbookEntity.create({
             cashbookCategory : frameDto.cashCategory,
             cashbookName : frameDto.cashName,
-            cashbookGoalValue : frameDto.cashListGoalValue
+            cashbookGoalValue : frameDto.cashListGoalValue,
+            userId : frameDto.userId
         })
         return await this.cashbookEntity.save(query)
 

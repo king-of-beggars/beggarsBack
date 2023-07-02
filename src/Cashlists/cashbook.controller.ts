@@ -49,6 +49,7 @@ export class CashbookContoller {
 
 
     @Post('frame')
+    @HttpCode(201)
     @UseGuards(AccessAuthenticationGuard)
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
