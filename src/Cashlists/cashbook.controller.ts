@@ -28,6 +28,7 @@ export class CashbookContoller {
         console.log(dateValue)
         //2. 2주 데이터, 남은 날은 null 처리
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
+        console.log(twoweek)
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
         const totalValue = await this.cashbookService.getCashbookByDate(nowdate,user.userId)
         console.log(`#####토탈밸류 ${totalValue}`)
@@ -78,9 +79,9 @@ export class CashbookContoller {
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
     async cashList(@Query() query, @Req() req : any) {
-        //const { user } = req
+        const { user } = req
         const date : Date = query.date
-        const result = this.cashbookService.getCashbookByDate(date,1)
+        const result = this.cashbookService.getCashbookByDate(date,user.userId)
         return result
     }
 
