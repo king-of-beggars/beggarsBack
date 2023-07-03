@@ -8,7 +8,8 @@ import { UserService } from 'src/Users/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
 import { CashDetailEntity } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
-import * as moment from 'moment-timezone';
+//import * as moment from 'moment-timezone';
+const moment = require('moment-timezone')
 
 @Controller('api/cashbook')
 export class CashbookContoller {
@@ -18,6 +19,7 @@ export class CashbookContoller {
     ){}
 
     @Get('/main')
+    @HttpCode(200)
     @UseGuards(AccessAuthenticationGuard)
     async mainPage(@Req() req : any) {
         const { user } = req
@@ -94,17 +96,30 @@ export class CashbookContoller {
     }
 
     @Get(':cashbookId')
-    async cashDetail(@Param() params : number) {
-        const cashbookId = params
-        const result = await this.cashbookService.getDetail(cashbookId)
-        if(!result) {
+    @UseGuards(AccessAuthenticationGuard)
+    async cashDetail(@Param() params : CashDetailEntity) {
+        console.log(params)
+        const cashbookId = params.cashbookId
+        console.log('니가호출되고있니')
+        const detail = await this.cashbookService.getDetail(cashbookId)
+        if(!detail) {
 
-            throw new Error('정상적으로 불러올 수 없습니다')
+            throw new Error('디테일 데이터가 없습니다')
         }
-        return result
+        let result2 = await this.cashbookService.cashbookById(cashbookId)
+        const {cashbookName, cashbookCategory, cashbookNowValue} = result2
+        if(detail.length===0) {
+            let consumption =true
+            cashbookNowValue===0 ? consumption=true : consumption=false
+            return consumption;
+        } else {
+        return `${cashbookName},
+                ${cashbookCategory},
+                ${detail}`
+        }
     }
-
-    @Post(":cashDetailId")
+ 
+    @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
     async postDetail(@Param() params : CashbookEntity, @Body() body : PostDetailDto) {
 
@@ -124,8 +139,7 @@ export class CashbookContoller {
 
     @Delete(":cashDetailId")
     @UseGuards(AccessAuthenticationGuard)
-    async deleteDetail(@Param() cashDetailId : CashDetailEntity, @Req() req : any) {
-        const { user } = req
+    async deleteDetail(@Param() cashDetailId : CashDetailEntity) {
         if(!cashDetailId) {
             throw new Error('정상적으로 요청되지 않았습니다')
         }
@@ -140,6 +154,13 @@ export class CashbookContoller {
         await this.cashbookService.deleteDetail(cashDetailId)
 
         return `삭제 성공`
+    }
+
+    @Put(":cashbookId")
+    @UseGuards(AccessAuthenticationGuard)
+    async checkConsume(@Param() cashbookId) {
+        await this.cashbookService.inputConsume(cashbookId)
+        return '무지출 지출 전환 완료'
     }
     
 }

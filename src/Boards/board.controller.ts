@@ -34,11 +34,12 @@ export class BoardController {
     }
 
     @Post(':cashbookId')
+    @UseGuards(AccessAuthenticationGuard)
     async boardInput(@Param() postBoardDto : PostBoardDto, @Body() body : PostBoardDto) {
 
         let boardTypes : number;
         let message : string;
-        const cashbook  = await this.cashbookService.getcashbookAndDetail(postBoardDto.cashbookId)
+        const cashbook  = await this.cashbookService.getcashbookAndDetail(Number(postBoardDto.cashbookId))
         cashbook.cashbookNowValue > cashbook.cashbookGoalValue ? boardTypes = 1 : boardTypes = 0
         postBoardDto.boardText = body.boardText
         postBoardDto.userId = cashbook.userId
@@ -64,8 +65,9 @@ export class BoardController {
         return result
     }
 
-    //@UseGuards(AccessAuthenticationGuard)
+    
     @Delete(':boardId')
+    @UseGuards(AccessAuthenticationGuard)
     async boardDelete(@Param() params : any) {
         const result = await this.boardService.deleteByboardId(params.boardId)
         if(result) {

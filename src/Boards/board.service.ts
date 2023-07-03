@@ -7,6 +7,7 @@ import { PaginationDto } from "./dto/pagination.dto";
 import { CashDetailEntity } from "src/Cashlists/entity/cashDetail.entity";
 import { CashbookService } from "src/Cashlists/cashbook.service";
 import { CashbookEntity } from "src/Cashlists/entity/cashbook.entity";
+
 @Injectable()
 export class BoardService {
     constructor(
@@ -23,11 +24,11 @@ export class BoardService {
         const query = this.boardRepository.create(
             postBoardDto
         )
-        this.boardRepository.save(query)
-        .then((result)=>{return result})
-        .catch((e)=>{
-            throw new Error('한 게시글에 칭찬/싫어요를 2개 등록할 수 없습니다')
-        })
+        const result = await this.boardRepository.save(query)
+        if(!result) {
+            throw new Error('하나의 캐시북에 하나의 보드만 작성가능')
+        }
+        return result;
     } 
 
     async deleteByboardId(boardId : number) : Promise<any> {

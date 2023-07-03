@@ -9,7 +9,8 @@ import { ValueUpdateDto } from "./dto/valueUpdate.dto";
 import { FrameDto } from "./dto/frame.dto";
 import { CashListEntity } from "./entity/cashList.entity";
 import { CashActivityEntity } from "./entity/cashactivity.entity";
-import * as moment from 'moment-timezone';
+//import * as moment from 'moment-timezone';
+const moment = require('moment-timezone')
 
 @Injectable()
 export class CashbookService {
@@ -26,7 +27,7 @@ export class CashbookService {
         private entityManager : EntityManager
     ){}
 
-    async getcashbookAndDetail(cashbookId : unknown) : Promise<CashbookEntity> {
+    async getcashbookAndDetail(cashbookId : number) : Promise<CashbookEntity> {
 
         return await this.cashbookEntity
         .createQueryBuilder('cashbook')
@@ -37,12 +38,11 @@ export class CashbookService {
         
     }
 
-    async getDetail(cashbookId : number) : Promise<CashDetailEntity[]> {
-
+    async getDetail(cashbookId : unknown) : Promise<CashDetailEntity[]> {
         return await this.cashDetailEntity
         .createQueryBuilder('cashDetail')
-        .where('cashDetail.cashbookId=:cashbookId',{cashbookId})
-        .orderBy('cashDetail.cashDetailCreatedAt',"DESC")
+        .where('cashDetail.cashbookId=:cashbookId',{cashbookId : cashbookId})
+        .orderBy('cashDetail.cashDetailCreatedAt',"ASC")
         .getMany()
     }
 
@@ -120,9 +120,9 @@ export class CashbookService {
         moment.tz.setDefault("Asia/Seoul");
         let lastSunday = moment().startOf('week');
         lastSunday = lastSunday.clone().subtract(7, 'days');
-        console.log(lastSunday)
+        
         let thisSaturday = moment().endOf('week');
-        console.log(thisSaturday)
+        
         let result = [];
         for (let m = moment(lastSunday); m.isBefore(thisSaturday) || m.isSame(thisSaturday); m.add(1, 'days')) {
             result.push(m.format('YYYY-MM-DD'));
@@ -209,5 +209,33 @@ export class CashbookService {
         .createQueryBuilder()
         .select()
         .getMany()
+    }
+
+
+    async cashbookById(cashbookId : CashbookEntity) : Promise<CashbookEntity> {
+        return await this.cashbookEntity
+        .createQueryBuilder()
+        .select()
+        .where('cashbookId=:cashbookId',{cashbookId})
+        .getOne()
+
+    }
+
+    async inputConsume(cashbookId : CashbookEntity) {
+        const cashbook = await this.cashbookById(cashbookId)
+        let { cashbookNowValue } = cashbook
+
+        if(cashbookNowValue===0) {
+            cashbookNowValue=null
+        } else {
+            cashbookNowValue=0
+        }
+        return await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .update()
+        .set({cashbookNowValue:cashbookNowValue})
+        .where('cashbookId=:cashbookId', {cashbookId})
+        .execute()
+
     }
 }

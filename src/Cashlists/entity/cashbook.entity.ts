@@ -17,10 +17,10 @@ export class CashbookEntity {
     @Column()
     public cashbookName : string
 
-    @Column()
+    @Column({default:0})
     public cashbookNowValue : number;
 
-    @Column()
+    @Column({default:0})
     public cashbookGoalValue : number;
 
     @CreateDateColumn({ type: 'timestamp' })
