@@ -64,4 +64,14 @@ export class CommentService {
         return this.likeEntity.save(query)
 
     }
+
+    async getLike(commentId : CommentEntity) {
+        const result : number = await this.likeEntity
+        .query(
+            `SELECT count(*) FROM Like
+            WHERE likeCheck=1
+            AND WHERE commentId = ?`,[commentId]
+        )
+        return result
+    }
 }

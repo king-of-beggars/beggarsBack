@@ -59,9 +59,12 @@ export class BoardController {
         console.log(req)
         //주요정보
         const result = await this.boardService.getBoardDetail(params.boardId)
+        console.log(result)
         //디테일
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
+        console.log(detail)
         result['cashbookDetail'] = detail
+        result['']
         return result
     }
 

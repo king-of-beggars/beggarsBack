@@ -9,6 +9,7 @@ import { ValueUpdateDto } from "./dto/valueUpdate.dto";
 import { FrameDto } from "./dto/frame.dto";
 import { CashListEntity } from "./entity/cashList.entity";
 import { CashActivityEntity } from "./entity/cashactivity.entity";
+import { ListBoard } from "src/Boards/dto/listBoard.dto";
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
 
@@ -74,13 +75,13 @@ export class CashbookService {
 
     async getCashbookByDate(date : Date, userId : Number) : Promise<CashbookEntity[]> {
     
-        const result = await this.cashbookEntity.query(
+        const result : Promise<CashbookEntity[]> = await this.cashbookEntity.query(
             `SELECT cashbookCategory, cashbookNowValue, cashbookGoalValue 
              FROM Cashbook 
              WHERE DATE(cashbookCreatedAt) = DATE(?) 
              AND userId = ? 
              GROUP BY cashbookCategory 
-             ORDER BY cashbookCreatedAt DESC`,[date, userId]);
+             ORDER BY cashbookCreatedAt DESC`,[date, userId]);  
         return result
     }
 
@@ -100,10 +101,6 @@ export class CashbookService {
         startDate.setDate(endDate.getDate() - day)
         endDate.setDate(endDate.getDate() + 2)
         const query = await this.cashbookEntity
-        // .query(
-        //     'SELECT Date(cashbookCreatedAt), cashbookCategory, cashbookNowValue, cashbookGoalValue FROM cashbook where userId = ? and\
-        //     cashbookCreatedAt > ? and cashbookCreatedAt <= ? group by Date'
-        // )
         .query(
             `SELECT DATE(cashbookCreatedAt) AS dt, cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
              FROM Cashbook
@@ -236,6 +233,15 @@ export class CashbookService {
         .set({cashbookNowValue:cashbookNowValue})
         .where('cashbookId=:cashbookId', {cashbookId})
         .execute()
+
+    }
+
+    async getCreateCheck(createCheck : number[]) {
+        if(!createCheck) {
+            throw new Error('날짜가 비어 있는 배열입니다')
+        }
+        const str = createCheck.toString()
+        console.log(str)
 
     }
 }

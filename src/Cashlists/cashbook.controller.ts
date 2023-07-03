@@ -10,6 +10,7 @@ import { CashDetailEntity } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('api/cashbook')
 export class CashbookContoller {
@@ -21,6 +22,7 @@ export class CashbookContoller {
     @Get('/main')
     @HttpCode(200)
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '메인 api', description: '몇일째 되는 날, 2주치 데이터, 당일 유저 지출 총합, 섹션별 소비' })
     async mainPage(@Req() req : any) {
         const { user } = req
         console.log(user)
@@ -61,6 +63,7 @@ export class CashbookContoller {
     @Post('frame')
     @HttpCode(201)
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
         let frameDto = new FrameDto()
@@ -88,15 +91,23 @@ export class CashbookContoller {
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() query, @Req() req : any) {
         const { user } = req
         const date : Date = query.date
-        const result = this.cashbookService.getCashbookByDate(date,user.userId)
+        console.log(date)
+        const result = await this.cashbookService.getCashbookByDate(date,user.userId)
+        const createCheck = result.map((e)=>{
+            return e.cashbookId
+        })
+        const Checkeddate = await this.cashbookService.getCreateCheck(createCheck)
+        
         return result
     }
 
     @Get(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
     async cashDetail(@Param() params : CashDetailEntity) {
         console.log(params)
         const cashbookId = params.cashbookId
@@ -121,6 +132,7 @@ export class CashbookContoller {
  
     @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '디테일 정보 입력', description: 'cashbookId, text, value 입력' })
     async postDetail(@Param() params : CashbookEntity, @Body() body : PostDetailDto) {
 
         let postDetailDto = new PostDetailDto();

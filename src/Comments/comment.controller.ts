@@ -6,7 +6,9 @@ import UserEntity from "src/Users/user.entity";
 import { AccessAuthenticationGuard } from "src/Users/passport/jwt/access.guard";
 import { BoardEntity } from "src/Boards/entity/board.entity";
 import { DeleteResult } from "typeorm";
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('유저 API')
 @Controller('api/board/:boardId/comment/')
 export class CommentController {
     constructor(
@@ -15,6 +17,7 @@ export class CommentController {
 
     @Post('/')
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '댓글 입력', description: '댓글 입력, 포인트 1점 기입' })
     async postComment(@Param() params : BoardEntity, @Body() commentText : string, @Req() req : any) {
         let { user } = req
         let postCommentDto = new PostCommentDto()
@@ -30,7 +33,7 @@ export class CommentController {
 
     @Delete(':commentId')
     @UseGuards(AccessAuthenticationGuard)
-    //@UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '댓글 삭제', description: '삭제가 완료되었습니다 리턴' })
     async deleteComment(@Param() commentId : number, @Req() req : any) {
         let { user } = req
         const result : DeleteResult = await this.commentService.deleteComment(commentId,user.userId)

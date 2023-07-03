@@ -1,6 +1,7 @@
 require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { setupSwagger } from './Utils/swagger.util';
 let cookieParser = require('cookie-parser')
 
 async function bootstrap() {
@@ -12,6 +13,7 @@ async function bootstrap() {
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
     exposedHeaders : ['Set-Cookie','userId','userNickname'],
   });
+  setupSwagger(app);
   await app.listen(3000);
 }
 bootstrap();

@@ -12,8 +12,11 @@ import * as bcrypt from 'bcrypt';
 import {Response} from 'express'
 import {HttpStatus} from 'httpstatus'
 import { AccessAuthenticationGuard } from './passport/jwt/access.guard';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
 
 @Controller('/api/user')
+@ApiTags('유저 API')
 export class UserController {
     constructor(private readonly userService: UserService,
                 private readonly authService: AuthService
@@ -22,6 +25,9 @@ export class UserController {
 
     @Post('signup')
     @HttpCode(201)
+    @ApiBody({ type: SignupDto, description:'회원가입 body' })
+    @ApiResponse({ status: 201, description: '회원가입이 완료되었습니다' })
+    @ApiOperation({ summary: '회원가입', description: '아이디, 닉네임, 비밀번호 기입' })
     async userSignup(@Body() SignupDto : SignupDto, @Req() req, @Res() res : Response) {
         try {
             const user = await this.userService.userSignup(SignupDto)
@@ -56,6 +62,8 @@ export class UserController {
 
     @Post('idCheck')
     @HttpCode(200)
+    @ApiResponse({ status: 200, description: '사용 가능한 아이디 입니다' })
+    @ApiOperation({ summary: '아이디 체크', description: '아이디 기입' }) 
     async userIdCheck(@Body() body : UserEntity) {
         try {
             const byName = await this.userService.userByName(body.userName)
@@ -70,6 +78,7 @@ export class UserController {
 
     @Post('nickCheck')
     @HttpCode(200)
+    @ApiOperation({ summary: '닉네임 체크', description: '아이디 기입' })
     async userNickCheck(@Req() req, @Body() body : UserEntity)  {
 
         try {
@@ -90,6 +99,7 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
+    @ApiOperation({ summary: '일반 로그인', description: 'id , pwd 입력' })
     async userLogin(@Req() req : any, @Res() res : Response) {
             const { user } = req
             let tokenDto = new TokenDto();
@@ -125,6 +135,8 @@ export class UserController {
 
     @Post('logout')
     @HttpCode(200)
+    @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '로그아웃', description: '쿠키 클리어' })
     async userLogout(@Req() req : any ,@Res() res : Response) {
         const { user } = req
         console.log('#############',user)
@@ -138,6 +150,7 @@ export class UserController {
     @Get('login/kakao')
     @UseGuards(KakaoAuthenticationGuard)
     @HttpCode(200)
+    @ApiOperation({ summary: '카카오 로그인', description: '최초가입시 닉네임 기입창으로' })
     async kakaoLogin(@Query() code, @Req() req : any, @Res() res: Response) {
         const { user } = req
         console.log(user)
@@ -184,6 +197,7 @@ export class UserController {
 
     @Post('signup/social')
     @HttpCode(201)
+    @ApiOperation({ summary: '카카오 회원가입', description: '카카오 로그인 최초, 닉네임 입력하면 네임과 같이 request' })
     async signupSocial(@Body() body : any, @Req() req, @Res() res : Response) {
         console.log('#######',req)
         console.log('#######',res)
