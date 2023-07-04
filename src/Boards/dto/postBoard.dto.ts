@@ -1,6 +1,6 @@
 import { IsNotEmpty, Max } from "class-validator";
-import { CashbookEntity } from "src/Cashlists/entity/cashbook.entity";
-import UserEntity from "src/Users/user.entity"
+import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
+import User from "src/Users/user.entity"
 
 export class PostBoardDto {
 
@@ -12,10 +12,10 @@ export class PostBoardDto {
     public boardText : string;
 
     @IsNotEmpty()
-    public userId : UserEntity;
+    public userId : User;
 
     @IsNotEmpty()
-    public cashbookId : CashbookEntity;
+    public cashbookId : Cashbook;
 
 
 }

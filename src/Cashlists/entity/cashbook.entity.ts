@@ -1,12 +1,12 @@
-import UserEntity from 'src/Users/user.entity'
+import User from 'src/Users/user.entity'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
-import { CashDetailEntity } from './cashDetail.entity'
-import { BoardEntity } from 'src/Boards/entity/board.entity'
+import { CashDetail } from './cashDetail.entity'
+import { Board } from 'src/Boards/entity/board.entity'
 
 @Entity('Cashbook')
-export class CashbookEntity {
+export class Cashbook {
     @PrimaryGeneratedColumn()
-    @OneToOne(()=> BoardEntity, {
+    @OneToOne(()=> Board, {
         cascade:true
     })
     public cashbookId : number
@@ -29,12 +29,12 @@ export class CashbookEntity {
     @UpdateDateColumn({ type: 'timestamp' })
     public cashbookUpdatedAt : Date
 
-    @ManyToOne(()=>UserEntity, (user : UserEntity)=>user.userId)
+    @ManyToOne(()=>User, (user : User)=>user.userId)
     @JoinColumn({name:'userId'})
-    public userId : UserEntity
+    public userId : User
 
-    @OneToMany(()=>CashDetailEntity, (detail : CashDetailEntity)=> detail.cashbookId)
-    public detail? : CashDetailEntity[]; 
+    @OneToMany(()=>CashDetail, (detail : CashDetail)=> detail.cashbookId)
+    public detail? : CashDetail[]; 
     
 
 }

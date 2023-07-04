@@ -2,17 +2,19 @@ import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Par
 import { CashbookService } from './cashbook.service';
 import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
-import { CashbookEntity } from './entity/cashbook.entity';
+import { Cashbook } from './entity/cashbook.entity';
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
 import { UserService } from 'src/Users/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
-import { CashDetailEntity } from './entity/cashDetail.entity';
+import { CashDetail } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
+import { GetCategory } from './dto/getCategory.dto';
 
 @Controller('api/cashbook')
+@ApiTags('가계부 관련 API')
 export class CashbookContoller {
     constructor(
         private readonly cashbookService : CashbookService,
@@ -22,6 +24,7 @@ export class CashbookContoller {
     @Get('/main')
     @HttpCode(200)
     @UseGuards(AccessAuthenticationGuard)
+    @ApiResponse({type:[GetCategory]})
     @ApiOperation({ summary: '메인 api', description: '몇일째 되는 날, 2주치 데이터, 당일 유저 지출 총합, 섹션별 소비' })
     async mainPage(@Req() req : any) {
         const { user } = req
@@ -38,13 +41,12 @@ export class CashbookContoller {
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
         console.log(twoweek)
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
-        const totalValue = await this.cashbookService.getCashbookByDate(nowdate2,user.userId)
+        const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(nowdate2,user.userId)
         console.log(nowdate2)
-        console.log(totalValue)
         let total = {
             cashbookNowValue : 0,
             cashbookGoalValue : 0
-        }
+        } 
         for(let i=0; totalValue.length>i; i++) {
             console.log(totalValue[i].cashbookGoalValue)
             total.cashbookNowValue += totalValue[i].cashbookNowValue
@@ -108,7 +110,7 @@ export class CashbookContoller {
     @Get(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
-    async cashDetail(@Param() params : CashDetailEntity) {
+    async cashDetail(@Param() params : CashDetail) {
         console.log(params)
         const cashbookId = params.cashbookId
         console.log('니가호출되고있니')
@@ -133,7 +135,7 @@ export class CashbookContoller {
     @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '디테일 정보 입력', description: 'cashbookId, text, value 입력' })
-    async postDetail(@Param() params : CashbookEntity, @Body() body : PostDetailDto) {
+    async postDetail(@Param() params : Cashbook, @Body() body : PostDetailDto) {
 
         let postDetailDto = new PostDetailDto();
         postDetailDto = {
@@ -151,7 +153,7 @@ export class CashbookContoller {
 
     @Delete(":cashDetailId")
     @UseGuards(AccessAuthenticationGuard)
-    async deleteDetail(@Param() cashDetailId : CashDetailEntity) {
+    async deleteDetail(@Param() cashDetailId : CashDetail) {
         if(!cashDetailId) {
             throw new Error('정상적으로 요청되지 않았습니다')
         }

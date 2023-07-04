@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { Repository, Join ,EntityManager , QueryBuilder } from "typeorm";
-import { CashDetailEntity } from "./entity/cashDetail.entity";
-import { CashbookEntity } from "./entity/cashbook.entity";
+import { CashDetail } from "./entity/cashDetail.entity";
+import { Cashbook } from "./entity/cashbook.entity";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { PostDetailDto } from "./dto/postDetail.dto";
-import UserEntity from "src/Users/user.entity";
+import User from "src/Users/user.entity";
 import { ValueUpdateDto } from "./dto/valueUpdate.dto";
 import { FrameDto } from "./dto/frame.dto";
-import { CashListEntity } from "./entity/cashList.entity";
-import { CashActivityEntity } from "./entity/cashactivity.entity";
+import { CashList } from "./entity/cashList.entity";
+import { CashActivity } from "./entity/cashactivity.entity";
 import { ListBoard } from "src/Boards/dto/listBoard.dto";
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
@@ -16,19 +16,19 @@ const moment = require('moment-timezone')
 @Injectable()
 export class CashbookService {
     constructor(
-        @InjectRepository(CashDetailEntity)
-        private readonly cashDetailEntity : Repository<CashDetailEntity>,
-        @InjectRepository(CashbookEntity)
-        private readonly cashbookEntity : Repository<CashbookEntity>,
-        @InjectRepository(CashListEntity)
-        private readonly cashListEntity : Repository<CashListEntity>,
-        @InjectRepository(CashActivityEntity)
-        private readonly cashactivityEntity : Repository<CashActivityEntity>,
+        @InjectRepository(CashDetail)
+        private readonly cashDetailEntity : Repository<CashDetail>,
+        @InjectRepository(Cashbook)
+        private readonly cashbookEntity : Repository<Cashbook>,
+        @InjectRepository(CashList)
+        private readonly cashListEntity : Repository<CashList>,
+        @InjectRepository(CashActivity)
+        private readonly cashactivityEntity : Repository<CashActivity>,
         @InjectEntityManager()
         private entityManager : EntityManager
     ){}
 
-    async getcashbookAndDetail(cashbookId : number) : Promise<CashbookEntity> {
+    async getcashbookAndDetail(cashbookId : number) : Promise<Cashbook> {
 
         return await this.cashbookEntity
         .createQueryBuilder('cashbook')
@@ -39,7 +39,7 @@ export class CashbookService {
         
     }
 
-    async getDetail(cashbookId : unknown) : Promise<CashDetailEntity[]> {
+    async getDetail(cashbookId : unknown) : Promise<CashDetail[]> {
         return await this.cashDetailEntity
         .createQueryBuilder('cashDetail')
         .where('cashDetail.cashbookId=:cashbookId',{cashbookId : cashbookId})
@@ -62,7 +62,7 @@ export class CashbookService {
         return await this.cashDetailEntity.save(query)
     }
 
-    async deleteDetail(cashDetailId : CashDetailEntity) : Promise<any> {
+    async deleteDetail(cashDetailId : CashDetail) : Promise<any> {
         try {
             return this.cashDetailEntity
             .createQueryBuilder('cashDetail')
@@ -73,9 +73,9 @@ export class CashbookService {
         }
     }
 
-    async getCashbookByDate(date : Date, userId : Number) : Promise<CashbookEntity[]> {
+    async getCashbookByDate(date : Date, userId : Number) : Promise<Cashbook[]> {
     
-        const result : Promise<CashbookEntity[]> = await this.cashbookEntity.query(
+        const result : Promise<Cashbook[]> = await this.cashbookEntity.query(
             `SELECT cashbookCategory, cashbookNowValue, cashbookGoalValue 
              FROM Cashbook 
              WHERE DATE(cashbookCreatedAt) = DATE(?) 
@@ -94,7 +94,7 @@ export class CashbookService {
         .execute()
     }
 
-    async getCashbookDuringDate(endDate : Date, userId : UserEntity) : Promise<any> {
+    async getCashbookDuringDate(endDate : Date, userId : User) : Promise<any> {
         console.log(userId)
         const day : number = endDate.getDay() + 7 + 1
         let startDate = new Date();
@@ -145,7 +145,7 @@ export class CashbookService {
         return trueResult;
     }
 
-    async getOneDetail(cashDetailId : CashDetailEntity) : Promise<CashDetailEntity> {
+    async getOneDetail(cashDetailId : CashDetail) : Promise<CashDetail> {
         return await this.cashDetailEntity
         .createQueryBuilder('cashDetail')
         .select()
@@ -153,7 +153,7 @@ export class CashbookService {
         .getOne()
     }
     
-    async frameActivityCreate(cashEntity : CashListEntity) {
+    async frameActivityCreate(cashEntity : CashList) {
         let date = new Date()
 
         const query =  this.cashactivityEntity.create({
@@ -184,7 +184,7 @@ export class CashbookService {
         const frame  = this.cashListEntity.create(
             frameDto
         )
-        const query : CashListEntity = await this.cashListEntity.save(frame)
+        const query : CashList = await this.cashListEntity.save(frame)
 
         if(!frame) {
             throw new Error('프레임 생성 에러')
@@ -201,7 +201,7 @@ export class CashbookService {
         return frame
     }
 
-    async allCashlist() : Promise<CashListEntity[]> {
+    async allCashlist() : Promise<CashList[]> {
         return await this.cashListEntity
         .createQueryBuilder()
         .select()
@@ -209,7 +209,7 @@ export class CashbookService {
     }
 
 
-    async cashbookById(cashbookId : CashbookEntity) : Promise<CashbookEntity> {
+    async cashbookById(cashbookId : Cashbook) : Promise<Cashbook> {
         return await this.cashbookEntity
         .createQueryBuilder()
         .select()
@@ -218,7 +218,7 @@ export class CashbookService {
 
     }
 
-    async inputConsume(cashbookId : CashbookEntity) {
+    async inputConsume(cashbookId : Cashbook) {
         const cashbook = await this.cashbookById(cashbookId)
         let { cashbookNowValue } = cashbook
 

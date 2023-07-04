@@ -1,21 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
-import { CommentEntity } from "./entity/comment.entity";
+import { Comment } from "./entity/comment.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PostCommentDto } from "./dto/postComment.dto";
-import UserEntity from "src/Users/user.entity";
+import User from "src/Users/user.entity";
 import { UserService } from "src/Users/user.service";
 import { EntityManager } from "typeorm";
-import { LikeEntity } from "./entity/like.entity";
+import { Like } from "./entity/like.entity";
 
 @Injectable()
 export class CommentService {
     constructor(
-        @InjectRepository(CommentEntity)
-        private readonly commentEntity : Repository<CommentEntity>,
+        @InjectRepository(Comment)
+        private readonly commentEntity : Repository<Comment>,
 
-        @InjectRepository(LikeEntity)
-        private readonly likeEntity : Repository<LikeEntity>,
+        @InjectRepository(Like)
+        private readonly likeEntity : Repository<Like>,
         
         private readonly userService : UserService,
 
@@ -46,7 +46,7 @@ export class CommentService {
 
     }
 
-    async postLike(userId : UserEntity, commentId : CommentEntity) {
+    async postLike(userId : User, commentId : Comment) {
         let query = await this.likeEntity
         .createQueryBuilder('like')
         .select()
@@ -65,7 +65,7 @@ export class CommentService {
 
     }
 
-    async getLike(commentId : CommentEntity) {
+    async getLike(commentId : Comment) {
         const result : number = await this.likeEntity
         .query(
             `SELECT count(*) FROM Like

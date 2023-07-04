@@ -2,17 +2,17 @@ import { Controller, Module,  } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import UserEntity from './Users/user.entity'
+import User from './Users/user.entity'
 import {UserModule} from './Users/user.module'
 import { CacheModule } from '@nestjs/cache-manager';  
 import { redisStore } from 'cache-manager-redis-yet'
-import { BoardEntity } from './Boards/entity/board.entity';
-import { CommentEntity } from './Comments/entity/comment.entity';
-import { LikeEntity } from './Comments/entity/like.entity';
-import { CashbookEntity } from './Cashlists/entity/cashbook.entity';
-import { CashListEntity } from './Cashlists/entity/cashList.entity';
-import { CashActivityEntity } from './Cashlists/entity/cashactivity.entity';
-import { CashDetailEntity } from './Cashlists/entity/cashDetail.entity';
+import { Board } from './Boards/entity/board.entity';
+import { Comment } from './Comments/entity/comment.entity';
+import { Like } from './Comments/entity/like.entity';
+import { Cashbook } from './Cashlists/entity/cashbook.entity';
+import { CashList } from './Cashlists/entity/cashList.entity';
+import { CashActivity } from './Cashlists/entity/cashactivity.entity';
+import { CashDetail } from './Cashlists/entity/cashDetail.entity';
 import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
@@ -40,14 +40,14 @@ import { ConfigModule } from '@nestjs/config';
         timezone: 'Asia/Seoul',
         synchronize:true,
         entities : [
-                  UserEntity,
-                  BoardEntity,
-                  CommentEntity,
-                  CashbookEntity,
-                  CashListEntity,
-                  CashActivityEntity,
-                  CashDetailEntity,
-                  LikeEntity
+                  User,
+                  Board,
+                  Comment,
+                  Cashbook,
+                  CashList,
+                  CashActivity,
+                  CashDetail,
+                  Like
                   ],
         logging:true
     }),

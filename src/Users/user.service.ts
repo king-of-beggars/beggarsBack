@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable} from '@nestjs/common'
-import UserEntity  from './user.entity'
+import User  from './user.entity'
 import {Repository, In} from 'typeorm'
 import { SignupDto } from './dto/signup.dto'
 import * as bcrypt from 'bcrypt';
@@ -9,8 +9,8 @@ import { SocialSignupDto } from './dto/socialSignup.dto'
 @Injectable()
 export class UserService {
     constructor(
-        @InjectRepository(UserEntity)
-        private userRepository: Repository<UserEntity>
+        @InjectRepository(User)
+        private userRepository: Repository<User>
 
         
     ){}
@@ -42,7 +42,7 @@ export class UserService {
 }
 
     //유저아이디로 db체크
-    async userByName(userName : string) : Promise<UserEntity> {
+    async userByName(userName : string) : Promise<User> {
 
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
@@ -58,7 +58,7 @@ export class UserService {
     }
 
     //유저 아이디로 pwd 반환
-    async allListByName(userName : string) : Promise<UserEntity> {
+    async allListByName(userName : string) : Promise<User> {
 
         if(!userName) {
             throw new Error('아이디가 넘어오지 않음')
@@ -75,7 +75,7 @@ export class UserService {
 
 
     //유저닉네임으로 db체크
-    async userByNickname(userNickname: string) : Promise<UserEntity> {
+    async userByNickname(userNickname: string) : Promise<User> {
         if(!userNickname) {
             throw new Error('닉네임이 넘어오지 않음')
         }
@@ -114,7 +114,7 @@ export class UserService {
         return encodeURIComponent(nickname)
     }
 
-    async userSignupDate(userId : UserEntity) {
+    async userSignupDate(userId : User) {
         const now : string = new Date().toISOString().split('T')[0]
         const nowdate = new Date(now)    
         let date = await this.userRepository

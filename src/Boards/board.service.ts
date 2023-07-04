@@ -1,18 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { BoardEntity } from "./entity/board.entity";
+import { Board } from "./entity/board.entity";
 import { PostBoardDto } from "./dto/postBoard.dto";
 import { PaginationDto } from "./dto/pagination.dto";
-import { CashDetailEntity } from "src/Cashlists/entity/cashDetail.entity";
+import { CashDetail } from "src/Cashlists/entity/cashDetail.entity";
 import { CashbookService } from "src/Cashlists/cashbook.service";
-import { CashbookEntity } from "src/Cashlists/entity/cashbook.entity";
+import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
 
 @Injectable()
 export class BoardService {
     constructor(
-        @InjectRepository(BoardEntity)
-        private boardRepository : Repository<BoardEntity>,
+        @InjectRepository(Board)
+        private boardRepository : Repository<Board>,
         //pirvate cashlistRepository :Repository<CashlistEntity>
         private readonly cashbookService : CashbookService
     ){}
@@ -42,7 +42,7 @@ export class BoardService {
         
     }
 
-    async getListAll(paginationDTO : PaginationDto) : Promise<BoardEntity[]> {
+    async getListAll(paginationDTO : PaginationDto) : Promise<Board[]> {
         const result =  await this.boardRepository
         .createQueryBuilder('board')
         .leftJoin('board.cashbookId','cashbook')
@@ -59,7 +59,7 @@ export class BoardService {
         return result;
     }
 
-    async getBoardDetail(boardId : number) : Promise<BoardEntity> {
+    async getBoardDetail(boardId : number) : Promise<Board> {
         return await this.boardRepository
         .createQueryBuilder('board')
         .leftJoin('board.userId','user')
@@ -70,7 +70,7 @@ export class BoardService {
 
     }
 
-    async getDetailByBoardId(boardId : number) : Promise<CashbookEntity> {
+    async getDetailByBoardId(boardId : number) : Promise<Cashbook> {
         const boards = await this.boardRepository
         .createQueryBuilder('board')
         .leftJoinAndSelect('board.cashbookId','cashbook')

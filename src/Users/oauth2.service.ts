@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable ,Body} from '@nestjs/common'
-import UserEntity  from './user.entity'
+import User  from './user.entity'
 import {Repository, In} from 'typeorm'
 import { TokenDto } from './dto/token.dto'
 import * as bcrypt from 'bcrypt';
@@ -11,21 +11,21 @@ import { UserService } from './user.service';
 @Injectable()
 export class AuthService {  
     constructor(
-        @InjectRepository(UserEntity)
-        private userRepository: Repository<UserEntity>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
         private readonly jwtService: JwtService,
         private readonly configService : ConfigService,
         private readonly userService : UserService
     ){}
 
     //패스워드 DB확인
-    async userCheck(userName: string, userPwd:string) : Promise<UserEntity> {
+    async userCheck(userName: string, userPwd:string) : Promise<User> {
         
         if(!userName || !userPwd) {
             throw new Error('아이디나 비번이 없다')
         }
         //아이디 확인
-        const byName : UserEntity = await this.userService.allListByName(userName)
+        const byName : User = await this.userService.allListByName(userName)
         .catch(e=>{
             throw new Error('아이디가 DB에 없습니다')
         })

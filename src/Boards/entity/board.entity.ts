@@ -1,10 +1,10 @@
-import { CashbookEntity } from 'src/Cashlists/entity/cashbook.entity'
-import { CommentEntity } from 'src/Comments/entity/comment.entity'
-import UserEntity from 'src/Users/user.entity'
+import { Cashbook } from 'src/Cashlists/entity/cashbook.entity'
+import { Comment } from 'src/Comments/entity/comment.entity'
+import User from 'src/Users/user.entity'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, OneToOne } from 'typeorm'
 
 @Entity('Board')
-export class BoardEntity {
+export class Board {
     @PrimaryGeneratedColumn()
     public boardId : number
 
@@ -20,20 +20,20 @@ export class BoardEntity {
     @UpdateDateColumn({ type: 'timestamp' })
     public boardUpdatedAt : Date
 
-    @ManyToOne(()=> UserEntity, (user : UserEntity)=> user.userId)
+    @ManyToOne(()=> User, (user : User)=> user.userId)
     @JoinColumn({name:'userId'})
-    public userId : UserEntity
+    public userId : User
 
-    @OneToMany(()=>CommentEntity,
-    (comment : CommentEntity) => comment.boardId, 
+    @OneToMany(()=>Comment,
+    (comment : Comment) => comment.boardId, 
         {
         cascade:true
     })
-    public comments? : CommentEntity[]
+    public comments? : Comment[]
 
-    @OneToOne(()=>CashbookEntity,
-              (cashbook : CashbookEntity) => cashbook.cashbookId)
+    @OneToOne(()=>Cashbook,
+              (cashbook : Cashbook) => cashbook.cashbookId)
     @JoinColumn({name : 'cashbookId'})
-    public cashbookId : CashbookEntity
+    public cashbookId : Cashbook
 
 }

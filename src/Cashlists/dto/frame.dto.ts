@@ -1,6 +1,6 @@
 import { IsNotEmpty, Max } from "class-validator";
-import UserEntity from "src/Users/user.entity";
-import { CashbookEntity } from "../entity/cashbook.entity";
+import User from "src/Users/user.entity";
+import { Cashbook } from "../entity/cashbook.entity";
 
 export class FrameDto {
 
@@ -13,5 +13,5 @@ export class FrameDto {
     public cashListGoalValue: number;
 
     @IsNotEmpty()
-    public userId : UserEntity;
+    public userId : User;
 }

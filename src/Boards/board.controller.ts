@@ -2,7 +2,7 @@ import { Controller,Post,Req, Res,Body, HttpCode, UseGuards, Get, Query, Delete,
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard'
 import { BoardService } from './board.service';
 import { CashbookService } from 'src/Cashlists/cashbook.service';
-import { CashDetailEntity } from 'src/Cashlists/entity/cashDetail.entity';
+import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 import { PostBoardDto } from './dto/postBoard.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { ListBoard } from './dto/listBoard.dto';

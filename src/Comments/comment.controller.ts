@@ -1,14 +1,14 @@
 import { Controller, Post, Delete, UseGuards, Param, Body, Req } from "@nestjs/common";
-import { CommentEntity } from "./entity/comment.entity";
+import { Comment } from "./entity/comment.entity";
 import { CommentService } from "./comment.service";
 import { PostCommentDto } from "./dto/postComment.dto";
-import UserEntity from "src/Users/user.entity";
+import User from "src/Users/user.entity";
 import { AccessAuthenticationGuard } from "src/Users/passport/jwt/access.guard";
-import { BoardEntity } from "src/Boards/entity/board.entity";
+import { Board } from "src/Boards/entity/board.entity";
 import { DeleteResult } from "typeorm";
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
-@ApiTags('유저 API')
+@ApiTags('댓글/좋아요 API')
 @Controller('api/board/:boardId/comment/')
 export class CommentController {
     constructor(
@@ -18,13 +18,14 @@ export class CommentController {
     @Post('/')
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '댓글 입력', description: '댓글 입력, 포인트 1점 기입' })
-    async postComment(@Param() params : BoardEntity, @Body() commentText : string, @Req() req : any) {
+    @ApiParam({ name: 'boardId', type: 'number' })
+    async postComment(@Param() boardId : Board, @Body() commentText : string, @Req() req : any) {
         let { user } = req
         let postCommentDto = new PostCommentDto()
         
         postCommentDto = {
-            userId : user.userId,
-            boardId : params,
+            userId : user.userId, 
+            boardId : boardId,
             commentText : commentText
         }
         return await this.commentService.postComment(postCommentDto,user.userId)

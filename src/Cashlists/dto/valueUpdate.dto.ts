@@ -1,11 +1,11 @@
 import { IsNotEmpty, Max } from "class-validator";
-import { CashbookEntity } from "../entity/cashbook.entity";
+import { Cashbook } from "../entity/cashbook.entity";
 
 export class ValueUpdateDto {
 
     @IsNotEmpty()
     @Max(1)
-    public cashbookId : CashbookEntity;
+    public cashbookId : Cashbook;
 
     @IsNotEmpty()
     public cashDetailValue : number

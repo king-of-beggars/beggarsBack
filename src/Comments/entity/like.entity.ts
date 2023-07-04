@@ -1,20 +1,20 @@
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, Timestamp, JoinColumn } from 'typeorm'
-import { CommentEntity } from './comment.entity'
-import UserEntity from 'src/Users/user.entity'
+import { Comment } from './comment.entity'
+import User from 'src/Users/user.entity'
 
 @Entity('Like')
-export class LikeEntity {
+export class Like {
 
     @PrimaryGeneratedColumn()
     public likeId : string
 
-    @ManyToOne(()=>CommentEntity, (comment:CommentEntity)=>comment.commentId)
+    @ManyToOne(()=>Comment, (comment:Comment)=>comment.commentId)
     @JoinColumn({name:'commentId'})
-    public commentId : CommentEntity
+    public commentId : Comment
 
-    @ManyToOne(()=>UserEntity, (user:UserEntity)=>user.userId)
+    @ManyToOne(()=>User, (user:User)=>user.userId)
     @JoinColumn({name:'userId'})
-    public userId : UserEntity
+    public userId : User
 
     @Column({default:1})
     public likeCheck : number

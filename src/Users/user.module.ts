@@ -4,7 +4,7 @@ import { AuthService } from './oauth2.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import UserEntity from './user.entity';
+import User from './user.entity';
 import { UserController } from './user.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './passport/local/local.strategy';
@@ -13,7 +13,7 @@ import { AccessStrategy } from './passport/jwt/access.strategy';
 // import { RedisService } from './redis.service';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
       secret : process.env.SECRET_KEY

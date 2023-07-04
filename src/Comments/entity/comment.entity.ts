@@ -1,10 +1,10 @@
-import { BoardEntity } from 'src/Boards/entity/board.entity'
-import UserEntity from 'src/Users/user.entity'
+import { Board } from 'src/Boards/entity/board.entity'
+import User from 'src/Users/user.entity'
 import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
-import { LikeEntity } from './like.entity'
+import { Like } from './like.entity'
 
 @Entity('Comment')
-export class CommentEntity {
+export class Comment {
     @PrimaryGeneratedColumn()
     public commentId : number
 
@@ -15,16 +15,16 @@ export class CommentEntity {
     public commentCreatedAt : Date
 
     @ManyToOne
-    (()=>UserEntity, (user : UserEntity)=> user.userId)
+    (()=>User, (user : User)=> user.userId)
     @JoinColumn({name:'userId'})
-    public userId : UserEntity
+    public userId : User
 
     @ManyToOne
-    (()=>BoardEntity, (board : BoardEntity)=> board.boardId)
+    (()=>Board, (board : Board)=> board.boardId)
     @JoinColumn({name:'boardId'})
-    public boardId : BoardEntity
+    public boardId : Board
 
     @OneToMany
-    (()=>LikeEntity, (like : LikeEntity)=> like.commentId)
-    public likes? : LikeEntity[]
+    (()=>Like, (like : Like)=> like.commentId)
+    public likes? : Like[]
 }

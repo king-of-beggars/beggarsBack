@@ -1,21 +1,13 @@
 import {IsNotEmpty} from 'class-validator' 
 import { ApiProperty } from '@nestjs/swagger';
+import { PickType } from "@nestjs/swagger";
+import User from "../user.entity";
+import { SignupDto } from './signup.dto';
 
-export class SocialSignupDto {
+export class SocialSignupDto extends PickType(SignupDto, ['userName', 'userNickname'] as const) {
+
     
-    @IsNotEmpty()
-    @ApiProperty({ description: '유저아이디' })
-    public userName : string;
+    public userType: number;
 
-    @IsNotEmpty()
-    @ApiProperty({ description: '유저닉네임' })
-    public userNickname : string;
-
-    @IsNotEmpty()
-    public userType : number
-    
-    @IsNotEmpty()
-    public userLoginType : string 
+    public userLoginType: string;
 }
-
-export default SocialSignupDto;

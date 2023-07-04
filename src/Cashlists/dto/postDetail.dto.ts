@@ -1,11 +1,11 @@
 import { IsNotEmpty, Max } from "class-validator";
-import { CashbookEntity } from "../entity/cashbook.entity";
+import { Cashbook } from "../entity/cashbook.entity";
 
 export class PostDetailDto {
 
     @IsNotEmpty()
     @Max(1)
-    public cashbookId : CashbookEntity;
+    public cashbookId : Cashbook;
 
     @IsNotEmpty()
     public cashDetailText : string;

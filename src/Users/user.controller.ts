@@ -3,7 +3,7 @@ import { SignupDto} from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
 import { UserService } from './user.service';
 import { AuthService } from './oauth2.service'
-import { UserEntity } from './user.entity'
+import { User } from './user.entity'
 import { LocalAuthenticationGuard } from './passport/local/local.guard'
 import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
@@ -12,7 +12,10 @@ import * as bcrypt from 'bcrypt';
 import {Response} from 'express'
 import {HttpStatus} from 'httpstatus'
 import { AccessAuthenticationGuard } from './passport/jwt/access.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { IdCheckDto } from './dto/idCheck.dto';
+import { NickCheckDto } from './dto/nickCheck.dto';
+import { LoginDto } from './dto/login.dto';
 
 
 @Controller('/api/user')
@@ -63,8 +66,9 @@ export class UserController {
     @Post('idCheck')
     @HttpCode(200)
     @ApiResponse({ status: 200, description: '사용 가능한 아이디 입니다' })
-    @ApiOperation({ summary: '아이디 체크', description: '아이디 기입' }) 
-    async userIdCheck(@Body() body : UserEntity) {
+    @ApiOperation({ summary: '아이디 체크', description: '아이디 기입' })
+    @ApiBody({type:IdCheckDto})
+    async userIdCheck(@Body() body : IdCheckDto) {
         try {
             const byName = await this.userService.userByName(body.userName)
             if(!byName) {
@@ -79,7 +83,7 @@ export class UserController {
     @Post('nickCheck')
     @HttpCode(200)
     @ApiOperation({ summary: '닉네임 체크', description: '아이디 기입' })
-    async userNickCheck(@Req() req, @Body() body : UserEntity)  {
+    async userNickCheck(@Req() req, @Body() body : NickCheckDto)  {
 
         try {
             console.log(req)
@@ -99,6 +103,7 @@ export class UserController {
     @Post('login')
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
+    @ApiBody({type:LoginDto})
     @ApiOperation({ summary: '일반 로그인', description: 'id , pwd 입력' })
     async userLogin(@Req() req : any, @Res() res : Response) {
             const { user } = req
@@ -135,10 +140,11 @@ export class UserController {
 
     @Post('logout')
     @HttpCode(200)
+    @ApiResponse({ status: 200, description: '로그아웃 완료' })
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '로그아웃', description: '쿠키 클리어' })
     async userLogout(@Req() req : any ,@Res() res : Response) {
-        const { user } = req
+        const { user } = req 
         console.log('#############',user)
         console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         console.log(req)
@@ -198,7 +204,7 @@ export class UserController {
     @Post('signup/social')
     @HttpCode(201)
     @ApiOperation({ summary: '카카오 회원가입', description: '카카오 로그인 최초, 닉네임 입력하면 네임과 같이 request' })
-    async signupSocial(@Body() body : any, @Req() req, @Res() res : Response) {
+    async signupSocial(@Body() body : SocialSignupDto, @Req() req, @Res() res : Response) {
         console.log('#######',req)
         console.log('#######',res)
         try {
@@ -210,7 +216,7 @@ export class UserController {
             let SignupDto : SocialSignupDto
 
             SignupDto = {
-                userName : 'asdasd',
+                userName : body.userName,
                 userNickname : body.userNickname,
                 userLoginType : 'kakao',
                 userType : 1
