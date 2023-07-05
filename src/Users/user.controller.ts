@@ -43,14 +43,14 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true,
+                secure : false,
                 httpOnly : false
             })
 
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true,
+                secure : false,
                 httpOnly : false
             })
             res.setHeader('userId', user.userId)
@@ -118,7 +118,7 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true,
+                secure : false,
                 httpOnly : false,
                 path : '/'
             })
@@ -126,7 +126,7 @@ export class UserController {
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true, 
+                secure : false, 
                 httpOnly : false,
                 path : '/'
             })
@@ -170,12 +170,12 @@ export class UserController {
             res.cookie('userName', user, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true,
+                secure : false,
                 httpOnly : false
             })
 
-            res.setHeader('Set-Cookie',`userName=${user}; Path=/; host=https://beggars-front-eight.vercel.app/; sameSite=None; secure=true; httpOnly=false;`)
-            return res.redirect(`https://beggars-front-eight.vercel.app/?loginSuccess=false`)
+            res.setHeader('Set-Cookie',`userName=${user}; Path=/; host=http://localhost:3000/; sameSite=None; secure=false; httpOnly=false;`)
+            return res.redirect(`http://localhost:3000?loginSuccess=false`)
         }
         
         const refreshToken = await this.authService.setRefreshToken(user)
@@ -183,14 +183,14 @@ export class UserController {
         res.cookie('refreshToken', refreshToken, {
             domain : 'poorkingapi.shop',
             sameSite : 'none',
-            secure : true,
+            secure : false,
             httpOnly : false
         })
 
         res.cookie('accessToken', accessToken, {
             domain : 'poorkingapi.shop',
             sameSite : 'none',
-            secure : true,
+            secure : false,
             httpOnly : false
         })
         res.setHeader('userId', user.userId)
@@ -198,7 +198,7 @@ export class UserController {
         const nickname : string = await this.userService.encodeNick(user.userNickname)
         res.setHeader('userNickname', nickname)
         
-        return res.redirect(`https://beggars-front-eight.vercel.app/`)
+        return res.redirect(`http://localhost:3000/`)
     }
 
     @Post('signup/social')
@@ -233,21 +233,21 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : true,
+                secure : false,
                 httpOnly :false
             })
 
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure :true,
+                secure :false,
                 httpOnly :false
             })
             res.setHeader('userId', user.userId)
             
             const nickname : string = await this.userService.encodeNick(user.userNickname)
             res.setHeader('userNickname', nickname)
-            return res.redirect(`https://beggars-front-eight.vercel.app/`)
+            return res.redirect(`http://localhost:3000/`)
         } catch(err) {
             throw new Error(err);
         }

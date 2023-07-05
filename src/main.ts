@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser())
   setupSwagger(app);
   app.enableCors({
-    origin : ['https://beggars-front-eight.vercel.app/','https://deeplake-beggars-front.vercel.app','https://dev-beggars-front-eight.vercel.app'],
+    origin : ['https://beggars-front-eight.vercel.app/','https://deeplake-beggars-front.vercel.app','https://dev-beggars-front-eight.vercel.app', 'http://localhost:3000'],
     credentials:true,
     methods : 'GET,HEAD,PUT,PATCH,POST,DELETE',
     exposedHeaders : ['Set-Cookie','userId','userNickname'],
