@@ -43,14 +43,14 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false,
+                secure : true,
                 httpOnly : false
             })
 
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false,
+                secure : true,
                 httpOnly : false
             })
             res.setHeader('userId', user.userId)
@@ -118,7 +118,7 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false,
+                secure : true,
                 httpOnly : false,
                 path : '/'
             })
@@ -126,7 +126,7 @@ export class UserController {
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false, 
+                secure : true, 
                 httpOnly : false,
                 path : '/'
             })
@@ -170,7 +170,7 @@ export class UserController {
             res.cookie('userName', user, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false,
+                secure : true,
                 httpOnly : false
             })
 
@@ -183,14 +183,14 @@ export class UserController {
         res.cookie('refreshToken', refreshToken, {
             domain : 'poorkingapi.shop',
             sameSite : 'none',
-            secure : false,
+            secure : true,
             httpOnly : false
         })
 
         res.cookie('accessToken', accessToken, {
             domain : 'poorkingapi.shop',
             sameSite : 'none',
-            secure : false,
+            secure : true,
             httpOnly : false
         })
         res.setHeader('userId', user.userId)
@@ -233,14 +233,14 @@ export class UserController {
             res.cookie('refreshToken', refreshToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure : false,
+                secure : true,
                 httpOnly :false
             })
 
             res.cookie('accessToken', accessToken, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
-                secure :false,
+                secure :true,
                 httpOnly :false
             })
             res.setHeader('userId', user.userId)
