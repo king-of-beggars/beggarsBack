@@ -55,7 +55,6 @@ export class BoardService {
         .take(paginationDTO.limit)
         .getMany()
 
-        console.log(result)
         return result;
     }
 
@@ -98,7 +97,6 @@ export class BoardService {
         .where('cashbookId IN (:...cashbookIds)',{cashbookIds})
         .getRawMany()
         const result = {}
-        console.log(query)
         for(let i=0; query.length>i; i++) {
             result[query[i].cashbookId] = query[i].boardId 
         }

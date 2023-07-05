@@ -74,11 +74,10 @@ export class BoardController {
         const result : any = await this.boardService.getBoardDetail(params.boardId)
         const like = result.comments.map(comment => comment.commentId)
         const likeList = await this.commentService.getLikeList(like)
-        console.log(likeList)
         let likeCheck = {}
         
         user ? likeCheck = await this.commentService.getLikeCheck(like,user.userId) : {}
-        console.log(likeCheck)
+    
         for(let i=0; result.comments.length>i; i++) {
             result.comments[i].likeCount = Number(likeList[result.comments[i].commentId]) || 0
             result.comments[i].likeCheck = likeCheck[result.comments[i].commentId] || 0

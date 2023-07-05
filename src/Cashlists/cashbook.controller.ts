@@ -30,9 +30,7 @@ export class CashbookContoller {
     @ApiOperation({ summary: '메인 api', description: '몇일째 되는 날, 2주치 데이터, 당일 유저 지출 총합, 섹션별 소비' })
     async mainPage(@Req() req : any) {
         const { user } = req
-        console.log(user)
         let tempdate = moment().tz("Asia/Seoul")
-        console.log(tempdate)
         let nowdate = tempdate.toDate()
         let nowdate2 = new Date()
         nowdate2.setHours(nowdate.getHours() + 9)
