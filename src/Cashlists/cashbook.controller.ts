@@ -124,10 +124,11 @@ export class CashbookContoller {
         let result2 = await this.cashbookService.cashbookById(cashbookId)
         const {cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
         if(detail.length===0) {
+            let result = {}
             let consumption =true
-            cashbookNowValue===0 ? consumption=true : consumption=false
-            return consumption;
-        } else {
+            cashbookNowValue===0 ? consumption=result['consumption'] = true : result['consumption']=false
+            return result
+        } else { 
         return `${cashbookName},
                 ${cashbookCategory},
                 ${cashbookGoalValue},
