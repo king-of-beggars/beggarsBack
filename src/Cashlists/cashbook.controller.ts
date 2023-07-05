@@ -131,14 +131,13 @@ export class CashbookContoller {
             cashbookNowValue===0 ? consumption=result['consumption'] = true : result['consumption']=false
             return result
         } else { 
-        return `data : {
-            "cashbookName" : ${cashbookName},
-            "cashbookCategory" : ${cashbookCategory},
-            "cashbookGoalValue" : ${cashbookGoalValue},
-            "detail" : ${detail}
-        }`
-        }
-    }
+        return {data : {
+            cashbookName,
+            cashbookCategory,
+            cashbookGoalValue,
+            detail
+        }}
+    }}
  
     @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
