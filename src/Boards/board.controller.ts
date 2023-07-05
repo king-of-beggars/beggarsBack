@@ -63,14 +63,11 @@ export class BoardController {
 
     @Get('detail/:boardId')
     async boardDetail(@Param() params : any, @Req() req : Request) {
-        let token = req.headers['set-cookie'][0]
-        if(token) {
-            token = token.split(',')[1]
-            token = token.split('=')[1]
-            token = token.split(' ')[0]
-            token = token.replace(';','')
-        } 
-        console.log(token)
+        let token = req.headers.cookie
+            if(token) {
+                token = token.split(';')[1]
+                token = token.split('=')[1]
+            } 
         const user = this.jwtService.verify(token,{secret : this.configService.get('SECRET_KEY')})
         
 

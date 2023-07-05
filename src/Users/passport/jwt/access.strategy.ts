@@ -18,20 +18,20 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
         super({
             jwtFromRequest : ExtractJwt.fromExtractors([
                 (request : Request) => {
-                    // let token = request.headers.cookie
-                    // if(token) {
-                    //     token = token.split(';')[1]
-                    //     token = token.split('=')[1]
-                    // } 
-                    // console.log(token)
-                    let token = request.headers['set-cookie'][0]
+                    let token = request.headers.cookie
                     if(token) {
-                        token = token.split(',')[1]
+                        token = token.split(';')[1]
                         token = token.split('=')[1]
-                        token = token.split(' ')[0]
-                        token = token.replace(';','')
                     } 
                     console.log(token)
+                    // let token = request.headers['set-cookie'][0]
+                    // if(token) {
+                    //     token = token.split(',')[1]
+                    //     token = token.split('=')[1]
+                    //     token = token.split(' ')[0]
+                    //     token = token.replace(';','')
+                    // } 
+                    // console.log(token)
                     const test = jwtService.verify(token,{secret : this.configService.get('SECRET_KEY')})
                     return token
                 }
