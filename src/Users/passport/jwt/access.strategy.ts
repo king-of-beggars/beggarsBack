@@ -12,7 +12,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
     constructor(
         private readonly userService : UserService,
         private readonly jwtService : JwtService,
-        private readonly configServcie : ConfigService
+        private readonly configService : ConfigService
 
     ){
         super({
@@ -32,7 +32,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
                         token = token.replace(';','')
                     } 
                     console.log(token)
-                    const test = jwtService.verify(token,{secret : this.configServcie.get('SECRET_KEY')})
+                    const test = jwtService.verify(token,{secret : this.configService.get('SECRET_KEY')})
                     return token
                 }
             ]),

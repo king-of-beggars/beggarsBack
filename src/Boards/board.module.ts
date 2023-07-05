@@ -13,16 +13,19 @@ import { CashbookModule } from 'src/Cashlists/cashbook.module';
 import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 import { AccessStrategy } from 'src/Users/passport/jwt/access.strategy';
+import { CommentService } from 'src/Comments/comment.service';
+import { Like } from 'src/Comments/entity/like.entity';
+import { AuthService } from 'src/Users/oauth2.service';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,Board,Comment,Cashbook,CashDetail]),
+    TypeOrmModule.forFeature([User,Board,Comment,Cashbook,CashDetail,Like]),
     PassportModule,
     UserModule,
     CashbookModule
   ],
   controllers: [BoardController], 
   providers: [
-    BoardService
+    BoardService,CommentService,AuthService,JwtService
   ], 
   exports: [
     BoardService

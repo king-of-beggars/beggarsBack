@@ -74,4 +74,36 @@ export class CommentService {
         )
         return result
     }
+
+    async getLikeList(commentId : number[]) {
+        const query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select('like.commentId', 'commentId')
+        .addSelect('COUNT(like.likeId)','likeCount')
+        .where('like.commentId IN (:...commentId)',{commentId})
+        .groupBy('like.commentId')
+        .getRawMany()
+
+        const result = {}
+        for(let i=0; query.length>i; i++) {
+            result[query[i].commentId] = query[i].likeCount
+        }
+        return result
+    }
+    async getLikeCheck(commentId : number[], userId : number) {
+        const query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select('like.commentId','commentId')
+        .addSelect('like.likeCheck', 'likeCheck')
+        .where('like.userId=:userId',{userId})
+        .andWhere('like.commentId IN (:...commentId)',{commentId})
+        .andWhere('like.likeCheck=1')
+        .getRawMany()
+
+        const result = {}
+        for(let i=0; query.length>i; i++) {
+            result[query[i].commentId] = query[i].likeCheck
+        }
+        return result
+    }
 }

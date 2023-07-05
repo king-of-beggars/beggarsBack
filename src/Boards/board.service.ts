@@ -62,9 +62,11 @@ export class BoardService {
     async getBoardDetail(boardId : number) : Promise<Board> {
         return await this.boardRepository
         .createQueryBuilder('board')
-        .leftJoin('board.userId','user')
-        .leftJoin('board.comments','comment')
-        .select(['board','comment','user.userId','user.userNickname','user.userName'])
+        .leftJoinAndSelect('board.userId','user')
+        .leftJoinAndSelect('board.comments','comment')
+        .leftJoinAndSelect('comment.userId','commentUser')
+        .leftJoinAndSelect('comment.likes','like')
+        .select(['board','comment','comment.userId','user.userId','user.userNickname','user.userName','commentUser.userId','commentUser.userName','commentUser.userNickname'])
         .where('board.boardId=:boardId',{boardId : boardId})
         .getOne()
 
@@ -82,6 +84,27 @@ export class BoardService {
         const cashbookId  = boards.cashbookId.cashbookId
         return await this.cashbookService.getcashbookAndDetail(cashbookId)
         
-    }   
+    }
+
+    async BoardCheck(cashbookIds : number[]) {
+        if(!cashbookIds) {
+            throw new Error('날짜가 비어 있는 배열입니다')
+        }
+        
+        const query = await this.boardRepository
+        .createQueryBuilder('board')
+        .select('boardId')
+        .addSelect('cashbookId')
+        .where('cashbookId IN (:...cashbookIds)',{cashbookIds})
+        .getRawMany()
+        const result = {}
+        console.log(query)
+        for(let i=0; query.length>i; i++) {
+            result[query[i].cashbookId] = query[i].boardId 
+        }
+
+        return result;
+
+    }
 
 }

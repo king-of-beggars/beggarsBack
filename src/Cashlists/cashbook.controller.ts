@@ -1,4 +1,4 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param, Put} from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param, Put, ConsoleLogger} from '@nestjs/common';
 import { CashbookService } from './cashbook.service';
 import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
@@ -12,13 +12,15 @@ import { FrameDto } from './dto/frame.dto';
 const moment = require('moment-timezone')
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
+import { BoardService } from 'src/Boards/board.service';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
 export class CashbookContoller {
     constructor(
         private readonly cashbookService : CashbookService,
-        private readonly userService : UserService
+        private readonly userService : UserService,
+        private readonly boardService : BoardService
     ){}
 
     @Get('/main')
@@ -98,12 +100,14 @@ export class CashbookContoller {
         const { user } = req
         const date : Date = query.date
         console.log(date)
-        const result = await this.cashbookService.getCashbookByDate(date,user.userId)
+        let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
         const createCheck = result.map((e)=>{
             return e.cashbookId
         })
-        const Checkeddate = await this.cashbookService.getCreateCheck(createCheck)
-        
+        const Checkdate = await this.boardService.BoardCheck(createCheck)
+        for(let i=0; result.length>i; i++) {
+            result[i].writeCheck = Number(Checkdate[result[i].cashbookId]) || 0
+        }
         return result
     }
 
@@ -120,7 +124,7 @@ export class CashbookContoller {
             throw new Error('디테일 데이터가 없습니다')
         }
         let result2 = await this.cashbookService.cashbookById(cashbookId)
-        const {cashbookName, cashbookCategory, cashbookNowValue} = result2
+        const {cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
         if(detail.length===0) {
             let consumption =true
             cashbookNowValue===0 ? consumption=true : consumption=false
@@ -128,6 +132,7 @@ export class CashbookContoller {
         } else {
         return `${cashbookName},
                 ${cashbookCategory},
+                ${cashbookGoalValue},
                 ${detail}`
         }
     }

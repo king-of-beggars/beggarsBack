@@ -17,7 +17,6 @@ export class AutoCreateService {
     async autoCashbook() {
         const list : CashList[] = await this.cashbookService.allCashlist()
         for(let i=0; i<list.length; i++) {
-                console.log(list[i])
                 await this.cashbookService.cashbookCreate(list[i])
             }
         }

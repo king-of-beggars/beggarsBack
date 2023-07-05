@@ -13,6 +13,7 @@ import { CommentService } from './comment.service';
 import { LikeController } from './like.controller';
 import { CommentController } from './comment.controller';
 import { UserService } from 'src/Users/user.service';
+import { AuthService } from 'src/Users/oauth2.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User,Board,Comment,Like]),

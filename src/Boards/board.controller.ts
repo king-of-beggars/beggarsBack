@@ -9,13 +9,20 @@ import { ListBoard } from './dto/listBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {Response, Request} from 'express'
 import { UserService } from 'src/Users/user.service';
+import { CommentService } from 'src/Comments/comment.service';
+import { AuthService } from 'src/Users/oauth2.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('api/board')
 export class BoardController {
     constructor(
         private readonly boardService : BoardService,
         private readonly cashbookService : CashbookService,
-        private readonly userService : UserService
+        private readonly userService : UserService,
+        private readonly commentService : CommentService,
+        private readonly jwtService : JwtService,
+        private readonly configService : ConfigService
     ){}
 
     @Get('noway')
@@ -55,16 +62,33 @@ export class BoardController {
     }
 
     @Get('detail/:boardId')
-    async boardDetail(@Param() params : any, @Req() req) {
-        console.log(req)
-        //주요정보
-        const result = await this.boardService.getBoardDetail(params.boardId)
-        console.log(result)
-        //디테일
+    async boardDetail(@Param() params : any, @Req() req : Request) {
+        let token = req.headers['set-cookie'][0]
+        if(token) {
+            token = token.split(',')[1]
+            token = token.split('=')[1]
+            token = token.split(' ')[0]
+            token = token.replace(';','')
+        } 
+        console.log(token)
+        const user = this.jwtService.verify(token,{secret : this.configService.get('SECRET_KEY')})
+        
+
+        const result : any = await this.boardService.getBoardDetail(params.boardId)
+        const like = result.comments.map(comment => comment.commentId)
+        const likeList = await this.commentService.getLikeList(like)
+        console.log(likeList)
+        let likeCheck = {}
+        
+        user ? likeCheck = await this.commentService.getLikeCheck(like,user.userId) : {}
+        console.log(likeCheck)
+        for(let i=0; result.comments.length>i; i++) {
+            result.comments[i].likeCount = Number(likeList[result.comments[i].commentId]) || 0
+            result.comments[i].likeCheck = likeCheck[result.comments[i].commentId] || 0
+        }
+
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
-        console.log(detail)
         result['cashbookDetail'] = detail
-        result['']
         return result
     }
 

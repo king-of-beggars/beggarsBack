@@ -15,9 +15,10 @@ import { CashActivity } from './entity/cashactivity.entity';
 import { UserService } from 'src/Users/user.service';
 import { AutoCreateService } from './autocreate.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { Board } from 'src/Boards/entity/board.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User,CashList,CashDetail,Cashbook,CashActivity]),
+    TypeOrmModule.forFeature([User,CashList,CashDetail,Cashbook,CashActivity,Board]),
     PassportModule,
     ScheduleModule.forRoot()
   ],
@@ -27,7 +28,8 @@ import { ScheduleModule } from '@nestjs/schedule';
   providers: [
     CashbookService,
     UserService,
-    AutoCreateService
+    AutoCreateService,
+    BoardService
   ], 
   exports: [
     CashbookService,

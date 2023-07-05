@@ -76,7 +76,7 @@ export class CashbookService {
     async getCashbookByDate(date : Date, userId : Number) : Promise<Cashbook[]> {
     
         const result : Promise<Cashbook[]> = await this.cashbookEntity.query(
-            `SELECT cashbookCategory, cashbookNowValue, cashbookGoalValue 
+            `SELECT cashbookId, cashbookCategory, cashbookNowValue, cashbookGoalValue 
              FROM Cashbook 
              WHERE DATE(cashbookCreatedAt) = DATE(?) 
              AND userId = ? 
@@ -203,7 +203,8 @@ export class CashbookService {
 
     async allCashlist() : Promise<CashList[]> {
         return await this.cashListEntity
-        .createQueryBuilder()
+        .createQueryBuilder('cashList')
+        .leftJoinAndSelect('cashList.userId','user')
         .select()
         .getMany()
     }
@@ -236,12 +237,4 @@ export class CashbookService {
 
     }
 
-    async getCreateCheck(createCheck : number[]) {
-        if(!createCheck) {
-            throw new Error('날짜가 비어 있는 배열입니다')
-        }
-        const str = createCheck.toString()
-        console.log(str)
-
-    }
 }
