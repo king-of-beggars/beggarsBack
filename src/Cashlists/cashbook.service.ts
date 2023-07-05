@@ -69,7 +69,7 @@ export class CashbookService {
             .delete()
             .where('cashDetail.cashDetailId', {cashDetailId})
         } catch(e) {
-            throw new Error('DB접속에러')
+            
         }
     }
 

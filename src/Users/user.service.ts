@@ -18,9 +18,6 @@ export class UserService {
     //회원가입 서비스
     async userSignup(SignupDto : SignupDto) : Promise<any> {
 
-            if(!SignupDto.userPwd) {
-                throw new Error('비밀번호가 넘어오지 않음')
-            }
             SignupDto.userPwd = await bcrypt.hash(SignupDto.userPwd,12)
             const query = this.userRepository.create(
                 SignupDto
@@ -44,9 +41,6 @@ export class UserService {
     //유저아이디로 db체크
     async userByName(userName : string) : Promise<User> {
 
-        if(!userName) {
-            throw new Error('아이디가 넘어오지 않음')
-        }
 
         const query = await this.userRepository
                      .createQueryBuilder('user')

@@ -27,7 +27,6 @@ export class BoardController {
 
     @Get('noway')
     async nowayList(@Query() paginationDto : PaginationDto) {
-    
         paginationDto.boardTypes = 1
         const result = this.boardService.getListAll(paginationDto)
         return result
@@ -43,7 +42,7 @@ export class BoardController {
     @Post(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
     async boardInput(@Param() postBoardDto : PostBoardDto, @Body() body : PostBoardDto) {
-
+    try {
         let boardTypes : number;
         let message : string;
         const cashbook  = await this.cashbookService.getcashbookAndDetail(Number(postBoardDto.cashbookId))
@@ -59,6 +58,9 @@ export class BoardController {
         
         boardTypes==0 ? message=`자랑하기 등록이 완료됐습니다` : message=`혼나러가기 등록이 완료됐습니다`
         return message;
+    } catch(e) {
+        throw new Error('에러러')
+    }
     }
 
     @Get('detail/:boardId')

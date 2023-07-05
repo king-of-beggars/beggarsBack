@@ -17,6 +17,7 @@ import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
 import { ConfigModule } from '@nestjs/config';
+import { ExceptionService } from './exception/exception.service';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -71,7 +72,7 @@ import { ConfigModule } from '@nestjs/config';
     // })
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ExceptionService],
 })
 
 export class AppModule {}

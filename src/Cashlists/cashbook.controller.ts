@@ -13,6 +13,7 @@ const moment = require('moment-timezone')
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
 import { BoardService } from 'src/Boards/board.service';
+import { UpdateFail } from 'src/Utils/error.util';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -52,6 +53,7 @@ export class CashbookContoller {
             total.cashbookNowValue += totalValue[i].cashbookNowValue
             total.cashbookGoalValue += totalValue[i].cashbookGoalValue
         }
+
         console.log(total)
         return `
             signupDay : ${dateValue},
@@ -129,10 +131,12 @@ export class CashbookContoller {
             cashbookNowValue===0 ? consumption=result['consumption'] = true : result['consumption']=false
             return result
         } else { 
-        return `${cashbookName},
-                ${cashbookCategory},
-                ${cashbookGoalValue},
-                ${detail}`
+        return `data : {
+            "cashbookName" : ${cashbookName},
+            "cashbookCategory" : ${cashbookCategory},
+            "cashbookGoalValue" : ${cashbookGoalValue},
+            "detail" : ${detail}
+        }`
         }
     }
  
@@ -177,8 +181,12 @@ export class CashbookContoller {
     @Put(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
     async checkConsume(@Param() cashbookId) {
-        await this.cashbookService.inputConsume(cashbookId)
-        return '무지출 지출 전환 완료'
+        try {
+            await this.cashbookService.inputConsume(cashbookId)
+            return '무지출 지출 전환 완료'
+        } catch(e) {
+            throw new UpdateFail(e)
+        }
     }
     
 }
