@@ -1,8 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable ,Body, Req} from '@nestjs/common'
-import User  from './user.entity'
+import User  from '../user.entity'
 import {Repository, In} from 'typeorm'
-import { TokenDto } from './dto/token.dto'
+import { TokenDto } from '../dto/token.dto'
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config'

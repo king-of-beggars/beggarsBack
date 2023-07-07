@@ -18,6 +18,7 @@ import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExceptionService } from './exception/exception.service';
+import { HotDeal } from './Hotdeal/hotdeal.entity';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -38,7 +39,7 @@ import { ExceptionService } from './exception/exception.service';
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: 'poorking',
-        timezone: 'Asia/Seoul',
+        timezone: '+09:00',
         synchronize:true,
         entities : [
                   User,
@@ -48,7 +49,8 @@ import { ExceptionService } from './exception/exception.service';
                   CashList,
                   CashActivity,
                   CashDetail,
-                  Like
+                  Like,
+                  //HotDeal
                   ],
         logging:true
     }),

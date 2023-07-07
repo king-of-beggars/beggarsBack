@@ -23,10 +23,10 @@ export class Cashbook {
     @Column({default:0})
     public cashbookGoalValue : number;
 
-    @CreateDateColumn({ type: 'timestamp' })
+    @CreateDateColumn({ type: 'timestamp'})
     public cashbookCreatedAt : Date
 
-    @UpdateDateColumn({ type: 'timestamp' })
+    @UpdateDateColumn({ type: 'timestamp'})
     public cashbookUpdatedAt : Date
 
     @ManyToOne(()=>User, (user : User)=>user.userId)

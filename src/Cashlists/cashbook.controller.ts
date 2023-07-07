@@ -4,7 +4,7 @@ import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
 import { Cashbook } from './entity/cashbook.entity';
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
-import { UserService } from 'src/Users/user.service';
+import { UserService } from 'src/Users/service/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
 import { CashDetail } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';

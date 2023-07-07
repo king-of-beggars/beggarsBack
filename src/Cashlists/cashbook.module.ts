@@ -12,7 +12,7 @@ import { CashbookService } from './cashbook.service';
 import { CashbookContoller } from './cashbook.controller';
 import { Cashbook } from './entity/cashbook.entity';
 import { CashActivity } from './entity/cashactivity.entity';
-import { UserService } from 'src/Users/user.service';
+import { UserService } from 'src/Users/service/user.service';
 import { AutoCreateService } from './autocreate.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { Board } from 'src/Boards/entity/board.entity';

@@ -4,7 +4,7 @@ import { Comment } from "./entity/comment.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PostCommentDto } from "./dto/postComment.dto";
 import User from "src/Users/user.entity";
-import { UserService } from "src/Users/user.service";
+import { UserService } from "src/Users/service/user.service";
 import { EntityManager } from "typeorm";
 import { Like } from "./entity/like.entity";
 

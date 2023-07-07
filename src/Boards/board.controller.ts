@@ -8,9 +8,9 @@ import { PaginationDto } from './dto/pagination.dto';
 import { ListBoard } from './dto/listBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {Response, Request} from 'express'
-import { UserService } from 'src/Users/user.service';
+import { UserService } from 'src/Users/service/user.service';
 import { CommentService } from 'src/Comments/comment.service';
-import { AuthService } from 'src/Users/oauth2.service';
+import { AuthService } from 'src/Users/service/oauth2.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 

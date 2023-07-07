@@ -15,7 +15,7 @@ import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 import { AccessStrategy } from 'src/Users/passport/jwt/access.strategy';
 import { CommentService } from 'src/Comments/comment.service';
 import { Like } from 'src/Comments/entity/like.entity';
-import { AuthService } from 'src/Users/oauth2.service';
+import { AuthService } from 'src/Users/service/oauth2.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User,Board,Comment,Cashbook,CashDetail,Like]),

@@ -12,6 +12,12 @@ export class BoardDto {
     public boardId : number
 
     @ApiProperty({
+        example : '오식예 ( 오늘의 식단 예산이라는 뜻 )',
+        description : '게시판 제목'
+    })
+    public boardName : string
+
+    @ApiProperty({
         example : '아 오늘 하루 넘넘 힘들었다. 이 돈 가지고 언제까지 버텨야 하지?',
         description : '게시판 텍스트'
     })

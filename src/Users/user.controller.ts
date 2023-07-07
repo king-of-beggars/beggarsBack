@@ -1,8 +1,8 @@
 import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Redirect, PayloadTooLargeException, Res } from '@nestjs/common';
 import { SignupDto} from './dto/signup.dto'
 import { TokenDto } from './dto/token.dto'
-import { UserService } from './user.service';
-import { AuthService } from './oauth2.service'
+import { UserService } from './service/user.service';
+import { AuthService } from './service/oauth2.service'
 import { User } from './user.entity'
 import { LocalAuthenticationGuard } from './passport/local/local.guard'
 import { KakaoAuthenticationGuard } from './passport/kakao/kakao.guard';

@@ -171,7 +171,7 @@ export class CashbookService {
             cashbookName : frameDto.cashName,
             cashbookGoalValue : frameDto.cashListGoalValue,
             userId : frameDto.userId
-        })
+        }) 
         return await this.cashbookEntity.save(query)
 
     }
