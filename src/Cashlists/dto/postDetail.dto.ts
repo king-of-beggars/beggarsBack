@@ -1,16 +1,10 @@
 import { IsNotEmpty, Max } from "class-validator";
 import { Cashbook } from "../entity/cashbook.entity";
+import { PickType } from "@nestjs/swagger";
+import { CashDetailDto} from "./cashbook.dto";
 
-export class PostDetailDto {
+export class PostDetailDto extends PickType(CashDetailDto, ['cashbookId','cashDetailText','cashDetailValue'] as const){
 
-    @IsNotEmpty()
-    @Max(1)
-    public cashbookId : Cashbook;
 
-    @IsNotEmpty()
-    public cashDetailText : string;
-
-    @IsNotEmpty()
-    public cashDetailValue : number
 
 }

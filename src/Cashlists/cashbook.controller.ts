@@ -10,10 +10,13 @@ import { CashDetail } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
-import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBody, ApiParam } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
 import { BoardService } from 'src/Boards/board.service';
 import { UpdateFail } from 'src/Utils/error.util';
+import { MainPageDto } from './dto/mainPageRes.dto';
+import { ByDateResDto } from './dto/byDateRes.dto';
+import { DetailResDto } from './dto/detailRes.dto';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -27,7 +30,7 @@ export class CashbookContoller {
     @Get('/main')
     @HttpCode(200)
     @UseGuards(AccessAuthenticationGuard)
-    @ApiResponse({type:[GetCategory]})
+    @ApiResponse({type: MainPageDto, description : 'data 객체 내부에 생성' })
     @ApiOperation({ summary: '메인 api', description: '몇일째 되는 날, 2주치 데이터, 당일 유저 지출 총합, 섹션별 소비' })
     async mainPage(@Req() req : any) {
         const { user } = req
@@ -55,18 +58,21 @@ export class CashbookContoller {
         }
 
         console.log(total)
-        return `
-            signupDay : ${dateValue},
-            twoweek : ${twoweek},
-            groupByCategory : ${totalValue},
-            total : ${total}
-        `
+        return {
+            data : {
+            signupDay : dateValue,
+            twoweek : twoweek,
+            groupByCategory : totalValue,
+            total : total
+            }
+        }
     }
 
 
     @Post('frame')
     @HttpCode(201)
     @UseGuards(AccessAuthenticationGuard)
+    @ApiResponse({type: FrameDto })
     @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
@@ -79,11 +85,10 @@ export class CashbookContoller {
             userId : user.userId
         }
 
-
         //이 부분 트랜잭션 해야하는데 어떡하지
         const frame = await this.cashbookService.frameCreate(frameDto)
         
-        return `프레임 생성 완료`
+        return {messsage : '프레임 생성이 완료되었습니다'}
     }
 
     @Put('frame/:cashListId')
@@ -95,6 +100,7 @@ export class CashbookContoller {
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
     @UseGuards(AccessAuthenticationGuard)
+    @ApiResponse({type:[ByDateResDto], description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() query, @Req() req : any) {
         const { user } = req
@@ -108,11 +114,14 @@ export class CashbookContoller {
         for(let i=0; result.length>i; i++) {
             result[i].writeCheck = Number(Checkdate[result[i].cashbookId]) || 0
         }
-        return result
+        return {
+            data :result
+        }
     }
 
     @Get(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
+    @ApiResponse({type:[DetailResDto], description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
     async cashDetail(@Param() params : CashDetail) {
         console.log(params)
@@ -142,6 +151,7 @@ export class CashbookContoller {
     @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '디테일 정보 입력', description: 'cashbookId, text, value 입력' })
+    @ApiBody({type:PostDetailDto})
     async postDetail(@Param() params : Cashbook, @Body() body : PostDetailDto) {
 
         let postDetailDto = new PostDetailDto();
@@ -179,6 +189,7 @@ export class CashbookContoller {
 
     @Put(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '무지출 전환 API', description: '무지출 전환시 DB데이터 NULL, 활성화 시 0' })
     async checkConsume(@Param() cashbookId) {
         try {
             await this.cashbookService.inputConsume(cashbookId)

@@ -9,6 +9,9 @@ export class Board {
     public boardId : number
 
     @Column()
+    public boardName : string;
+
+    @Column()
     public boardText : string
 
     @Column()

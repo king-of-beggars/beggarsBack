@@ -83,6 +83,7 @@ export class UserController {
     @Post('nickCheck')
     @HttpCode(200)
     @ApiOperation({ summary: '닉네임 체크', description: '아이디 기입' })
+    @ApiBody({type:NickCheckDto})
     async userNickCheck(@Req() req, @Body() body : NickCheckDto)  {
 
         try {

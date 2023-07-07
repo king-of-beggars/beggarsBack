@@ -1,5 +1,5 @@
 import { PickType } from "@nestjs/swagger";
-import { SignupDto } from "./signup.dto";
+import { UserDto } from "./user.dto";
 
-export class NickCheckDto extends PickType(SignupDto, ['userNickname'] as const) {
+export class NickCheckDto extends PickType(UserDto, ['userNickname'] as const) {
 }

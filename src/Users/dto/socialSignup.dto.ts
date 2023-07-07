@@ -1,13 +1,8 @@
 import {IsNotEmpty} from 'class-validator' 
 import { ApiProperty } from '@nestjs/swagger';
 import { PickType } from "@nestjs/swagger";
-import User from "../user.entity";
-import { SignupDto } from './signup.dto';
+import { UserDto } from './user.dto';
 
-export class SocialSignupDto extends PickType(SignupDto, ['userName', 'userNickname'] as const) {
+export class SocialSignupDto extends PickType(UserDto, ['userName', 'userNickname', 'userType', 'userLoginType'] as const) {
 
-    
-    public userType: number;
-
-    public userLoginType: string;
 }

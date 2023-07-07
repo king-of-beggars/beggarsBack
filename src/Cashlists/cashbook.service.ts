@@ -76,7 +76,7 @@ export class CashbookService {
     async getCashbookByDate(date : Date, userId : Number) : Promise<Cashbook[]> {
     
         const result : Promise<Cashbook[]> = await this.cashbookEntity.query(
-            `SELECT cashbookId, cashbookCategory, cashbookNowValue, cashbookGoalValue 
+            `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
              FROM Cashbook 
              WHERE DATE(cashbookCreatedAt) = DATE(?) 
              AND userId = ? 

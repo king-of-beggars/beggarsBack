@@ -29,14 +29,18 @@ export class BoardController {
     async nowayList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 1
         const result = this.boardService.getListAll(paginationDto)
-        return result
+        return {
+            data : result
+        }
     }
 
     @Get('goodjob')
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
         const result = await this.boardService.getListAll(paginationDto)
-        return result
+        return {
+            data : result
+        }
     }
 
     @Post(':cashbookId')
@@ -57,7 +61,7 @@ export class BoardController {
         await this.userService.pointInput(20,Number(cashbook.userId))
         
         boardTypes==0 ? message=`자랑하기 등록이 완료됐습니다` : message=`혼나러가기 등록이 완료됐습니다`
-        return message;
+        return {message};
     } catch(e) {
         throw new Error('에러러')
     }
@@ -87,7 +91,9 @@ export class BoardController {
 
         const detail = await this.boardService.getDetailByBoardId(params.boardId)
         result['cashbookDetail'] = detail
-        return result
+        return {
+            data : result
+        }
     }
 
     
