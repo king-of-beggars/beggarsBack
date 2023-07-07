@@ -76,7 +76,7 @@ export class CashbookContoller {
   }
 
   //프레임 수정
-  @Put('frame/:cashListId')
+  @Put('frame')
   async cashFrameUpdate(@Body() body: FrameDto, @Req() req: any) {
     // const { user } = req;
 
@@ -86,6 +86,7 @@ export class CashbookContoller {
       cashName: body.cashName,
       cashListGoalValue: body.cashListGoalValue,
       userId: body.userId,
+      cashListId: body.cashListId,
     };
 
     const frame = await this.cashbookService.frameModify(frameDto);

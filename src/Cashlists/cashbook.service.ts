@@ -203,22 +203,17 @@ export class CashbookService {
       throw new Error('서비스 단으로 데이터가 넘어오지 않음');
     }
     try {
-      const cashList = await this.cashListEntity
-        .createQueryBuilder('CashList')
-        .innerJoin('CashList.userId', 'User')
-        .where('CashList.userId = :userId', { userId: frameDto.userId })
-        .getOne();
-
       //카테고리 정보 검색
       const cashactivity = await this.cashactivityEntity
         .createQueryBuilder('cashactivity')
         .innerJoin('cashactivity.cashListId', 'CashList')
         .where('cashactivity.cashListId = :cashListId', {
-          cashListId: cashList.cashListId,
+          cashListId: frameDto.cashListId,
         })
         .getOne();
+
       if (
-        (await cashactivity).cashStopDate > (await cashactivity).cashRestartDate
+        (await cashactivity.cashStopDate) > (await cashactivity.cashRestartDate)
       ) {
         throw new Error('비활성화');
       }
@@ -231,7 +226,9 @@ export class CashbookService {
           cashName: frameDto.cashName,
           cashListGoalValue: frameDto.cashListGoalValue,
         })
-        .where('cashListId=:cashListId', { cashListId: cashList.cashListId })
+        .where('cashListId=:cashListId', {
+          cashListId: frameDto.cashListId,
+        })
         .execute();
       return frame;
     } catch (error) {

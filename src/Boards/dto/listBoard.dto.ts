@@ -1,5 +1,7 @@
-import { CashbookEntity } from "src/Cashlists/entity/cashbook.entity";
+import { CashbookEntity } from 'src/Cashlists/entity/cashbook.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ListBoard {
-    public CashbookEntity : CashbookEntity
+  @ApiProperty()
+  public CashbookEntity: CashbookEntity;
 }
