@@ -1,7 +1,7 @@
 import { Cashbook } from 'src/Cashlists/entity/cashbook.entity'
 import { Comment } from 'src/Comments/entity/comment.entity'
 import User from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, OneToOne } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, OneToOne, BeforeInsert, BeforeUpdate } from 'typeorm'
 
 @Entity('Board')
 export class Board {
@@ -17,10 +17,10 @@ export class Board {
     @Column()
     public boardTypes : number
 
-    @CreateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     public boardCreatedAt : Date
 
-    @UpdateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     public boardUpdatedAt : Date
 
     @ManyToOne(()=> User, (user : User)=> user.userId)
@@ -38,5 +38,15 @@ export class Board {
               (cashbook : Cashbook) => cashbook.cashbookId)
     @JoinColumn({name : 'cashbookId'})
     public cashbookId : Cashbook
+
+    @BeforeInsert()
+    updateCreatedAt() {
+        this.boardCreatedAt = new Date();
+    }
+
+    @BeforeUpdate()
+    updateUpdatedAt() {
+        this.boardUpdatedAt = new Date();
+    }
 
 }

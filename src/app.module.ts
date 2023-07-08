@@ -39,7 +39,9 @@ import { HotDeal } from './Hotdeal/hotdeal.entity';
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: 'poorking',
-        timezone: '+09:00',
+        extra : {
+          timezone: 'local'
+        },
         synchronize:true,
         entities : [
                   User,

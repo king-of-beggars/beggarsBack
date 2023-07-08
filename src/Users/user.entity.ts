@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
 import { Exclude } from 'class-transformer';
 import { Board } from 'src/Boards/entity/board.entity';
 import { CashList } from 'src/Cashlists/entity/cashList.entity';
@@ -13,10 +13,6 @@ export class User {
     public userId : number;
     
     @Column({ unique: true })
-    @ApiProperty({
-        example : 'rlatmdcjf',
-        description : '사용자 아이디'
-    })
     public userName : string;
 
     @Column({ unique: true })
@@ -24,27 +20,15 @@ export class User {
 
     @Column({nullable:true})
     @Exclude()
-    @ApiProperty({
-        example : 'qwe123456',
-        description : '유저 비밀번호'
-    })
     public userPwd: string;
 
     @Column({default:0})
     public userAuth: number;
 
     @Column({default:'normal'})
-    @ApiProperty({
-        example : 'kakao',
-        description : '로그인 매체'
-    })
     public userLoginType: string;
     
     @Column({default:0})
-    @ApiProperty({
-        example : '0',
-        description : '일반 회원'
-    })
     public userType: number;
     
     @Column({nullable:true, default:0})
@@ -53,10 +37,10 @@ export class User {
     @Column({nullable:true})
     public userImage: string;
 
-    @CreateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     public userCreatedAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     public userUpdatedAt: Date;
 
     @OneToMany(()=>CashList, 
@@ -87,6 +71,16 @@ export class User {
         cascade:true
     })
     public likes? : Like[]
+
+    @BeforeInsert()
+    updateCreatedAt() {
+        this.userCreatedAt = new Date();
+    }
+
+    @BeforeUpdate()
+    updateUpdatedAt() {
+        this.userUpdatedAt = new Date();
+    }
 
     
 }   

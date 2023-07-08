@@ -1,5 +1,5 @@
 import User from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
 import { CashDetail } from './cashDetail.entity'
 import { Board } from 'src/Boards/entity/board.entity'
 
@@ -23,10 +23,14 @@ export class Cashbook {
     @Column({default:0})
     public cashbookGoalValue : number;
 
-    @CreateDateColumn({ type: 'timestamp'})
+    @Column({
+        type: 'timestamp'
+    })
     public cashbookCreatedAt : Date
 
-    @UpdateDateColumn({ type: 'timestamp'})
+    @Column({
+        type: 'timestamp'
+    })
     public cashbookUpdatedAt : Date
 
     @ManyToOne(()=>User, (user : User)=>user.userId)
@@ -35,6 +39,16 @@ export class Cashbook {
 
     @OneToMany(()=>CashDetail, (detail : CashDetail)=> detail.cashbookId)
     public detail? : CashDetail[]; 
+
+    @BeforeInsert()
+    updateCreatedAt() {
+        this.cashbookCreatedAt = new Date();
+    }
+
+    @BeforeUpdate()
+    updateUpdatedAt() {
+        this.cashbookUpdatedAt = new Date();
+    }
     
 
 }

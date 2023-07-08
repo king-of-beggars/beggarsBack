@@ -13,7 +13,7 @@ export class AutoCreateService {
         private cashbookEntity : Cashbook
     ){}
 
-    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    @Cron(CronExpression.EVERY_MINUTE)
     async autoCashbook() {
         const list : CashList[] = await this.cashbookService.allCashlist()
         for(let i=0; i<list.length; i++) {

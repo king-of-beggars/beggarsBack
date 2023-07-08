@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, Timestamp, JoinColumn } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, Timestamp, JoinColumn, BeforeInsert } from 'typeorm'
 import { Comment } from './comment.entity'
 import User from 'src/Users/user.entity'
 
@@ -22,7 +22,9 @@ export class Like {
     @CreateDateColumn({type:'timestamp'})
     public likeCreatedAt : Date
 
-    @UpdateDateColumn({type:'timestamp'})
-    public likeUpdatedAt : Date
+    @BeforeInsert()
+    updateCreatedAt() {
+        this.likeCreatedAt = new Date();
+    }
     
 }

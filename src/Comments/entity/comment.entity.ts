@@ -1,6 +1,6 @@
 import { Board } from 'src/Boards/entity/board.entity'
 import User from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn , BeforeInsert } from 'typeorm'
 import { Like } from './like.entity'
 
 @Entity('Comment')
@@ -11,7 +11,7 @@ export class Comment {
     @Column()
     public commentText : string
 
-    @CreateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     public commentCreatedAt : Date
 
     @ManyToOne
@@ -27,4 +27,9 @@ export class Comment {
     @OneToMany
     (()=>Like, (like : Like)=> like.commentId)
     public likes? : Like[]
+
+    @BeforeInsert()
+    updateCreatedAt() {
+        this.commentCreatedAt = new Date();
+    }
 }
