@@ -67,7 +67,7 @@ export class CashbookService {
             return this.cashDetailEntity
             .createQueryBuilder('cashDetail')
             .delete()
-            .where('cashDetail.cashDetailId', {cashDetailId})
+            .where('cashDetail.cashDetailId=:cashDetailId', {cashDetailId})
             .execute()
         } catch(e) {
             
@@ -87,12 +87,13 @@ export class CashbookService {
     }
 
     async addValue(valueUpdate : ValueUpdateDto) : Promise<any> {
-         return await this.cashbookEntity
+         const result = await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .update()
         .set({cashbookNowValue : () => `cashbookNowValue + ${valueUpdate.cashDetailValue}`})
-        .where('cashbookId=:cashbookId',{cashbookId : valueUpdate.cashbookId})
+        .where('cashbookId=:cashbookId',valueUpdate.cashbookId)
         .execute()
+
     }
 
     async getCashbookDuringDate(endDate : Date, userId : User) : Promise<any> {
