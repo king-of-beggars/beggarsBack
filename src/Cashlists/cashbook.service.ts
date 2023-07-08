@@ -68,6 +68,7 @@ export class CashbookService {
             .createQueryBuilder('cashDetail')
             .delete()
             .where('cashDetail.cashDetailId', {cashDetailId})
+            .execute()
         } catch(e) {
             
         }
