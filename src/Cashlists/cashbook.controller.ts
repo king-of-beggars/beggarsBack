@@ -128,6 +128,7 @@ export class CashbookContoller {
         const cashbookId = params.cashbookId
         console.log('니가호출되고있니')
         const detail = await this.cashbookService.getDetail(cashbookId)
+        console.log(detail)
         if(!detail) {
 
             throw new Error('디테일 데이터가 없습니다')
@@ -138,7 +139,10 @@ export class CashbookContoller {
             let result = {}
             let consumption =true
             cashbookNowValue===0 ? consumption=result['consumption'] = true : result['consumption']=false
-            return result
+            return { data : {
+                result
+            }
+            }
         } else { 
         return {data : {
             cashbookName,
