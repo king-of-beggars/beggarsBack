@@ -15,7 +15,7 @@ export class BoardService {
         private boardRepository : Repository<Board>,
         //pirvate cashlistRepository :Repository<CashlistEntity>
         private readonly cashbookService : CashbookService
-    ){}
+    ){} 
     
     async postBoard(postBoardDto : PostBoardDto) : Promise<any> {
         if(!postBoardDto) {
