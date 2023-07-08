@@ -13,8 +13,13 @@ import { CommentService } from 'src/Comments/comment.service';
 import { AuthService } from 'src/Users/service/oauth2.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ApiQuery, ApiResponse, ApiParam, ApiBody ,ApiTags } from '@nestjs/swagger';
+import { BoardResponseDTO } from './dto/boardResponse.dto';
+import { BoardDetailDTO } from './dto/boardDetail.dto';
+import { BoardDetailReponseDTO } from './dto/boarDetailResponse.dto';
 
 @Controller('api/board')
+@ApiTags('게시물 API')
 export class BoardController {
     constructor(
         private readonly boardService : BoardService,
@@ -26,6 +31,16 @@ export class BoardController {
     ){}
 
     @Get('noway')
+    @ApiQuery({
+      name: '혼나러가기 페이지 정보',
+      required: true,
+      type: PaginationDto,
+    })
+    @ApiResponse({
+      status: 200,
+      type: BoardResponseDTO,
+      description: '혼나러가기 게시물 목록',
+    })
     async nowayList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 1
         const result = this.boardService.getListAll(paginationDto)
@@ -35,6 +50,16 @@ export class BoardController {
     }
 
     @Get('goodjob')
+    @ApiQuery({
+      name: '자랑하기 페이지 정보',
+      required: true,
+      type: PaginationDto,
+    })
+    @ApiResponse({
+      status: 200,
+      type: BoardResponseDTO,
+      description: '자랑하기 게시물 정보',
+    })
     async goodjobList(@Query() paginationDto : PaginationDto) {
         paginationDto.boardTypes = 0
         const result = await this.boardService.getListAll(paginationDto)
@@ -43,6 +68,30 @@ export class BoardController {
         }
     }
 
+    @Get('detail/:boardId')
+    // @ApiParam({
+    //   name: '칭찬, 훈수 상세조회',
+    //   type: BoardDetailDTO,
+    // })
+    @ApiResponse({
+      type: BoardDetailDTO,
+    })
+    @Post(':cashbookId')
+    @UseGuards(AccessAuthenticationGuard)
+    @ApiParam({
+      name: '칭찬, 훈수 작성',
+      required: true,
+      type: PostBoardDto,
+    })
+    @ApiBody({
+      type: PostBoardDto,
+    })
+    @ApiResponse({
+      status: 200,
+      type: String,
+      description:
+        '자랑하기 등록이 완료됐습니다 || 혼나러가기 등록이 완료됐습니다',
+    })
     @Post(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
     async boardInput(@Param() postBoardDto : PostBoardDto, @Body() body : PostBoardDto) {
@@ -66,7 +115,9 @@ export class BoardController {
         throw new Error('에러러')
     }
     }
-
+    @ApiResponse({
+      type: BoardDetailReponseDTO,
+    })
     @Get('detail/:boardId')
     async boardDetail(@Param() params : any, @Req() req : Request) {
         let token = req.headers.cookie
@@ -96,7 +147,8 @@ export class BoardController {
         }
     }
 
-    
+
+    @ApiResponse({ type: String })
     @Delete(':boardId')
     @UseGuards(AccessAuthenticationGuard)
     async boardDelete(@Param() params : any) {
