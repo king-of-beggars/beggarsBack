@@ -2,6 +2,8 @@ import User from "src/Users/user.entity";
 import { CashDetail } from "../entity/cashDetail.entity";
 import { Cashbook } from "../entity/cashbook.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty } from "class-validator";
+import { CashList } from "../entity/cashList.entity";
 
 class CashbookDto {
 
@@ -15,6 +17,7 @@ class CashbookDto {
         example : '식비',
         description : '캐시북 카테고리'
     })
+    @IsNotEmpty()
     public cashbookCategory : string
 
     @ApiProperty({
@@ -47,9 +50,19 @@ class CashbookDto {
     })
     public cashbookUpdatedAt : Date
 
+    @ApiProperty({
+        example : 4,
+        description : '유저 아이디'
+    })
     public userId : User
 
-    public detail? : CashDetail[]; 
+    public detail? : CashDetail[];
+    
+    @ApiProperty({
+        example : 2,
+        description : '캐시 프레임 아이디'
+    })
+    public cashListId : CashList;
 
 }
 
@@ -65,6 +78,7 @@ class CashListDto {
         example : '식비',
         description : '가계부 프레임 카테고리'
     })
+    @IsNotEmpty()
     public cashCategory : string
 
     @ApiProperty({
@@ -77,6 +91,7 @@ class CashListDto {
         example : 5000,
         description : '가계부 프레임 목표'
     })
+    @IsNotEmpty()
     public cashListGoalValue : number;
 
     @ApiProperty({
@@ -108,12 +123,14 @@ class CashDetailDto {
         example : '짬뽕',
         description : '소비 상세 정보'
     })
+    @IsNotEmpty()
     public cashDetailText : string
 
     @ApiProperty({
         example : 5000,
         description : '소비 상세 가격'
     })
+    @IsNotEmpty()
     public cashDetailValue : number
 
 

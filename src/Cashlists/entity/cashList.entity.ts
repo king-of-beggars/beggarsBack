@@ -1,7 +1,8 @@
 import { createPublicKey } from 'crypto'
 import User from 'src/Users/user.entity'
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm'
 import { CashActivity } from './cashactivity.entity'
+import { Cashbook } from './cashbook.entity'
 
 @Entity('CashList')
 export class CashList {
@@ -29,6 +30,9 @@ export class CashList {
     @ManyToOne(()=>User, (user : User)=> user.userId)
     @JoinColumn({name:'userId'})
     public userId : User
+
+    @OneToMany(()=>Cashbook, (cashbook : Cashbook)=> cashbook.cashListId)
+    public cashbook? : Cashbook[];
 
     @BeforeInsert()
     updateCreatedAt() {

@@ -24,8 +24,8 @@ export class CashDetail {
     })
     public cashDetailUpdatedAt : Date
 
-    @ManyToOne(()=>Cashbook, (cashbook:Cashbook)=>cashbook.cashbookId)
-    @JoinColumn({name:'cashbookId'})
+    @ManyToOne(()=>Cashbook, (cashbook:Cashbook)=>cashbook.cashbookId, { onDelete: 'CASCADE' })
+    @JoinColumn({name:'cashbookId', referencedColumnName: 'cashbookId'})
     public cashbookId : Cashbook
 
     @BeforeInsert()

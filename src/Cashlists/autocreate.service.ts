@@ -16,8 +16,6 @@ export class AutoCreateService {
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async autoCashbook() {
         const list : CashList[] = await this.cashbookService.allCashlist()
-        for(let i=0; i<list.length; i++) {
-                await this.cashbookService.cashbookCreate(list[i])
-            }
+            await this.cashbookService.cashbookCreate(list)
         }
     }

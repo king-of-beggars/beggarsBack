@@ -10,6 +10,8 @@ import { FrameDto } from "./dto/frame.dto";
 import { CashList } from "./entity/cashList.entity";
 import { CashActivity } from "./entity/cashactivity.entity";
 import { ListBoard } from "src/Boards/dto/listBoard.dto";
+import { CashbookCreateDto } from "./dto/cashbookCreate.dto";
+import { GetByCashbookId } from "./dto/getByCashbookId.dto";
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
 
@@ -48,6 +50,7 @@ export class CashbookService {
     }
 
     async postDetail(postDetailDto : PostDetailDto) : Promise<any> {
+        console.log(postDetailDto, 'postDetail')
         const query = this.cashDetailEntity
         .create(
             postDetailDto
@@ -56,18 +59,18 @@ export class CashbookService {
         let valueUpdateDto = new ValueUpdateDto()
         valueUpdateDto = {
             cashbookId : postDetailDto.cashbookId,
-            cashDetailValue : postDetailDto.cashDetailValue
+            cashDetailValue : Number(postDetailDto.cashDetailValue)
         }
-        await this.addValue(valueUpdateDto)
         return await this.cashDetailEntity.save(query)
     }
 
     async deleteDetail(cashDetailId : CashDetail) : Promise<any> {
+        console.log(cashDetailId)
         try {
-            return this.cashDetailEntity
+            return await this.cashDetailEntity
             .createQueryBuilder('cashDetail')
             .delete()
-            .where('cashDetail.cashDetailId=:cashDetailId', {cashDetailId})
+            .where('cashDetail.cashDetailId=:cashDetailId', cashDetailId)
             .execute()
         } catch(e) {
             
@@ -87,11 +90,12 @@ export class CashbookService {
     }
 
     async addValue(valueUpdate : ValueUpdateDto) : Promise<any> {
+        console.log(valueUpdate)
          const result = await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .update()
         .set({cashbookNowValue : () => `cashbookNowValue + ${valueUpdate.cashDetailValue}`})
-        .where('cashbookId=:cashbookId',valueUpdate.cashbookId)
+        .where('cashbookId=:cashbookId',{cashbookId : valueUpdate.cashbookId})
         .execute()
 
     }
@@ -147,12 +151,14 @@ export class CashbookService {
         return trueResult;
     }
 
-    async getOneDetail(cashDetailId : CashDetail) : Promise<CashDetail> {
+    async getOneDetail(cashDetail : CashDetail) : Promise<CashDetail> {
         return await this.cashDetailEntity
-        .createQueryBuilder('cashDetail')
-        .select()
-        .where('cashDetailId=:cashDetailId',{cashDetailId})
-        .getOne()
+        .query(
+            `SELECT cashbookId, cashDetailValue
+             FROM cashDetail
+             WHERE cashDetailId = ?
+             `, [cashDetail.cashDetailId]
+        )
     }
     
     async frameActivityCreate(cashEntity : CashList) {
@@ -167,14 +173,28 @@ export class CashbookService {
         return await this.cashactivityEntity.save(query)
     }
 
-    async cashbookCreate(frameDto : FrameDto) {
-        const query = this.cashbookEntity.create({
-            cashbookCategory : frameDto.cashCategory,
-            cashbookName : frameDto.cashName,
-            cashbookGoalValue : frameDto.cashListGoalValue,
-            userId : frameDto.userId
-        }) 
-        return await this.cashbookEntity.save(query)
+    async cashbookCreate(cashbookList : any) {
+        if(cashbookList.length>=0) {
+            for(let i =0; cashbookList.length>i; i++) {
+                const query = this.cashbookEntity.create({
+                    cashbookCategory : cashbookList[i].cashCategory,
+                    cashbookName : cashbookList[i].cashName,
+                    cashbookGoalValue : cashbookList[i].cashListGoalValue,
+                    userId : cashbookList[i].userId,
+                    cashListId : cashbookList[i]
+                })
+                await this.cashbookEntity.save(query)
+            }
+        } else {
+            const query = this.cashbookEntity.create({
+                cashbookCategory : cashbookList.cashbookCategory,
+                cashbookName : cashbookList.cashbookName,
+                cashbookGoalValue : cashbookList.cashbookGoalValue,
+                userId : cashbookList.userId,
+                cashListId : cashbookList
+            })
+            await this.cashbookEntity.save(query)
+        }
 
     }
 
@@ -186,7 +206,7 @@ export class CashbookService {
         const frame  = this.cashListEntity.create(
             frameDto
         )
-        const query : CashList = await this.cashListEntity.save(frame)
+        const query : any = await this.cashListEntity.save(frame)
 
         if(!frame) {
             throw new Error('프레임 생성 에러')
@@ -196,11 +216,71 @@ export class CashbookService {
         if(!activity) {
             throw new Error('액티비티 생성 에러')
         }
-        const cashbook = await this.cashbookCreate(frameDto)
-        if(!cashbook) {
-            throw new Error('캐시북 생성 에러')
+        let cashbookCreateDto = new CashbookCreateDto()
+        cashbookCreateDto = {
+            cashbookCategory : frameDto.cashCategory,
+            cashbookName : frameDto.cashName,
+            cashbookGoalValue : frameDto.cashListGoalValue,
+            userId : frameDto.userId,
+            cashListId : query.cashListId
         }
+        console.log(cashbookCreateDto)
+        const cashbook = await this.cashbookCreate(cashbookCreateDto)
         return frame
+    }
+
+    async frameUpdate(cashbook : GetByCashbookId, frameDto : FrameDto) {
+        console.log(typeof cashbook)
+        const cashList = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .leftJoinAndSelect('cashbook.cashListId', 'cashList')
+        .where('cashbookId=:cashbookId',{cashbookId : Number(cashbook.cashbookId)})
+        .getOne()
+        const cashListId = cashList.cashListId.cashListId
+
+        await this.cashListEntity
+        .createQueryBuilder('cashList')
+        .update()
+        .set({
+            'cashListGoalValue':frameDto.cashListGoalValue,
+            'cashCategory':frameDto.cashCategory,
+            'cashName':frameDto.cashName})
+        .where('cashListId=:cashListId',{cashListId})
+        .execute()
+
+        const result = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .update()
+        .set({'cashbookGoalValue':frameDto.cashListGoalValue, 'cashbookCategory':frameDto.cashCategory, 'cashbookName':frameDto.cashName})
+        .where('cashbookId=:cashbookId',{cashbookId : Number(cashbook.cashbookId)})
+        .execute()
+
+        return result
+    } 
+    
+    async frameDelete(cashbook : GetByCashbookId) {
+        const cashList = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .leftJoinAndSelect('cashbook.cashListId', 'cashList')
+        .where('cashbookId=:cashbookId',{cashbookId : Number(cashbook.cashbookId)})
+        .getOne()
+        const cashListId = cashList.cashListId.cashListId
+
+        const result = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .delete()
+        .where('cashbookId=:cashbookId',{cashbookId : Number(cashbook.cashbookId)})
+        .execute()
+        
+        await this.cashListEntity
+        .createQueryBuilder('cashList')
+        .delete()
+        .where('cashListId=:cashListId',{cashListId})
+        .execute()
+       
+
+        return result
+
     }
 
     async allCashlist() : Promise<CashList[]> {
@@ -216,7 +296,7 @@ export class CashbookService {
         return await this.cashbookEntity
         .createQueryBuilder()
         .select()
-        .where('cashbookId=:cashbookId',{cashbookId})
+        .where('cashbookId=:cashbookId',{cashbookId : cashbookId.cashbookId})
         .getOne()
 
     }
@@ -233,8 +313,8 @@ export class CashbookService {
         return await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .update()
-        .set({cashbookNowValue:cashbookNowValue})
-        .where('cashbookId=:cashbookId', {cashbookId})
+        .set({'cashbookNowValue':cashbookNowValue})
+        .where('cashbookId=:cashbookId', {cashbookId : cashbookId.cashbookId})
         .execute()
 
     }

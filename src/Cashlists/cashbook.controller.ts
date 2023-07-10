@@ -13,10 +13,11 @@ const moment = require('moment-timezone')
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBody, ApiParam } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
 import { BoardService } from 'src/Boards/board.service';
-import { UpdateFail } from 'src/Utils/error.util';
 import { MainPageDto } from './dto/mainPageRes.dto';
 import { ByDateResDto } from './dto/byDateRes.dto';
 import { DetailResDto } from './dto/detailRes.dto';
+import { CashList } from './entity/cashList.entity';
+import { GetByCashbookId } from './dto/getByCashbookId.dto';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -72,12 +73,10 @@ export class CashbookContoller {
     @Post('frame')
     @HttpCode(201)
     @UseGuards(AccessAuthenticationGuard)
-    @ApiResponse({type: FrameDto })
     @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
         const { user } = req
         let frameDto = new FrameDto()
-        console.log(user);
         frameDto = {
             cashCategory : body.cashCategory,
             cashName : body.cashName,
@@ -91,11 +90,32 @@ export class CashbookContoller {
         return {messsage : '프레임 생성이 완료되었습니다'}
     }
 
-    @Put('frame/:cashListId')
-    async cashFrameUpdate (@Req() req : any) {
-        const { user } = req
-
+    //카태고리 수정
+    //당일 날짜의 cashbook과 cashlist를 수정
+    @Put('frame/:cashbookId')
+    @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '프레임 수정', description: '프레임 수정 및 캐시북 아이디 값에 맞는 캐시북 수정' })
+    async cashFrameUpdate(@Param() cashbookId : GetByCashbookId, @Body() body: FrameDto, @Req() req: any) {
+      const { user } = req
+      let frameDto = new FrameDto()
+        frameDto = {
+            cashCategory : body.cashCategory,
+            cashName : body.cashName,
+            cashListGoalValue : body.cashListGoalValue,
+            userId : user.userId
+        } 
+      await this.cashbookService.frameUpdate(cashbookId, frameDto)
+      return '프레임 수정 완료';
     }
+
+    //딜리트
+    @Delete('frame/:cashbookId')
+    @UseGuards(AccessAuthenticationGuard)
+    @ApiOperation({ summary: '프레임 삭제', description: '프레임 삭제 및 부모 row 전부 삭제' })
+    async frameDelete(@Param() cashbookId : GetByCashbookId) {
+        await this.cashbookService.frameDelete(cashbookId)
+        return '프레임 삭제 완료'
+    }   
 
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
     @Get('/')
@@ -156,16 +176,23 @@ export class CashbookContoller {
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '디테일 정보 입력', description: 'cashbookId, text, value 입력' })
     @ApiBody({type:PostDetailDto})
-    async postDetail(@Param() params : Cashbook, @Body() body : PostDetailDto) {
-
+    async postDetail(@Param() params : any, @Body() body : PostDetailDto) {
+        console.log(params,'params')
         let postDetailDto = new PostDetailDto();
         postDetailDto = {
-            cashbookId : params,
+            cashbookId : params.cashbookId, 
             cashDetailText : body.cashDetailText,
             cashDetailValue : body.cashDetailValue
         };
 
         const result = await this.cashbookService.postDetail(postDetailDto);
+
+        let valueUpdate = new ValueUpdateDto();
+        valueUpdate = {
+            cashbookId : params.cashbookId,
+            cashDetailValue : body.cashDetailValue
+        }
+        await this.cashbookService.addValue(valueUpdate)
         if(!result) {
             throw new Error('정상적으로 입력되지 않았습니다')
         }
@@ -174,19 +201,25 @@ export class CashbookContoller {
 
     @Delete(":cashDetailId")
     @UseGuards(AccessAuthenticationGuard)
-    async deleteDetail(@Param() cashDetailId : CashDetail) {
-        if(!cashDetailId) {
+    async deleteDetail(@Param() params : CashDetail) {
+        if(!params) {
             throw new Error('정상적으로 요청되지 않았습니다')
         }
-        const detail = await this.cashbookService.getOneDetail(cashDetailId)
+        console.log(params)
+        const detail = await this.cashbookService.getOneDetail(params)
+        console.log(detail[0])
+        if(!detail[0].cashbookId) {
+            throw new Error('dfgdfg')
+        }
         let valueUpdateDto = new ValueUpdateDto()
-        valueUpdateDto = {
-            cashbookId : detail.cashbookId,
-            cashDetailValue : -Number(detail.cashDetailValue)
+
+        valueUpdateDto = { 
+            cashbookId : detail[0].cashbookId,
+            cashDetailValue : -Number(detail[0].cashDetailValue)
         }
 
         await this.cashbookService.addValue(valueUpdateDto)
-        await this.cashbookService.deleteDetail(cashDetailId)
+        await this.cashbookService.deleteDetail(params)
 
         return `삭제 성공`
     }
@@ -199,7 +232,7 @@ export class CashbookContoller {
             await this.cashbookService.inputConsume(cashbookId)
             return '무지출 지출 전환 완료'
         } catch(e) {
-            throw new UpdateFail(e)
+
         }
     }
     
