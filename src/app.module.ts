@@ -18,7 +18,7 @@ import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExceptionService } from './exception/exception.service';
-import { HotDeal } from './Hotdeal/hotdeal.entity';
+//import { HotDeal } from './Hotdeal/hotdeal.entity';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
