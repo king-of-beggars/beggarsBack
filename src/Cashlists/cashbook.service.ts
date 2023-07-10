@@ -30,13 +30,13 @@ export class CashbookService {
         private entityManager : EntityManager
     ){}
 
-    async getcashbookAndDetail(cashbookId : number) : Promise<Cashbook> {
+    async getcashbookAndDetail(cashbookId : GetByCashbookId) : Promise<Cashbook> {
 
         return await this.cashbookEntity
         .createQueryBuilder('cashbook')
         .innerJoinAndSelect('cashbook.detail','cashDetail')
         .innerJoinAndSelect('cashbook.userId','user.userId')
-        .where('cashbook.cashbookId=:cashbookId', {cashbookId})
+        .where('cashbook.cashbookId=:cashbookId', cashbookId)
         .getOne()
         
     }
@@ -271,7 +271,7 @@ export class CashbookService {
         .delete()
         .where('cashbookId=:cashbookId',{cashbookId : Number(cashbook.cashbookId)})
         .execute()
-        
+
         await this.cashListEntity
         .createQueryBuilder('cashList')
         .delete()
@@ -296,7 +296,7 @@ export class CashbookService {
         return await this.cashbookEntity
         .createQueryBuilder()
         .select()
-        .where('cashbookId=:cashbookId',{cashbookId : cashbookId.cashbookId})
+        .where('cashbookId=:cashbookId',{cashbookId})
         .getOne()
 
     }
