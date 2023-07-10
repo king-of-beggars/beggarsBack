@@ -7,6 +7,7 @@ import { PaginationDto } from "./dto/pagination.dto";
 import { CashDetail } from "src/Cashlists/entity/cashDetail.entity";
 import { CashbookService } from "src/Cashlists/cashbook.service";
 import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
+import { GetByCashbookId } from "src/Cashlists/dto/getByCashbookId.dto";
 
 @Injectable()
 export class BoardService {
@@ -80,7 +81,7 @@ export class BoardService {
         if(!boards) {
             throw new Error('매칭되는 데이터가 없습니다')
         }
-        const cashbookId  = boards.cashbookId.cashbookId
+        const cashbookId : GetByCashbookId = boards.cashbookId
         return await this.cashbookService.getcashbookAndDetail(cashbookId)
         
     }

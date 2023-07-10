@@ -17,6 +17,8 @@ import { ApiQuery, ApiResponse, ApiParam, ApiBody ,ApiTags } from '@nestjs/swagg
 import { BoardResponseDTO } from './dto/boardResponse.dto';
 import { BoardDetailDTO } from './dto/boardDetail.dto';
 import { BoardDetailReponseDTO } from './dto/boarDetailResponse.dto';
+import { GetByCashbookId } from 'src/Cashlists/dto/getByCashbookId.dto';
+import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 
 @Controller('api/board')
 @ApiTags('게시물 API')
@@ -67,22 +69,10 @@ export class BoardController {
             data : result
         }
     }
-
-    @Get('detail/:boardId')
-    // @ApiParam({
-    //   name: '칭찬, 훈수 상세조회',
-    //   type: BoardDetailDTO,
-    // })
-    @ApiResponse({
-      type: BoardDetailDTO,
-    })
+    
+    //NAME 추가
     @Post(':cashbookId')
     @UseGuards(AccessAuthenticationGuard)
-    @ApiParam({
-      name: '칭찬, 훈수 작성',
-      required: true,
-      type: PostBoardDto,
-    })
     @ApiBody({
       type: PostBoardDto,
     })
@@ -92,27 +82,23 @@ export class BoardController {
       description:
         '자랑하기 등록이 완료됐습니다 || 혼나러가기 등록이 완료됐습니다',
     })
-    @Post(':cashbookId')
-    @UseGuards(AccessAuthenticationGuard)
-    async boardInput(@Param() postBoardDto : PostBoardDto, @Body() body : PostBoardDto) {
+    async boardInput(@Param() getByCashbookId : GetByCashbookId, @Body() postBoardDto : PostBoardDto) {
     try {
         let boardTypes : number;
         let message : string;
-        const cashbook  = await this.cashbookService.getcashbookAndDetail(Number(postBoardDto.cashbookId))
+        const cashbook  = await this.cashbookService.getcashbookAndDetail(getByCashbookId)
         cashbook.cashbookNowValue > cashbook.cashbookGoalValue ? boardTypes = 1 : boardTypes = 0
-        postBoardDto.boardText = body.boardText
         postBoardDto.userId = cashbook.userId
         postBoardDto.boardTypes = boardTypes
+        postBoardDto.cashbookId = cashbook
         await this.boardService.postBoard(postBoardDto)
-
         cashbook.cashbookNowValue > cashbook.cashbookGoalValue ? 
-        await this.userService.pointInput(3,Number(cashbook.userId)) :
-        await this.userService.pointInput(20,Number(cashbook.userId))
-        
+        await this.userService.pointInput(postBoardDto.userId,3) :
+        await this.userService.pointInput(postBoardDto.userId,20)
         boardTypes==0 ? message=`자랑하기 등록이 완료됐습니다` : message=`혼나러가기 등록이 완료됐습니다`
         return {message};
     } catch(e) {
-        throw new Error('에러러')
+        throw new Error(e)
     }
     }
     @ApiResponse({
