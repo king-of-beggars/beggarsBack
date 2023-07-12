@@ -11,15 +11,23 @@ class ErrorUtil extends Error {
         this.message = message,
         this.name = name
 
-
     }
     
-    
-
 }
 
 export class UpdateFail extends ErrorUtil {
     
+    
+}
 
+export class DeleteFail extends ErrorUtil {
+
+}
+
+export class ReadFail extends ErrorUtil {
+
+}
+
+export class CreateFail extends ErrorUtil {
 
 }

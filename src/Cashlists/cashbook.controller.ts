@@ -10,7 +10,7 @@ import { CashDetail } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
-import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
 import { BoardService } from 'src/Boards/board.service';
 import { MainPageDto } from './dto/mainPageRes.dto';
@@ -19,6 +19,7 @@ import { DetailResDto } from './dto/detailRes.dto';
 import { CashList } from './entity/cashList.entity';
 import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
+import { PaginationDto } from 'src/Boards/dto/pagination.dto';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -127,6 +128,7 @@ export class CashbookContoller {
     @Get('/')
     @UseGuards(AccessAuthenticationGuard)
     @ApiResponse({type:[ByDateResDto], description : 'data 객체 내부에 생성'})
+    @ApiQuery({type:PaginationDto})
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() query, @Req() req : any) {
         const { user } = req
@@ -141,7 +143,7 @@ export class CashbookContoller {
             result[i].writeCheck = Number(Checkdate[result[i].cashbookId]) || 0
         }
         let byDateResDto : ByDateResDto[]
-        byDateResDto = result
+        byDateResDto = result 
         return {
             data :byDateResDto
         }
@@ -151,17 +153,15 @@ export class CashbookContoller {
     @UseGuards(AccessAuthenticationGuard)
     @ApiResponse({type:DetailResDto, description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
-    async cashDetail(@Param() params : CashDetail) {
-        console.log(params)
-        const cashbookId = params.cashbookId
+    async cashDetail(@Param() getByCashbookIdDto : GetByCashbookIdDto) {
         console.log('니가호출되고있니')
-        const detail = await this.cashbookService.getDetail(cashbookId)
+        const detail = await this.cashbookService.getDetail(getByCashbookIdDto)
         console.log(detail)
         if(!detail) {
 
             throw new Error('디테일 데이터가 없습니다')
         }
-        let result2 = await this.cashbookService.cashbookById(cashbookId)
+        let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)
         const {cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
         if(detail.length===0) {
             let result = {}
