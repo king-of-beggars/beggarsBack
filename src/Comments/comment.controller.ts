@@ -11,13 +11,13 @@ import { GetByBoardIdDto } from "src/Boards/dto/getByBoardId.dto";
 import { GetByCommentIdDto } from "./dto/getByCommentId.dto";
 
 @ApiTags('댓글/좋아요 API')
-@Controller('api/board/:boardId/comment/')
+@Controller('api/board/:boardId/comment')
 export class CommentController {
     constructor(
         private readonly commentService : CommentService
     ){}
 
-    @Post('/')
+    @Post('')
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '댓글 입력', description: '댓글 입력, 포인트 1점 기입' })
     @ApiParam({ name: 'boardId', type: 'number' })
@@ -29,8 +29,8 @@ export class CommentController {
             userId : user.userId, 
             boardId : getByBoardIdDto,
             commentText : commentText
-        }
-        return await this.commentService.postComment(postCommentDto)
+        } 
+        return '댓글 입력에 성공하였습니다'
 
     }
 

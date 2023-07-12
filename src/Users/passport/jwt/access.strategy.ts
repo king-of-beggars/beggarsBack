@@ -33,7 +33,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
                     // } 
                     // console.log(token)
                     const test = jwtService.verify(token,{secret : this.configService.get('SECRET_KEY')})
-                    return token
+                    return token 
                 }
             ]),
             secretOrKey : process.env.SECRET_KEY

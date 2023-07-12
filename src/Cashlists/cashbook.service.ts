@@ -145,11 +145,11 @@ export class CashbookService {
                 let tostring = query[a]['dt'].toISOString().split('T')[0]
                 if(Number(query[a]['cashbookGoalValue']) >= Number(query[a]['cashbookNowValue'])) {
 
-                    flag!=tostring ? trueResult[tostring]=1 : trueResult[tostring]=0
+                    flag!=tostring ? trueResult[tostring]=2 : trueResult[tostring]=0
 
                 } else if(Number(query[a]['cashbookGoalValue']) < Number(query[a]['cashbookNowValue'])) {
                     
-                    trueResult[tostring] === 1 ? trueResult[tostring] = 0 : trueResult[tostring] = null
+                    trueResult[tostring] === 2 ? trueResult[tostring] = 1 : trueResult[tostring] = 0
                     flag = tostring
                 }
             }
