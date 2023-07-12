@@ -7,6 +7,8 @@ COPY package*.json ./
 
 COPY ./ ./
 
+RUN npm outdated
+
 RUN npm install
 
 EXPOSE 3000
