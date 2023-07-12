@@ -7,7 +7,9 @@ import { PaginationDto } from "./dto/pagination.dto";
 import { CashDetail } from "src/Cashlists/entity/cashDetail.entity";
 import { CashbookService } from "src/Cashlists/cashbook.service";
 import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
-import { GetByCashbookId } from "src/Cashlists/dto/getByCashbookId.dto";
+import { GetByCashbookIdDto } from "src/Cashlists/dto/getByCashbookId.dto";
+import { BoardResDto } from "./dto/boardRes.dto";
+import { GetByBoardIdDto } from "./dto/getByBoardId.dto";
 
 @Injectable()
 export class BoardService {
@@ -43,7 +45,7 @@ export class BoardService {
         
     }
 
-    async getListAll(paginationDTO : PaginationDto) : Promise<Board[]> {
+    async getListAll(paginationDTO : PaginationDto) : Promise<BoardResDto[]> {
         const result =  await this.boardRepository
         .createQueryBuilder('board')
         .leftJoin('board.cashbookId','cashbook')
@@ -59,7 +61,7 @@ export class BoardService {
         return result;
     }
 
-    async getBoardDetail(boardId : number) : Promise<Board> {
+    async getBoardDetail(getByBoardIdDto : GetByBoardIdDto) : Promise<Board> {
         return await this.boardRepository
         .createQueryBuilder('board')
         .leftJoinAndSelect('board.userId','user')
@@ -67,21 +69,18 @@ export class BoardService {
         .leftJoinAndSelect('comment.userId','commentUser')
         .leftJoinAndSelect('comment.likes','like')
         .select(['board','comment','comment.userId','user.userId','user.userNickname','user.userName','commentUser.userId','commentUser.userName','commentUser.userNickname'])
-        .where('board.boardId=:boardId',{boardId : boardId})
+        .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
         .getOne()
 
     }
 
-    async getDetailByBoardId(boardId : number) : Promise<Cashbook> {
+    async getDetailByBoardId(getByBoardIdDto : GetByBoardIdDto) : Promise<Cashbook> {
         const boards = await this.boardRepository
         .createQueryBuilder('board')
         .leftJoinAndSelect('board.cashbookId','cashbook')
-        .where('board.boardId=:boardId',{boardId : boardId})
+        .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
         .getOne()
-        if(!boards) {
-            throw new Error('매칭되는 데이터가 없습니다')
-        }
-        const cashbookId : GetByCashbookId = boards.cashbookId
+        const cashbookId : GetByCashbookIdDto = boards.cashbookId
         return await this.cashbookService.getcashbookAndDetail(cashbookId)
         
     }

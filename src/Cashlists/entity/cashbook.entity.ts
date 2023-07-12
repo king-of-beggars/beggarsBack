@@ -18,7 +18,7 @@ export class Cashbook {
     @Column()
     public cashbookName : string
 
-    @Column({default:0})
+    @Column({default:0, nullable:true})
     public cashbookNowValue : number;
 
     @Column({default:0})

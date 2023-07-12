@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable ,Body, Req} from '@nestjs/common'
+import { Injectable ,Body, Req , Res} from '@nestjs/common'
 import User  from '../user.entity'
 import {Repository, In} from 'typeorm'
 import { TokenDto } from '../dto/token.dto'
@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config'
 import { UserService } from './user.service';
+import {Response} from 'express'
 
 @Injectable()
 export class AuthService {  
@@ -63,4 +64,22 @@ export class AuthService {
 
     }
 
+    //
+    async setCookie(@Res() res : Response, accessToken : string, refreshToken? : string) {
+        if(refreshToken) {
+            res.cookie('refreshToken', refreshToken, {
+                //domain : 'poorkingapi.shop',
+                sameSite : 'none',
+                secure : true,
+                httpOnly : false
+            })
+        }
+        res.cookie('accessToken', accessToken, {
+            //domain : 'poorkingapi.shop',
+            sameSite : 'none',
+            secure : true,
+            httpOnly : false
+        })
+        return '쿠키 세팅 완료'
+        }
 }

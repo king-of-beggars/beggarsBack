@@ -40,19 +40,7 @@ export class UserController {
             tokenDto.userNickname = user.userNickname
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            res.cookie('refreshToken', refreshToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure : true,
-                httpOnly : false
-            })
-
-            res.cookie('accessToken', accessToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure : true,
-                httpOnly : false
-            })
+            await this.authService.setCookie(res,accessToken,refreshToken)
             res.setHeader('userId', user.userId)
             
             const nickname : string = await this.userService.encodeNick(user.userNickname)
@@ -87,7 +75,6 @@ export class UserController {
     async userNickCheck(@Req() req, @Body() body : NickCheckDto)  {
 
         try {
-            console.log(req)
             const byNickname = await this.userService.userByNickname(body.userNickname)
             if(!byNickname) {
                 return '사용 가능한 닉네임입니다'
@@ -115,22 +102,22 @@ export class UserController {
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
 
+            await this.authService.setCookie(res,accessToken,refreshToken)
+            // res.cookie('refreshToken', refreshToken, {
+            //     domain : 'poorkingapi.shop',
+            //     sameSite : 'none',
+            //     secure : true,
+            //     httpOnly : false,
+            //     path : '/'
+            // })
 
-            res.cookie('refreshToken', refreshToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure : true,
-                httpOnly : false,
-                path : '/'
-            })
-
-            res.cookie('accessToken', accessToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure : true, 
-                httpOnly : false,
-                path : '/'
-            })
+            // res.cookie('accessToken', accessToken, {
+            //     domain : 'poorkingapi.shop',
+            //     sameSite : 'none',
+            //     secure : true, 
+            //     httpOnly : false,
+            //     path : '/'
+            // })
             res.setHeader('userId', user.userId)
             
             const nickname : string = await this.userService.encodeNick(user.userNickname)
@@ -146,9 +133,6 @@ export class UserController {
     @ApiOperation({ summary: '로그아웃', description: '쿠키 클리어' })
     async userLogout(@Req() req : any ,@Res() res : Response) {
         const { user } = req 
-        console.log('#############',user)
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-        console.log(req)
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         return res.send('로그아웃 완료');
@@ -166,8 +150,6 @@ export class UserController {
         }
         if(!user.userId) {
             const loginSuccess = false
-            //await req.res.setHeader('loginSuccess',false)
-            //await req.res.setHeader('userName',user)
             res.cookie('userName', user, {
                 domain : 'poorkingapi.shop',
                 sameSite : 'none',
@@ -181,19 +163,7 @@ export class UserController {
         
         const refreshToken = await this.authService.setRefreshToken(user)
         const accessToken = await this.authService.setAccessToken(user)
-        res.cookie('refreshToken', refreshToken, {
-            domain : 'poorkingapi.shop',
-            sameSite : 'none',
-            secure : true,
-            httpOnly : false
-        })
-
-        res.cookie('accessToken', accessToken, {
-            domain : 'poorkingapi.shop',
-            sameSite : 'none',
-            secure : true,
-            httpOnly : false
-        })
+        await this.authService.setCookie(res,accessToken,refreshToken) 
         res.setHeader('userId', user.userId)
         
         const nickname : string = await this.userService.encodeNick(user.userNickname)
@@ -205,6 +175,7 @@ export class UserController {
     @Post('signup/social')
     @HttpCode(201)
     @ApiOperation({ summary: '카카오 회원가입', description: '카카오 로그인 최초, 닉네임 입력하면 네임과 같이 request' })
+    @ApiBody({type:SocialSignupDto})
     async signupSocial(@Body() body : SocialSignupDto, @Req() req, @Res() res : Response) {
         console.log('#######',req)
         console.log('#######',res)
@@ -231,19 +202,7 @@ export class UserController {
 
             const refreshToken = await this.authService.setRefreshToken(tokenDto)
             const accessToken = await this.authService.setAccessToken(tokenDto)
-            res.cookie('refreshToken', refreshToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure : true,
-                httpOnly :false
-            })
-
-            res.cookie('accessToken', accessToken, {
-                domain : 'poorkingapi.shop',
-                sameSite : 'none',
-                secure :true,
-                httpOnly :false
-            })
+            await this.authService.setCookie(res,accessToken,refreshToken)
             res.setHeader('userId', user.userId)
             
             const nickname : string = await this.userService.encodeNick(user.userNickname)

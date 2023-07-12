@@ -33,17 +33,8 @@ export class UserDto {
     })
     public userAuth: number;
 
-
-    @ApiProperty({
-        example : 'kakao',
-        description : '로그인 매체'
-    })
     public userLoginType: string;
     
-    @ApiProperty({
-        example : '0',
-        description : '일반 로그인'
-    })
     public userType: number;
     
     @ApiProperty({

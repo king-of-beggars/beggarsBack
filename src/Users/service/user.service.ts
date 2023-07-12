@@ -5,6 +5,7 @@ import {Repository, In} from 'typeorm'
 import { SignupDto } from '../dto/signup.dto'
 import * as bcrypt from 'bcrypt';
 import { SocialSignupDto } from '../dto/socialSignup.dto'
+import { GetByUserIdDto } from '../dto/getByUserId.dto';
 
 @Injectable()
 export class UserService {
@@ -82,18 +83,18 @@ export class UserService {
         
     }
 
-    async pointCheck(userId:any) : Promise<number> {
+    async pointCheck(getByUserIdDto:GetByUserIdDto) : Promise<number> {
         const result = await this.userRepository
         .createQueryBuilder('user')
         .select(['user.userPoint'])
-        .where('user.userId = :userId', {userId : userId.userId})
+        .where('user.userId = :userId', {userId : getByUserIdDto})
         .getOne()
         return Number(result.userPoint)
     }
 
-    async pointInput(userId : any, point : number) {
-        console.log(userId)
-        let userPoint : number = await this.pointCheck(userId)
+    async pointInput(getByUserIdDto : GetByUserIdDto, point : number) {
+        console.log(getByUserIdDto)
+        let userPoint : number = await this.pointCheck(getByUserIdDto)
         console.log(userPoint)
         userPoint = userPoint + point
         console.log(userPoint)
@@ -101,7 +102,7 @@ export class UserService {
         .createQueryBuilder('user')
         .update()
         .set({userPoint:userPoint})
-        .where('userId = :userId',{userId : userId.userId})
+        .where('userId = :userId',{userId : getByUserIdDto})
         .execute()
     }
 

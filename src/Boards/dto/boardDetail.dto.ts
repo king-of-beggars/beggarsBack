@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Board } from '../entity/board.entity';
+import { BoardDto } from './board.dto';
 
-export class BoardDetailDTO extends PickType(Board, ['boardId']) {}
+export class BoardDetailDTO extends PickType(BoardDto, ['boardId']) {}

@@ -18,7 +18,6 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
         super({
             jwtFromRequest : ExtractJwt.fromExtractors([
                 (request : Request) => {
-                    console.log(request)
                     let token = request.headers.cookie
                     if(token) {
                         token = token.split(';')[1]
@@ -27,7 +26,7 @@ export class AccessStrategy extends PassportStrategy(Strategy,'access') {
                     console.log(token)
                     // let token = request.headers['set-cookie'][0]
                     // if(token) {
-                    //     token = token.split(',')[1]
+                    //     //token = token.split(',')[1]
                     //     token = token.split('=')[1]
                     //     token = token.split(' ')[0]
                     //     token = token.replace(';','')

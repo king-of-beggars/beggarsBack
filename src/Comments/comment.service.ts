@@ -7,6 +7,8 @@ import User from "src/Users/user.entity";
 import { UserService } from "src/Users/service/user.service";
 import { EntityManager } from "typeorm";
 import { Like } from "./entity/like.entity";
+import { GetByUserIdDto } from "src/Users/dto/getByUserId.dto";
+import { GetByCommentIdDto } from "./dto/getByCommentId.dto";
 
 @Injectable()
 export class CommentService {
@@ -22,7 +24,7 @@ export class CommentService {
         private readonly entityManager : EntityManager
     ){}
 
-    async postComment(postCommentDto : PostCommentDto, userId : number) {
+    async postComment(postCommentDto : PostCommentDto) {
         this.entityManager.transaction(async (manager)=> {
 
         })
@@ -30,16 +32,16 @@ export class CommentService {
         const query = this.commentEntity.create(
             postCommentDto
         )
-        await this.userService.pointInput(userId,1)
+        await this.userService.pointInput(postCommentDto.userId,1)
         return await this.commentEntity.save(query);
         
     }
     
-    async deleteComment(commentId : number,userId : number) {
+    async deleteComment(getByCommentIdDto : GetByCommentIdDto,userId : number) {
         return await this.commentEntity
         .createQueryBuilder('comment')
         .delete()
-        .where('comment.commentId=:commentId',{commentId})
+        .where('comment.commentId=:commentId',{commentId : getByCommentIdDto.commentId})
         .andWhere('comment.userId=:userId',{userId})
         .execute()
 

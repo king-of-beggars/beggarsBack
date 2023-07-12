@@ -11,14 +11,6 @@ export class PaginationDto {
   @IsNotEmpty()
   @IsOptional()
   public limit: number;
-
-  @ApiProperty({
-    type: Number,
-    required: true,
-    description: '게시물 타입(혼나기=1/자랑하기=0)',
-  })
-  @IsNotEmpty()
-  @IsOptional()
-  @Max(1)
+  
   public boardTypes: number;
 }

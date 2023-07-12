@@ -56,6 +56,14 @@ class CashbookDto {
     })
     public userId : User
 
+    @ApiProperty({
+        example : [{
+            'cashDetailId' : 4,
+            'cashDetailText' : "마라탕350g",
+            "cashDetailValue" : 5000
+        }],
+        description : '캐시 디테일'
+    })
     public detail? : CashDetail[];
     
     @ApiProperty({
@@ -140,7 +148,7 @@ class CashDetailDto {
     })
     public cashDetailCreatedAt : Date
 
-    public cashbookId : Cashbook
+    public cashbookId : Cashbook;
 
 }
 

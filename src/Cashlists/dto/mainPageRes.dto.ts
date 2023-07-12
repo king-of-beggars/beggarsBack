@@ -1,7 +1,7 @@
 import { ApiProperty, PickType } from "@nestjs/swagger"
 import { CashbookDto } from "./cashbook.dto";
 
-class GroupByCategoryDto extends PickType(CashbookDto, ['cashbookCategory', 'cashbookNowValue', 'cashbookGoalValue', 'cashbookCreatedAt', 'cashbookUpdatedAt'] as const) {}
+class GroupByCategoryDto extends PickType(CashbookDto, ['cashbookCategory', 'cashbookNowValue', 'cashbookGoalValue'] as const) {}
 class CashbookTotalDto extends PickType(CashbookDto, ['cashbookNowValue', 'cashbookGoalValue'] as const) {}
 
 class MainPageResDto {
@@ -23,7 +23,7 @@ class MainPageResDto {
         example : {'cashCategory' : '식비', 'cashbookNowValue' : 5000, 'cashbookGoalValue' : 8000},
         description : '카테고리 대분류 group by'
     })
-    public groupByCategory : GroupByCategoryDto
+    public groupByCategory : GroupByCategoryDto[]
 
     @ApiProperty({
         example : {'cashbookNowValue' : 5000, 'cashbookGoalValue' : 8000},

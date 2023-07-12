@@ -23,10 +23,6 @@ export class BoardDto {
     })
     public boardText : string
 
-    @ApiProperty({
-        example : 0,
-        description : '게시판 번호 0 : 칭찬, 게시판 번호 1 : 혼나기'
-    })
     public boardTypes : number
 
     @ApiProperty({
@@ -40,5 +36,9 @@ export class BoardDto {
         description : '글 수정 시간 ( 수정이 없으므로 사용하지 않는 항목 )'
     })
     public boardUpdatedAt : Date
+
+    public userId : User
+    
+    public cashbookId : Cashbook
 
 }
