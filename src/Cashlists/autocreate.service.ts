@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Cashbook } from './entity/cashbook.entity';
 import { CashbookService } from './cashbook.service';
-import { PostCashbookDto } from './dto/postCashbook.dto';
 import { CashList } from './entity/cashList.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
