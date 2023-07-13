@@ -20,6 +20,7 @@ import { CashList } from './entity/cashList.entity';
 import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
 import { PaginationDto } from 'src/Boards/dto/pagination.dto';
+import { QueryDate } from './dto/queryDate.dto';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -48,7 +49,11 @@ export class CashbookContoller {
         const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
         console.log(twoweek)
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
-        const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(nowdate2,user.userId)
+        let query = new QueryDate()
+        query = {
+            queryDate : nowdate2
+        }
+        const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(query,user.userId)
         console.log(nowdate2)
         let total = {
             cashbookNowValue : 0,
@@ -128,11 +133,9 @@ export class CashbookContoller {
     @Get('/')
     @UseGuards(AccessAuthenticationGuard)
     @ApiResponse({type:[ByDateResDto], description : 'data 객체 내부에 생성'})
-    @ApiQuery({type:PaginationDto})
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
-    async cashList(@Query() query, @Req() req : any) {
+    async cashList(@Query() date : QueryDate, @Req() req : any) {
         const { user } = req
-        const date = query.date
         console.log(date)
         let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
         const createCheck = result.map((e)=>{
@@ -158,7 +161,7 @@ export class CashbookContoller {
         const detail = await this.cashbookService.getDetail(getByCashbookIdDto)
         console.log(detail)
         if(!detail) {
-
+ 
             throw new Error('디테일 데이터가 없습니다')
         }
         let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)

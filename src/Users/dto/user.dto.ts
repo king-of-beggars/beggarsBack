@@ -6,69 +6,67 @@ import { Comment } from 'src/Comments/entity/comment.entity';
 import { Like } from 'src/Comments/entity/like.entity';
 
 export class UserDto {
+  public userId: number;
 
-    public userId : number;
-    
-    @ApiProperty({
-        example : 'rlatmdcjf',
-        description : '사용자 아이디'
-    })
-    public userName : string;
+  @ApiProperty({
+    example: 'rlatmdcjf',
+    description: '사용자 아이디',
+  })
+  public userName: string;
 
-    @ApiProperty({
-        example : '가나다라',
-        description : '사용자 닉네임'
-    })
-    public userNickname: string;
+  @ApiProperty({
+    example: '가나다라',
+    description: '사용자 닉네임',
+  })
+  public userNickname: string;
 
-    @ApiProperty({
-        example : 'qwe123456',
-        description : '유저 비밀번호'
-    })
-    public userPwd: string;
+  @ApiProperty({
+    example: 'qwe123456',
+    description: '유저 비밀번호',
+  })
+  public userPwd: string;
 
-    @ApiProperty({
-        example : '0',
-        description : '일반 회원'
-    })
-    public userAuth: number;
+  @ApiProperty({
+    example: '0',
+    description: '일반 회원',
+  })
+  public userAuth: number;
 
-    public userLoginType: string;
-    
-    public userType: number;
-    
-    @ApiProperty({
-        example : '0',
-        description : '일반 로그인'
-    })
-    public userPoint: number;
-    
-    @ApiProperty({
-        example : 'sdfsfdgd.jpg',
-        description : '사용자 이미지'
-    })
-    public userImage: string;
+  public userLoginType: string;
 
-    @ApiProperty({
-        example : '2023-07-04 04:49:37.783151',
-        description : '회원가입 날짜'
-    })
-    public userCreatedAt: Date;
+  public userType: number;
 
-    @ApiProperty({
-        example : '2023-07-04 04:49:37.783151',
-        description : '회원정보 업데이트 날짜'
-    })
-    public userUpdatedAt: Date;
+  @ApiProperty({
+    example: '0',
+    description: '일반 로그인',
+  })
+  public userPoint: number;
 
-    public cashlists? : CashList[];
+  @ApiProperty({
+    example: 'sdfsfdgd.jpg',
+    description: '사용자 이미지',
+  })
+  public userImage: string;
 
-    public cashbooks? : Cashbook[];
+  @ApiProperty({
+    example: '2023-07-04 04:49:37.783151',
+    description: '회원가입 날짜',
+  })
+  public userCreatedAt: Date;
 
-    public boards? : Board[];
+  @ApiProperty({
+    example: '2023-07-04 04:49:37.783151',
+    description: '회원정보 업데이트 날짜',
+  })
+  public userUpdatedAt: Date;
 
-    public comments? : Comment[]
+  public cashlists?: CashList[];
 
-    public likes? : Like[]
+  public cashbooks?: Cashbook[];
 
+  public boards?: Board[];
+
+  public comments?: Comment[];
+
+  public likes?: Like[];
 }

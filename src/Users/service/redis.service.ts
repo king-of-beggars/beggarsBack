@@ -15,4 +15,4 @@
 //      // ioredis 에서 사용하듯이 사용하면 된다 !
 //      return await this.defaultClusterClient.ping()
 //    }
-// } 
+// }

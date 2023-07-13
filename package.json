@@ -70,5 +70,8 @@
     "socket.io": "^4.7.0",
     "swagger-ui-express": "^4.6.3",
     "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   }
 }

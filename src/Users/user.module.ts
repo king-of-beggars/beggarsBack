@@ -16,23 +16,19 @@ import { AccessStrategy } from './passport/jwt/access.strategy';
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
-      secret : process.env.SECRET_KEY
-    })
+      secret: process.env.SECRET_KEY,
+    }),
   ],
-  controllers: [UserController], 
+  controllers: [UserController],
   providers: [
-    UserService, 
-    AuthService, 
+    UserService,
+    AuthService,
     JwtService,
     ConfigService,
     LocalStrategy,
     KakaoStrategy,
     AccessStrategy,
-  ], 
-  exports: [
-    UserService, 
-    AuthService, 
-    JwtService,
   ],
-}) 
-export class UserModule {}   
+  exports: [UserService, AuthService, JwtService],
+})
+export class UserModule {}

@@ -1,11 +1,11 @@
-import { Controller, Module,  } from '@nestjs/common';
+import { Controller, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import User from './Users/user.entity'
-import {UserModule} from './Users/user.module'
-import { CacheModule } from '@nestjs/cache-manager';  
-import { redisStore } from 'cache-manager-redis-yet'
+import User from './Users/user.entity';
+import { UserModule } from './Users/user.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 import { Board } from './Boards/entity/board.entity';
 import { Comment } from './Comments/entity/comment.entity';
 import { Like } from './Comments/entity/like.entity';
@@ -30,39 +30,39 @@ import { ExceptionService } from './exception/exception.service';
     //     enableReadyCheck: true,
     //     dnsLookup :(address, callback) => callback(null, address)
     //   }
-    // }) 
+    // })
     //}),
     TypeOrmModule.forRoot({
-        type:'mysql',
-        host: process.env.DB_HOST,
-        port: 3306,
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
-        database: 'poorking',
-        extra : {
-          timezone: 'local'
-        },
-        synchronize:true,
-        entities : [
-                  User,
-                  Board,
-                  Comment,
-                  Cashbook,
-                  CashList,
-                  CashActivity,
-                  CashDetail,
-                  Like,
-                  //HotDeal
-                  ],
-        logging:true
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: 3306,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: 'poorking',
+      extra: {
+        timezone: 'local',
+      },
+      synchronize: true,
+      entities: [
+        User,
+        Board,
+        Comment,
+        Cashbook,
+        CashList,
+        CashActivity,
+        CashDetail,
+        Like,
+        //HotDeal
+      ],
+      logging: true,
     }),
     UserModule,
     BoardModule,
     CashbookModule,
     CommentModule,
     ConfigModule.forRoot({
-      isGlobal : true
-    })
+      isGlobal: true,
+    }),
     //CommentModule
     // CacheModule.registerAsync({
     //   useFactory : async() => ({
@@ -78,5 +78,4 @@ import { ExceptionService } from './exception/exception.service';
   controllers: [AppController],
   providers: [AppService, ExceptionService],
 })
-
 export class AppModule {}

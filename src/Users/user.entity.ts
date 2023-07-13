@@ -1,4 +1,13 @@
-import {Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Board } from 'src/Boards/entity/board.entity';
 import { CashList } from 'src/Cashlists/entity/cashList.entity';
@@ -9,80 +18,74 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('User')
 export class User {
-    @PrimaryGeneratedColumn()
-    public userId : number;
-    
-    @Column({ unique: true })
-    public userName : string;
+  @PrimaryGeneratedColumn()
+  public userId: number;
 
-    @Column({ unique: true })
-    public userNickname: string;
+  @Column({ unique: true })
+  public userName: string;
 
-    @Column({nullable:true})
-    @Exclude()
-    public userPwd: string;
+  @Column({ unique: true })
+  public userNickname: string;
 
-    @Column({default:0})
-    public userAuth: number;
+  @Column({ nullable: true })
+  @Exclude()
+  public userPwd: string;
 
-    @Column({default:'normal'})
-    public userLoginType: string;
-    
-    @Column({default:0})
-    public userType: number;
-    
-    @Column({nullable:true, default:0})
-    public userPoint: number;
- 
-    @Column({nullable:true})
-    public userImage: string;
+  @Column({ default: 0 })
+  public userAuth: number;
 
-    @Column({ type: 'timestamp' })
-    public userCreatedAt: Date;
+  @Column({ default: 'normal' })
+  public userLoginType: string;
 
-    @Column({ type: 'timestamp' })
-    public userUpdatedAt: Date;
+  @Column({ default: 0 })
+  public userType: number;
 
-    @OneToMany(()=>CashList, 
-    (cashlist : CashList) => cashlist.userId, {
-       cascade:true 
-    })
-    public cashlists? : CashList[];
+  @Column({ nullable: true, default: 0 })
+  public userPoint: number;
 
-    @OneToMany(()=>Cashbook,
-    (cashbook : Cashbook) => cashbook.userId, {
-        cascade:true
-    })
-    public cashbooks? : Cashbook[];
+  @Column({ nullable: true })
+  public userImage: string;
 
-    @OneToMany(()=>Board,
-    (board : Board) => board.userId, {
-        cascade:true
-    })
-    public boards? : Board[];
+  @Column({ type: 'timestamp' })
+  public userCreatedAt: Date;
 
-    @OneToMany(()=>Comment,
-    (comment : Comment) => comment.userId, {
-        cascade:true
-    })
-    public comments? : Comment[]
+  @Column({ type: 'timestamp' })
+  public userUpdatedAt: Date;
 
-    @OneToMany(()=>Like, (like : Like)=>like.userId, {
-        cascade:true
-    })
-    public likes? : Like[]
+  @OneToMany(() => CashList, (cashlist: CashList) => cashlist.userId, {
+    cascade: true,
+  })
+  public cashlists?: CashList[];
 
-    @BeforeInsert()
-    updateCreatedAt() {
-        this.userCreatedAt = new Date();
-    }
+  @OneToMany(() => Cashbook, (cashbook: Cashbook) => cashbook.userId, {
+    cascade: true,
+  })
+  public cashbooks?: Cashbook[];
 
-    @BeforeUpdate()
-    updateUpdatedAt() {
-        this.userUpdatedAt = new Date();
-    }
+  @OneToMany(() => Board, (board: Board) => board.userId, {
+    cascade: true,
+  })
+  public boards?: Board[];
 
-    
-}   
+  @OneToMany(() => Comment, (comment: Comment) => comment.userId, {
+    cascade: true,
+  })
+  public comments?: Comment[];
+
+  @OneToMany(() => Like, (like: Like) => like.userId, {
+    cascade: true,
+  })
+  public likes?: Like[];
+
+  @BeforeInsert()
+  updateCreatedAt() {
+    this.userCreatedAt = new Date();
+  }
+
+  @BeforeUpdate()
+  updateUpdatedAt() {
+    this.userUpdatedAt = new Date();
+  }
+}
 
 export default User;

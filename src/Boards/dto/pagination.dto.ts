@@ -11,6 +11,6 @@ export class PaginationDto {
   @IsNotEmpty()
   @IsOptional()
   public limit: number;
-  
+
   public boardTypes: number;
 }

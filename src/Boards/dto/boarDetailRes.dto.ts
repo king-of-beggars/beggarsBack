@@ -7,25 +7,25 @@ import { UserDto } from 'src/Users/dto/user.dto';
 import { CashDetailDto, CashbookDto } from 'src/Cashlists/dto/cashbook.dto';
 import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 
-class BoardCommentResDto extends PickType(CommentDto, [ 
+class BoardCommentResDto extends PickType(CommentDto, [
   'commentId',
   'commentText',
-  'commentCreatedAt'
-]){
+  'commentCreatedAt',
+]) {
   @ApiProperty({
-    example : 2
+    example: 2,
   })
-  public likeCheck : number
+  public likeCheck: number;
   @ApiProperty({
-    example : 0
+    example: 0,
   })
-  public likeCount : number
+  public likeCount: number;
 }
 
 class BoardUserResDto extends PickType(UserDto, [
   'userId',
   'userName',
-  'userNickname'
+  'userNickname',
 ]) {}
 
 class BoardCashDetailResDto extends PickType(CashbookDto, [
@@ -34,11 +34,8 @@ class BoardCashDetailResDto extends PickType(CashbookDto, [
   'cashbookGoalValue',
   'cashbookCreatedAt',
   'cashbookNowValue',
-  'detail'
-]) {
-}
- 
-
+  'detail',
+]) {}
 
 export class BoardDetailResDto extends PickType(BoardDto, [
   'boardId',
@@ -47,19 +44,18 @@ export class BoardDetailResDto extends PickType(BoardDto, [
   'boardCreatedAt',
   'boardUpdatedAt',
 ]) {
+  @ApiProperty({
+    type: [BoardCommentResDto],
+  })
+  public comments?: BoardCommentResDto[];
 
   @ApiProperty({
-    type : [BoardCommentResDto]
+    type: BoardUserResDto,
   })
-  public comments? : BoardCommentResDto[]
+  public userId: BoardUserResDto;
 
   @ApiProperty({
-    type : BoardUserResDto
+    type: CashbookDto,
   })
-  public userId : BoardUserResDto
-
-  @ApiProperty({
-    type : CashbookDto
-  })
-  public cashbookId : BoardCashDetailResDto
+  public cashbookId: BoardCashDetailResDto;
 }
