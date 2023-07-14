@@ -1,4 +1,4 @@
-import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param, Put, ConsoleLogger} from '@nestjs/common';
+import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param, Put, ConsoleLogger, UseFilters} from '@nestjs/common';
 import { CashbookService } from './cashbook.service';
 import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
@@ -21,6 +21,9 @@ import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
 import { PaginationDto } from 'src/Boards/dto/pagination.dto';
 import { QueryDate } from './dto/queryDate.dto';
+import { ErrorService, ReadFail } from 'src/Utils/exception.service';
+import { HttpStatus } from '@nestjs/common/enums';
+import { HttpException } from '@nestjs/common/exceptions';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -37,43 +40,49 @@ export class CashbookContoller {
     @ApiResponse({type: MainPageDto, description : 'data 객체 내부에 생성' })
     @ApiOperation({ summary: '메인 api', description: '몇일째 되는 날, 2주치 데이터, 당일 유저 지출 총합, 섹션별 소비' })
     async mainPage(@Req() req : any) {
-        const { user } = req
-        let tempdate = moment().tz("Asia/Seoul")
-        let nowdate = tempdate.toDate()
-        let nowdate2 = new Date()
-        nowdate2.setHours(nowdate.getHours() + 9)
-        //1. 몇 일 째 되는 날
-        const dateValue : number = await this.userService.userSignupDate(user.userId)
-        console.log(dateValue)
-        //2. 2주 데이터, 남은 날은 null 처리
-        const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
-        console.log(twoweek)
-        //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
-        let query = new QueryDate()
-        query = {
-            date : nowdate2
-        }
-        const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(query,user.userId)
-        console.log(nowdate2)
-        let total = {
-            cashbookNowValue : 0,
-            cashbookGoalValue : 0
-        } 
-        for(let i=0; totalValue.length>i; i++) {
-            console.log(totalValue[i].cashbookGoalValue)
-            total.cashbookNowValue += totalValue[i].cashbookNowValue
-            total.cashbookGoalValue += totalValue[i].cashbookGoalValue
-        }
+        try {
+            const { user } = req
+            let tempdate = moment().tz("Asia/Seoul")
+            let nowdate = tempdate.toDate()
+            let nowdate2 = new Date()
+            nowdate2.setHours(nowdate.getHours() + 9)
+            //1. 몇 일 째 되는 날
+            const dateValue : number = await this.userService.userSignupDate(user.userId)
+            
+            //2. 2주 데이터, 남은 날은 null 처리
+            const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
+        
+            //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
+            let query = new QueryDate()
+            query = {
+                date : nowdate2
+            }
+            const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(query,user.userId)
+            
+            let total = {
+                cashbookNowValue : 0,
+                cashbookGoalValue : 0
+            } 
+            for(let i=0; totalValue.length>i; i++) {
+                console.log(totalValue[i].cashbookGoalValue)
+                total.cashbookNowValue += totalValue[i].cashbookNowValue
+                total.cashbookGoalValue += totalValue[i].cashbookGoalValue
+            }
 
-        let mainPageDto = new MainPageDto()
-        mainPageDto = {
-            signupDay : dateValue,
-            twoweek : twoweek,
-            groupByCategory : totalValue,
-            total : total
-        }
-        return {
-            data : mainPageDto
+            let mainPageDto = new MainPageDto()
+            mainPageDto = {
+                signupDay : dateValue,
+                twoweek : twoweek,
+                groupByCategory : totalValue,
+                total : total
+            }
+            return {
+                data : mainPageDto
+            }
+
+        } catch(e) {
+            console.log(e.stack)
+            throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
@@ -84,19 +93,22 @@ export class CashbookContoller {
     @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     @ApiBody({type:FrameDto})
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
-        const { user } = req
-        let frameDto = new FrameDto()
-        frameDto = {
-            cashCategory : body.cashCategory,
-            cashName : body.cashName,
-            cashListGoalValue : body.cashListGoalValue,
-            userId : user.userId
+        try {
+            const { user } = req
+            let frameDto = new FrameDto()
+            frameDto = {
+                cashCategory : body.cashCategory,
+                cashName : body.cashName,
+                cashListGoalValue : body.cashListGoalValue,
+                userId : user.userId
+            }
+            //이 부분 트랜잭션 해야하는데 어떡하지
+            await this.cashbookService.frameCreate(frameDto)
+            return {messsage : '프레임 생성이 완료되었습니다'}
+        } catch(e) {
+            console.log(e.stack)
+            throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
         }
-
-        //이 부분 트랜잭션 해야하는데 어떡하지
-        const frame = await this.cashbookService.frameCreate(frameDto)
-        
-        return {messsage : '프레임 생성이 완료되었습니다'}
     }
 
     //카태고리 수정
@@ -107,16 +119,21 @@ export class CashbookContoller {
     @ApiOperation({ summary: '프레임 수정', description: '프레임 수정 및 캐시북 아이디 값에 맞는 캐시북 수정' })
     @ApiBody({type:FrameDto})
     async cashFrameUpdate(@Param() cashbookId : GetByCashbookIdDto, @Body() body: FrameDto, @Req() req: any) {
-      const { user } = req
-      let frameDto = new FrameDto()
+      try {
+        const { user } = req
+        let frameDto = new FrameDto()
         frameDto = {
-            cashCategory : body.cashCategory,
-            cashName : body.cashName,
-            cashListGoalValue : body.cashListGoalValue,
-            userId : user.userId
+                cashCategory : body.cashCategory,
+                cashName : body.cashName,
+                cashListGoalValue : body.cashListGoalValue,
+                userId : user.userId
         } 
-      await this.cashbookService.frameUpdate(cashbookId, frameDto)
-      return '프레임 수정 완료';
+        await this.cashbookService.frameUpdate(cashbookId, frameDto)
+        return '프레임 수정 완료';
+    } catch(e) {
+        console.log(e.stack)
+        throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+    }
     }
 
     //딜리트
@@ -125,8 +142,12 @@ export class CashbookContoller {
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '프레임 삭제', description: '프레임 삭제 및 부모 row 전부 삭제' })
     async frameDelete(@Param() cashbookId : GetByCashbookIdDto) {
-        await this.cashbookService.frameDelete(cashbookId)
-        return '프레임 삭제 완료'
+        try {
+            await this.cashbookService.frameDelete(cashbookId)
+            return '프레임 삭제 완료'
+        } catch(e) {
+
+        }
     }   
 
     //디폴트는 오늘로 전달해주시길 프론트엔드 2023-05-24 형식으로
@@ -135,21 +156,29 @@ export class CashbookContoller {
     @ApiResponse({type:[ByDateResDto], description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() date : QueryDate, @Req() req : any) {
-        const { user } = req
-        console.log(date)
-        let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
-        const createCheck = result.map((e)=>{
-            return e.cashbookId
-        })
-        const Checkdate = await this.boardService.BoardCheck(createCheck)
-        for(let i=0; result.length>i; i++) {
-            result[i].writeCheck = Number(Checkdate[result[i].cashbookId]) || 0
-        }
-        let byDateResDto : ByDateResDto[]
-        byDateResDto = result 
-        return {
-            data :byDateResDto
-        }
+            const regex = /\d{4}-\d{2}-\d{2}/;
+            if(!regex.test(date.toString())) {
+                console.log('dfgdfg')
+            } 
+            const { user } = req
+            console.log(date) 
+            let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
+            const createCheck = result.map((e)=>{
+                return e.cashbookId
+            })
+            const Checkdate = await this.boardService.BoardCheck(createCheck)
+            for(let i=0; result.length>i; i++) {
+                result[i].writeCheck = Number(Checkdate[result[i].cashbookId]) || 0
+            }
+            let byDateResDto : ByDateResDto[]
+            byDateResDto = result 
+            return {
+                data :byDateResDto
+            }
+        // } catch(e) {
+        //     console.log(e.stack)
+        //     throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        // }
     }
 
     @Get(':cashbookId')
@@ -157,21 +186,24 @@ export class CashbookContoller {
     @ApiResponse({type:DetailResDto, description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
     async cashDetail(@Param() getByCashbookIdDto : GetByCashbookIdDto) {
-        console.log('니가호출되고있니')
         const detail = await this.cashbookService.getDetail(getByCashbookIdDto)
-        console.log(detail)
         if(!detail) {
- 
-            throw new Error('디테일 데이터가 없습니다')
+            throw new HttpException('디테일 데이터가 없습니다',HttpStatus.BAD_REQUEST)
         }
         let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)
         const {cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
         if(detail.length===0) {
-            let result = {}
-            let consumption =true
-            cashbookNowValue===0 ? consumption=result['consumption'] = true : result['consumption']=false
+            const result = {}
+            cashbookNowValue===0 ? result['consumption'] = true : result['consumption']=false
+            let detailResDto = new DetailResDto()
+            detailResDto = {
+                cashbookGoalValue : cashbookGoalValue,
+                cashbookName : cashbookName,
+                cashbookCategory : cashbookCategory
+            }
             return { data : {
-                result
+                result,
+                detailResDto
             }
             }
         } else {

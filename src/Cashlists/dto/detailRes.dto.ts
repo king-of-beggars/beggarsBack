@@ -24,5 +24,5 @@ export class DetailResDto extends PickType(CashbookDto, [
     ],
     description: '캐시 디테일',
   })
-  public detail: DetailValueDto[];
+  public detail?: DetailValueDto[];
 }

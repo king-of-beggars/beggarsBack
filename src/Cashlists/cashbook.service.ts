@@ -14,6 +14,7 @@ import { CashbookCreateDto } from './dto/cashbookCreate.dto';
 import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
 import { QueryDate } from './dto/queryDate.dto';
+import { CreateFail, DeleteFail, ReadFail, UpdateFail } from 'src/Utils/exception.service';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone');
 
@@ -83,188 +84,201 @@ export class CashbookService {
     date: QueryDate,
     userId: Number,
   ): Promise<Cashbook[]> {
-    const result = await this.cashbookEntity.query(
-      `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
-             FROM Cashbook 
-             WHERE DATE(cashbookCreatedAt) = DATE(?) 
-             AND userId = ? 
-             GROUP BY cashbookCategory 
-             ORDER BY cashbookCreatedAt DESC`,
-      [date.date, userId],
-    ); 
-    return result;
+    try {
+      const result = await this.cashbookEntity.query(
+        `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
+              FROM Cashbook 
+              WHERE DATE(cashbookCreatedAt) = DATE(?)
+              AND userId = ? 
+              GROUP BY cashbookCategory 
+              ORDER BY cashbookCreatedAt DESC`,
+        [date.date, userId],
+      ); 
+      return result; 
+    } catch(e) {
+      throw new ReadFail(e.stack)
+    }
   } 
 
   async addValue(valueUpdate: ValueUpdateDto): Promise<any> {
-    console.log(valueUpdate);
-    const result = await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .update()
-      .set({
-        cashbookNowValue: () =>
-          `cashbookNowValue + ${valueUpdate.cashDetailValue}`,
-      })
-      .where('cashbookId=:cashbookId', {
-        cashbookId: valueUpdate.cashbookId.cashbookId,
-      })
-      .execute();
+    try {
+      await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .update()
+        .set({
+          cashbookNowValue: () =>
+            `cashbookNowValue + ${valueUpdate.cashDetailValue}`,
+        })
+        .where('cashbookId=:cashbookId', {
+          cashbookId: valueUpdate.cashbookId.cashbookId,
+        })
+        .execute();
+    } catch(e) {
+      throw new UpdateFail(e.stack)
+    }
   }
 
   async getCashbookDuringDate(endDate: Date, userId: User): Promise<any> {
-    console.log(userId);
-    console.log(endDate);
-    const day: number = endDate.getDay() + 7 + 1;
-    let startDate = new Date();
-    startDate.setDate(endDate.getDate() - day);
-    endDate.setDate(endDate.getDate() + 2);
-    const query = await this.cashbookEntity.query(
-      `SELECT DATE(cashbookCreatedAt) AS dt, cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
-             FROM Cashbook
-             WHERE DATE(cashbookCreatedAt) >= DATE(?)
-             AND DATE(cashbookCreatedAt) < DATE(?)
-             AND userId = ?
-             GROUP BY dt, cashbookCategory
-             ORDER BY DATE(cashbookCreatedAt)`,
-      [startDate, endDate, userId],
-    );
-    console.log(query);
+    try {
+      const day: number = endDate.getDay() + 7 + 1;
+      let startDate = new Date();
+      startDate.setDate(endDate.getDate() - day);
+      endDate.setDate(endDate.getDate() + 2);
+      const query = await this.cashbookEntity.query(
+        `SELECT DATE(cashbookCreatedAt) AS dt, cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
+              FROM Cashbook
+              WHERE DATE(cashbookCreatedAt) >= DATE(?)
+              AND DATE(cashbookCreatedAt) < DATE(?)
+              AND userId = ?
+              GROUP BY dt, cashbookCategory
+              ORDER BY DATE(cashbookCreatedAt)`,
+        [startDate, endDate, userId],
+      );
+      console.log(query);
 
-    let array = new Array(14).fill(null);
-    moment.tz.setDefault('Asia/Seoul');
-    let lastSunday = moment().startOf('week');
-    lastSunday = lastSunday.clone().subtract(7, 'days');
+      let array = new Array(14).fill(null);
+      moment.tz.setDefault('Asia/Seoul');
+      let lastSunday = moment().startOf('week');
+      lastSunday = lastSunday.clone().subtract(7, 'days');
 
-    let thisSaturday = moment().endOf('week');
+      let thisSaturday = moment().endOf('week');
 
-    let result = [];
-    for (
-      let m = moment(lastSunday);
-      m.isBefore(thisSaturday) || m.isSame(thisSaturday);
-      m.add(1, 'days')
-    ) {
-      result.push(m.format('YYYY-MM-DD'));
-    }
-
-    let trueResult = result.reduce(
-      (result, key, i) => ({ ...result, [key]: array[i] }),
-      {},
-    );
-    console.log(trueResult);
-
-    let flag = '';
-    for (let a = 0; query.length > a; a++) {
-      let tostring = query[a]['dt'].toISOString().split('T')[0];
-      if (
-        Number(query[a]['cashbookGoalValue']) >=
-        Number(query[a]['cashbookNowValue'])
+      let result = [];
+      for (
+        let m = moment(lastSunday);
+        m.isBefore(thisSaturday) || m.isSame(thisSaturday);
+        m.add(1, 'days')
       ) {
-        flag != tostring
-          ? (trueResult[tostring] = 2)
-          : (trueResult[tostring] = 0);
-      } else if (
-        Number(query[a]['cashbookGoalValue']) <
-        Number(query[a]['cashbookNowValue'])
-      ) {
-        trueResult[tostring] === 2
-          ? (trueResult[tostring] = 1)
-          : (trueResult[tostring] = 0);
-        flag = tostring;
+        result.push(m.format('YYYY-MM-DD'));
       }
-    }
 
-    return trueResult;
+      let trueResult = result.reduce(
+        (result, key, i) => ({ ...result, [key]: array[i] }),
+        {},
+      );
+      console.log(trueResult);
+
+      let flag = '';
+      for (let a = 0; query.length > a; a++) {
+        let tostring = query[a]['dt'].toISOString().split('T')[0];
+        if (
+          Number(query[a]['cashbookGoalValue']) >=
+          Number(query[a]['cashbookNowValue'])
+        ) {
+          flag != tostring
+            ? (trueResult[tostring] = 2)
+            : (trueResult[tostring] = 0);
+        } else if (
+          Number(query[a]['cashbookGoalValue']) <
+          Number(query[a]['cashbookNowValue'])
+        ) {
+          trueResult[tostring] === 2
+            ? (trueResult[tostring] = 1)
+            : (trueResult[tostring] = 0);
+          flag = tostring;
+        }
+      }
+      return trueResult;
+   } catch(e) {
+      throw new ReadFail(e.stack)
+   }
   }
 
   async getOneDetail(
     getByCashbookId: GetByCashDetailIdDto,
   ): Promise<CashDetail> {
-    const result = await this.cashDetailEntity.query(
-      `SELECT cashbookId, cashDetailValue
-             FROM cashDetail
-             WHERE cashDetailId = ?
-             `,
-      [Number(getByCashbookId.cashDetailId)],
-    );
+    try {
+      const result = await this.cashDetailEntity.query(
+        `SELECT cashbookId, cashDetailValue
+              FROM cashDetail
+              WHERE cashDetailId = ?
+              `,
+        [Number(getByCashbookId.cashDetailId)],
+      );
+
     return result[0];
+
+    } catch(e) {
+      throw new ReadFail(e.stack)
+    }
   }
 
   async frameActivityCreate(cashEntity: CashList) {
-    let date = new Date();
+    try {
+      let date = new Date();
+      const query = this.cashactivityEntity.create({
+        cashListId: cashEntity,
+        cashRestartDate: date,
+        cashUpdateDate: date,
+      });
+      return await this.cashactivityEntity.save(query);
 
-    const query = this.cashactivityEntity.create({
-      cashListId: cashEntity,
-      cashRestartDate: date,
-      cashUpdateDate: date,
-    });
-
-    return await this.cashactivityEntity.save(query);
+    } catch(e) {
+      throw new CreateFail(e.stack)
+    }
   }
 
   async cashbookCreate(cashbookList: any) {
-    if (cashbookList.length >= 0) {
-      for (let i = 0; cashbookList.length > i; i++) {
+    try {
+      if (cashbookList.length >= 0) {
+        for (let i = 0; cashbookList.length > i; i++) {
+          const query = this.cashbookEntity.create({
+            cashbookCategory: cashbookList[i].cashCategory,
+            cashbookName: cashbookList[i].cashName,
+            cashbookGoalValue: cashbookList[i].cashListGoalValue,
+            userId: cashbookList[i].userId,
+            cashListId: cashbookList[i],
+          });
+          await this.cashbookEntity.save(query);
+        }
+      } else {
         const query = this.cashbookEntity.create({
-          cashbookCategory: cashbookList[i].cashCategory,
-          cashbookName: cashbookList[i].cashName,
-          cashbookGoalValue: cashbookList[i].cashListGoalValue,
-          userId: cashbookList[i].userId,
-          cashListId: cashbookList[i],
+          cashbookCategory: cashbookList.cashbookCategory,
+          cashbookName: cashbookList.cashbookName,
+          cashbookGoalValue: cashbookList.cashbookGoalValue,
+          userId: cashbookList.userId,
+          cashListId: cashbookList,
         });
         await this.cashbookEntity.save(query);
-      }
-    } else {
-      const query = this.cashbookEntity.create({
-        cashbookCategory: cashbookList.cashbookCategory,
-        cashbookName: cashbookList.cashbookName,
-        cashbookGoalValue: cashbookList.cashbookGoalValue,
-        userId: cashbookList.userId,
-        cashListId: cashbookList,
-      });
-      await this.cashbookEntity.save(query);
+    }
+    } catch(e) {
+      throw new CreateFail(e.stack)
     }
   }
 
   async frameCreate(frameDto: FrameDto) {
-    if (!frameDto) {
-      throw new Error('서비스 단으로 데이터가 넘어오지 않음');
+    try {
+      const frame = this.cashListEntity.create(frameDto);
+      const query: any = await this.cashListEntity.save(frame);
+      await this.frameActivityCreate(query);
+      let cashbookCreateDto = new CashbookCreateDto();
+      cashbookCreateDto = {
+        cashbookCategory: frameDto.cashCategory,
+        cashbookName: frameDto.cashName,
+        cashbookGoalValue: frameDto.cashListGoalValue,
+        userId: frameDto.userId,
+        cashListId: query.cashListId,
+      };
+      console.log(cashbookCreateDto);
+      await this.cashbookCreate(cashbookCreateDto);
+      return frame;
+    } catch(e) {
+      throw new CreateFail(e.stack)
     }
-
-    const frame = this.cashListEntity.create(frameDto);
-    const query: any = await this.cashListEntity.save(frame);
-
-    if (!frame) {
-      throw new Error('프레임 생성 에러');
-    }
-
-    const activity = await this.frameActivityCreate(query);
-    if (!activity) {
-      throw new Error('액티비티 생성 에러');
-    }
-    let cashbookCreateDto = new CashbookCreateDto();
-    cashbookCreateDto = {
-      cashbookCategory: frameDto.cashCategory,
-      cashbookName: frameDto.cashName,
-      cashbookGoalValue: frameDto.cashListGoalValue,
-      userId: frameDto.userId,
-      cashListId: query.cashListId,
-    };
-    console.log(cashbookCreateDto);
-    const cashbook = await this.cashbookCreate(cashbookCreateDto);
-    return frame;
   }
 
   async frameUpdate(cashbook: GetByCashbookIdDto, frameDto: FrameDto) {
-    console.log(typeof cashbook);
-    const cashList = await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .leftJoinAndSelect('cashbook.cashListId', 'cashList')
-      .where('cashbookId=:cashbookId', {
-        cashbookId: Number(cashbook.cashbookId),
-      })
-      .getOne();
-    const cashListId = cashList.cashListId.cashListId;
+    try {
+      const cashList = await this.cashbookEntity
+                      .createQueryBuilder('cashbook')
+                      .leftJoinAndSelect('cashbook.cashListId', 'cashList')
+                      .where('cashbookId=:cashbookId', {
+                        cashbookId: Number(cashbook.cashbookId),
+                      })
+                      .getOne();
+      const cashListId = cashList.cashListId.cashListId;
 
-    await this.cashListEntity
+      await this.cashListEntity
       .createQueryBuilder('cashList')
       .update()
       .set({
@@ -275,86 +289,101 @@ export class CashbookService {
       .where('cashListId=:cashListId', { cashListId })
       .execute();
 
-    const result = await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .update()
-      .set({
-        cashbookGoalValue: frameDto.cashListGoalValue,
-        cashbookCategory: frameDto.cashCategory,
-        cashbookName: frameDto.cashName,
-      })
-      .where('cashbookId=:cashbookId', {
-        cashbookId: Number(cashbook.cashbookId),
-      })
-      .execute();
-
+      const result = await this.cashbookEntity
+                    .createQueryBuilder('cashbook')
+                    .update()
+                    .set({
+                      cashbookGoalValue: frameDto.cashListGoalValue,
+                      cashbookCategory: frameDto.cashCategory,
+                      cashbookName: frameDto.cashName,
+                    })
+                    .where('cashbookId=:cashbookId', {
+                      cashbookId: Number(cashbook.cashbookId),
+                    })
+                    .execute();
     return result;
+    } catch(e) {
+        throw new UpdateFail(e.stack)
+    }
   }
 
   async frameDelete(cashbook: GetByCashbookIdDto) {
-    const cashList = await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .leftJoinAndSelect('cashbook.cashListId', 'cashList')
-      .where('cashbookId=:cashbookId', {
-        cashbookId: Number(cashbook.cashbookId),
-      })
-      .getOne();
-    const cashListId = cashList.cashListId.cashListId;
+    try {
+      const cashList = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .leftJoinAndSelect('cashbook.cashListId', 'cashList')
+        .where('cashbookId=:cashbookId', {
+          cashbookId: Number(cashbook.cashbookId),
+        })
+        .getOne();
+      const cashListId = cashList.cashListId.cashListId;
 
-    const result = await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .delete()
-      .where('cashbookId=:cashbookId', {
-        cashbookId: Number(cashbook.cashbookId),
-      })
-      .execute();
+      const result = await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .delete()
+        .where('cashbookId=:cashbookId', {
+          cashbookId: Number(cashbook.cashbookId),
+        })
+        .execute();
 
-    await this.cashListEntity
-      .createQueryBuilder('cashList')
-      .delete()
-      .where('cashListId=:cashListId', { cashListId })
-      .execute();
+      await this.cashListEntity
+        .createQueryBuilder('cashList')
+        .delete()
+        .where('cashListId=:cashListId', { cashListId })
+        .execute();
 
-    return result;
+      return result;
+    } catch(e) {
+        throw new DeleteFail(e.stack)
+    }
   }
 
   async allCashlist(): Promise<CashList[]> {
-    return await this.cashListEntity
-      .createQueryBuilder('cashList')
-      .leftJoinAndSelect('cashList.userId', 'user')
-      .select()
-      .getMany();
+    try {
+      return await this.cashListEntity
+            .createQueryBuilder('cashList')
+            .leftJoinAndSelect('cashList.userId', 'user')
+            .select()
+            .getMany();
+    } catch(e) {
+        throw new ReadFail(e.stack)
+    }
   }
 
   async cashbookById(
     getByCashbookIdDto: GetByCashbookIdDto,
   ): Promise<Cashbook> {
-    console.log(getByCashbookIdDto.cashbookId)
-    return await this.cashbookEntity
-      .createQueryBuilder()
-      .select()
-      .where('cashbookId=:cashbookId', {
-        cashbookId: getByCashbookIdDto.cashbookId,
-      })
-      .getOne();
+    try {
+      return await this.cashbookEntity
+        .createQueryBuilder()
+        .select()
+        .where('cashbookId=:cashbookId', {
+          cashbookId: getByCashbookIdDto.cashbookId,
+        })
+        .getOne();
+    } catch(e) {
+        throw new CreateFail(e.stack)
+    }
   }
 
   async inputConsume(cashbookId: Cashbook) {
-    const cashbook = await this.cashbookById(cashbookId);
-    console.log(cashbook);
-    let cashbookNowValue = cashbook.cashbookNowValue;
-    console.log(cashbookNowValue);
-    if (cashbookNowValue === 0) {
-      cashbookNowValue = null;
-    } else {
-      cashbookNowValue = 0;
+    try {
+      const cashbook = await this.cashbookById(cashbookId);
+      let cashbookNowValue = cashbook.cashbookNowValue;
+      if (cashbookNowValue === 0) {
+        cashbookNowValue = null;
+      } else {
+        cashbookNowValue = 0;
+      }
+      console.log(cashbookNowValue);
+      return await this.cashbookEntity
+        .createQueryBuilder('cashbook')
+        .update()
+        .set({ cashbookNowValue: cashbookNowValue })
+        .where('cashbookId=:cashbookId', cashbookId)
+        .execute();
+    } catch(e) {
+        throw new UpdateFail(e.stack)
     }
-    console.log(cashbookNowValue);
-    return await this.cashbookEntity
-      .createQueryBuilder('cashbook')
-      .update()
-      .set({ cashbookNowValue: cashbookNowValue })
-      .where('cashbookId=:cashbookId', cashbookId)
-      .execute();
   }
 }
