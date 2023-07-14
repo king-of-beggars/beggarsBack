@@ -4,5 +4,5 @@ export class QueryDate {
   @ApiProperty({
     example: '2023-07-01',
   })
-  public queryDate: Date;
+  public date: Date;
 }

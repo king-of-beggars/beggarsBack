@@ -51,7 +51,7 @@ export class CashbookContoller {
         //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
         let query = new QueryDate()
         query = {
-            queryDate : nowdate2
+            date : nowdate2
         }
         const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(query,user.userId)
         console.log(nowdate2)

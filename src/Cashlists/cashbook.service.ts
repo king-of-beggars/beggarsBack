@@ -18,7 +18,7 @@ import { QueryDate } from './dto/queryDate.dto';
 const moment = require('moment-timezone');
 
 @Injectable()
-export class CashbookService {
+export class CashbookService { 
   constructor(
     @InjectRepository(CashDetail)
     private readonly cashDetailEntity: Repository<CashDetail>,
@@ -83,17 +83,17 @@ export class CashbookService {
     date: QueryDate,
     userId: Number,
   ): Promise<Cashbook[]> {
-    const result: Promise<Cashbook[]> = await this.cashbookEntity.query(
+    const result = await this.cashbookEntity.query(
       `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
              FROM Cashbook 
              WHERE DATE(cashbookCreatedAt) = DATE(?) 
              AND userId = ? 
              GROUP BY cashbookCategory 
              ORDER BY cashbookCreatedAt DESC`,
-      [date.queryDate, userId],
-    );
+      [date.date, userId],
+    ); 
     return result;
-  }
+  } 
 
   async addValue(valueUpdate: ValueUpdateDto): Promise<any> {
     console.log(valueUpdate);
