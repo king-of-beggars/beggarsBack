@@ -232,17 +232,17 @@ export class CashbookService {
             userId: cashbookList[i].userId,
             cashListId: cashbookList[i],
           });
-          await this.cashbookEntity.save(query);
+          return await this.cashbookEntity.save(query);
         } 
       } else {
         const query = this.cashbookEntity.create({
           cashbookCategory: cashbookList.cashbookCategory,
           cashbookName: cashbookList.cashbookName,
           cashbookGoalValue: cashbookList.cashbookGoalValue,
-          userId: cashbookList.userId,
-          cashListId: cashbookList,
+          userId: cashbookList.userId, 
+          cashListId: cashbookList.cashListId,
         });
-        await queryRunner.manager.save(query);
+        return await queryRunner.manager.save(query);
     }
     } catch(e) {
       throw new CreateFail(e.stack)
