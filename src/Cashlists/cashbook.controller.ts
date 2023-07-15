@@ -181,6 +181,11 @@ export class CashbookContoller {
             const { user } = req
             console.log(date) 
             let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
+            if(result.length===0) {
+                return {
+                    data : []
+                }
+            } 
             const createCheck = result.map((e)=>{
                 return e.cashbookId
             })

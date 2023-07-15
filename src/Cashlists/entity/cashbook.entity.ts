@@ -54,10 +54,10 @@ export class Cashbook {
   public detail?: CashDetail[];
 
   @ManyToOne(() => CashList, (cashList: CashList) => cashList.cashListId, {
-    onDelete: 'CASCADE',
-  })
+    onDelete: 'SET NULL'
+  }) 
   @JoinColumn({ name: 'cashListId' })
-  public cashListId: CashList;
+  public cashListId: CashList; 
 
   @BeforeInsert()
   updateCreatedAt() {

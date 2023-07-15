@@ -317,14 +317,21 @@ export class CashbookService {
       })
       .getOne();
       const cashListId = cashList.cashListId.cashListId;
-
+      await queryRunner.manager
+      .createQueryBuilder()
+      .delete()
+      .from('Cashbook')
+      .where('cashbookId=:cashbookId', {
+        cashbookId: Number(cashbook.cashbookId)
+      })
+      .execute() 
       await queryRunner.manager
       .createQueryBuilder()
       .delete()
       .from('CashList')
       .where('cashListId=:cashListId', { cashListId })
-      .execute();
-
+      .execute() 
+      console.log(cashbook.cashbookId)
       await queryRunner.commitTransaction()
     } catch(e) {
       await queryRunner.rollbackTransaction()
