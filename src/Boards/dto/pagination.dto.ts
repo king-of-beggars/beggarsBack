@@ -13,4 +13,4 @@ export class PaginationDto {
   public limit: number;
 
   public boardTypes: number;
-}
+} 

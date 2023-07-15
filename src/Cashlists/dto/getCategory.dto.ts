@@ -6,3 +6,4 @@ export class GetCategory extends PickType(CashbookDto, [
   'cashbookGoalValue',
   'cashbookNowValue',
 ] as const) {}
+ 

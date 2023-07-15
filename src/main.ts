@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   setupSwagger(app);
-  app.enableCors({
+  app.enableCors({ 
     origin: [
       'https://beggars-front-eight.vercel.app/',
       'https://deeplake-beggars-front.vercel.app',

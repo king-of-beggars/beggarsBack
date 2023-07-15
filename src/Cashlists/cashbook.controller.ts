@@ -1,15 +1,14 @@
 import { Controller,Post,Req, Body, HttpCode, UseGuards, Get, Query, Delete, Param, Put, ConsoleLogger, UseFilters} from '@nestjs/common';
 import { CashbookService } from './cashbook.service';
-import {Cronjob} from 'cron'
 import { PostDetailDto } from './dto/postDetail.dto';
 import { Cashbook } from './entity/cashbook.entity';
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
 import { UserService } from 'src/Users/service/user.service';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
-import { CashDetail } from './entity/cashDetail.entity';
 import { FrameDto } from './dto/frame.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone')
+import { DataSource } from 'typeorm';
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { GetCategory } from './dto/getCategory.dto';
 import { BoardService } from 'src/Boards/board.service';
@@ -21,9 +20,9 @@ import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
 import { PaginationDto } from 'src/Boards/dto/pagination.dto';
 import { QueryDate } from './dto/queryDate.dto';
-import { ErrorService, ReadFail } from 'src/Utils/exception.service';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
+import { CashbookCreateDto } from './dto/cashbookCreate.dto';
 
 @Controller('api/cashbook')
 @ApiTags('가계부 관련 API')
@@ -31,7 +30,8 @@ export class CashbookContoller {
     constructor(
         private readonly cashbookService : CashbookService,
         private readonly userService : UserService,
-        private readonly boardService : BoardService
+        private readonly boardService : BoardService,
+        private dataSource : DataSource
     ){}
 
     @Get('/main')
@@ -45,7 +45,7 @@ export class CashbookContoller {
             let tempdate = moment().tz("Asia/Seoul")
             let nowdate = tempdate.toDate()
             let nowdate2 = new Date()
-            nowdate2.setHours(nowdate.getHours() + 9)
+            nowdate2.setHours(nowdate.getHours() + 9 - 24)
             //1. 몇 일 째 되는 날
             const dateValue : number = await this.userService.userSignupDate(user.userId)
             
@@ -86,13 +86,16 @@ export class CashbookContoller {
         }
     }
 
-
+ 
     @Post('frame')
     @HttpCode(201)
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     @ApiBody({type:FrameDto})
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
         try {
             const { user } = req
             let frameDto = new FrameDto()
@@ -103,11 +106,24 @@ export class CashbookContoller {
                 userId : user.userId
             }
             //이 부분 트랜잭션 해야하는데 어떡하지
-            await this.cashbookService.frameCreate(frameDto)
-            return {messsage : '프레임 생성이 완료되었습니다'}
+            const query = await this.cashbookService.frameCreate(frameDto, queryRunner)
+            let cashbookCreateDto = new CashbookCreateDto();
+            cashbookCreateDto = {
+                cashbookCategory: frameDto.cashCategory,
+                cashbookName: frameDto.cashName,
+                cashbookGoalValue: frameDto.cashListGoalValue,
+                userId: frameDto.userId,
+                cashListId: query
+            }; 
+            await this.cashbookService.cashbookCreate(cashbookCreateDto, queryRunner)
+            await queryRunner.commitTransaction()
         } catch(e) {
+            await queryRunner.rollbackTransaction()
             console.log(e.stack)
             throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+        } finally {
+            await queryRunner.release()
+            return {messsage : '프레임 생성이 완료되었습니다'}
         }
     }
 
@@ -118,7 +134,7 @@ export class CashbookContoller {
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '프레임 수정', description: '프레임 수정 및 캐시북 아이디 값에 맞는 캐시북 수정' })
     @ApiBody({type:FrameDto})
-    async cashFrameUpdate(@Param() cashbookId : GetByCashbookIdDto, @Body() body: FrameDto, @Req() req: any) {
+    async cashFrameUpdate(@Param() getByCashbookIdDto : GetByCashbookIdDto, @Body() body: FrameDto, @Req() req: any) {
       try {
         const { user } = req
         let frameDto = new FrameDto()
@@ -128,7 +144,7 @@ export class CashbookContoller {
                 cashListGoalValue : body.cashListGoalValue,
                 userId : user.userId
         } 
-        await this.cashbookService.frameUpdate(cashbookId, frameDto)
+        await this.cashbookService.frameUpdate(getByCashbookIdDto, frameDto)
         return '프레임 수정 완료';
     } catch(e) {
         console.log(e.stack)
@@ -146,7 +162,7 @@ export class CashbookContoller {
             await this.cashbookService.frameDelete(cashbookId)
             return '프레임 삭제 완료'
         } catch(e) {
-
+            throw new HttpException(e.message,500)
         }
     }   
 
@@ -223,54 +239,71 @@ export class CashbookContoller {
     @ApiOperation({ summary: '디테일 정보 입력', description: 'cashbookId, text, value 입력' })
     @ApiBody({type:PostDetailDto})
     async postDetail(@Param() cashbookId : GetByCashbookIdDto, @Body() body : PostDetailDto) {
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            let postDetailDto = new PostDetailDto();
+            const cashbook = await this.cashbookService.cashbookById(cashbookId)
+            postDetailDto = {
+                cashbookId : cashbook, 
+                cashDetailText : body.cashDetailText,
+                cashDetailValue : body.cashDetailValue
+            };
 
-        let postDetailDto = new PostDetailDto();
-        const cashbook = await this.cashbookService.cashbookById(cashbookId)
-        
-        postDetailDto = {
-            cashbookId : cashbook, 
-            cashDetailText : body.cashDetailText,
-            cashDetailValue : body.cashDetailValue
-        };
-
-        const result = await this.cashbookService.postDetail(postDetailDto);
-  
-        let valueUpdate = new ValueUpdateDto();
-        valueUpdate = {
-            cashbookId : cashbook,
-            cashDetailValue : body.cashDetailValue
+            //데이터 업데이트, 입력 구간
+            await this.cashbookService.postDetail(postDetailDto, queryRunner);
+            let valueUpdate = new ValueUpdateDto();
+            valueUpdate = {
+                cashbookId : cashbook,
+                cashDetailValue : body.cashDetailValue
+            }
+            await this.cashbookService.addValue(valueUpdate, queryRunner)
+            await queryRunner.commitTransaction()
+        } catch(e) {
+            console.log(e.stack)
+            await queryRunner.rollbackTransaction()
+            throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+        } finally {
+            await queryRunner.release()
+            return `입력 성공`
         }
-        await this.cashbookService.addValue(valueUpdate)
-        if(!result) {
-            throw new Error('정상적으로 입력되지 않았습니다')
-        }
-        return `입력 성공`
     }
 
     @Delete(":cashDetailId")
     @UseGuards(AccessAuthenticationGuard)
     @ApiOperation({ summary: '디테일 삭제', description: '디테일 삭제 API' })
     async deleteDetail(@Param() getByCashDetailId : GetByCashDetailIdDto) {
-        if(!getByCashDetailId) {
-            throw new Error('정상적으로 요청되지 않았습니다')
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            if(!getByCashDetailId) {
+                throw new Error('정상적으로 요청되지 않았습니다')
+            }
+            const detail = await this.cashbookService.getOneDetail(getByCashDetailId)
+            console.log(detail)
+            if(!detail.cashbookId) {
+                throw new Error('dfgdfg')
+            }
+            let valueUpdateDto = new ValueUpdateDto()
+            const cashbook = await this.cashbookService.cashbookById(detail.cashbookId)
+            console.log(cashbook)
+            valueUpdateDto = { 
+                cashbookId : cashbook,
+                cashDetailValue : -Number(detail.cashDetailValue)
+            }
+            await this.cashbookService.addValue(valueUpdateDto,queryRunner)
+            await this.cashbookService.deleteDetail(getByCashDetailId,queryRunner)
+            await queryRunner.commitTransaction()
+        } catch(e) {
+            console.log(e.stack)
+            await queryRunner.rollbackTransaction()
+            throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+        } finally {
+            await queryRunner.release()
+            return `삭제 성공`
         }
-        const detail = await this.cashbookService.getOneDetail(getByCashDetailId)
-        console.log(detail)
-        if(!detail.cashbookId) {
-            throw new Error('dfgdfg')
-        }
-        let valueUpdateDto = new ValueUpdateDto()
-        const cashbook = await this.cashbookService.cashbookById(detail.cashbookId)
-        console.log(cashbook)
-        valueUpdateDto = { 
-            cashbookId : cashbook,
-            cashDetailValue : -Number(detail.cashDetailValue)
-        }
-
-        await this.cashbookService.addValue(valueUpdateDto)
-        await this.cashbookService.deleteDetail(getByCashDetailId)
-
-        return `삭제 성공`
     }
 
     @Put(":cashbookId")

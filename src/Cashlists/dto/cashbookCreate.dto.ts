@@ -11,3 +11,4 @@ export class CashbookCreateDto extends PickType(CashbookDto, [
   'userId',
   'cashListId',
 ] as const) {}
+ 

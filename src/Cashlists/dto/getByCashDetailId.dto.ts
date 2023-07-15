@@ -4,3 +4,4 @@ import { CashDetailDto } from './cashbook.dto';
 export class GetByCashDetailIdDto extends PickType(CashDetailDto, [
   'cashDetailId',
 ] as const) {}
+ 

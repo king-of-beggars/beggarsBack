@@ -11,3 +11,4 @@ export class PostBoardDto extends PickType(BoardDto, [
   'userId',
   'cashbookId',
 ]) {}
+ 

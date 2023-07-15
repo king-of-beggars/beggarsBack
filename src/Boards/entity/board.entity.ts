@@ -19,7 +19,7 @@ import {
 export class Board {
   @PrimaryGeneratedColumn()
   public boardId: number;
-
+ 
   @Column()
   public boardName: string;
 

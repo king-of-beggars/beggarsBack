@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { Comment } from './entity/comment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostCommentDto } from './dto/postComment.dto';
@@ -19,27 +19,22 @@ export class CommentService {
     @InjectRepository(Like)
     private readonly likeEntity: Repository<Like>,
 
-    private readonly userService: UserService,
-
-    private readonly entityManager: EntityManager,
+    private readonly userService: UserService
   ) {}
 
-  async postComment(postCommentDto: PostCommentDto) {
-    this.entityManager.transaction(async (manager) => {});
-
+  async postComment(postCommentDto: PostCommentDto, queryRunner : QueryRunner) {
     const query = this.commentEntity.create(postCommentDto);
-    await this.userService.pointInput(postCommentDto.userId, 1);
-    return await this.commentEntity.save(query);
+    return await queryRunner.manager.save(query)
   }
 
-  async deleteComment(getByCommentIdDto: GetByCommentIdDto, userId: number) {
+  async deleteComment(getByCommentIdDto: GetByCommentIdDto, getByUserIdDto: GetByUserIdDto) {
     return await this.commentEntity
       .createQueryBuilder('comment')
       .delete()
       .where('comment.commentId=:commentId', {
         commentId: getByCommentIdDto.commentId,
       })
-      .andWhere('comment.userId=:userId', { userId })
+      .andWhere('comment.userId=:userId', { userId : getByUserIdDto.userId })
       .execute();
   }
 

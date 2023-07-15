@@ -10,3 +10,4 @@ export class FrameDto extends PickType(CashListDto, [
   'cashListGoalValue',
   'userId',
 ] as const) {}
+ 

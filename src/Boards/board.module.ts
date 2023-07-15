@@ -32,6 +32,6 @@ import { AuthService } from 'src/Users/service/oauth2.service';
   ],
   controllers: [BoardController],
   providers: [BoardService, CommentService, AuthService, JwtService],
-  exports: [BoardService],
-})
+  exports: [BoardService], 
+}) 
 export class BoardModule {}

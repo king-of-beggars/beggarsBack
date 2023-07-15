@@ -54,7 +54,7 @@ class CashbookDto {
     description: '유저 아이디',
   })
   public userId: User;
-
+ 
   @ApiProperty({
     example: [
       {

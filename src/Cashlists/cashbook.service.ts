@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, Join, EntityManager, QueryBuilder } from 'typeorm';
+import { Repository, Join, EntityManager, QueryBuilder, DataSource, QueryRunner } from 'typeorm';
 import { CashDetail } from './entity/cashDetail.entity';
 import { Cashbook } from './entity/cashbook.entity';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -8,7 +8,6 @@ import User from 'src/Users/user.entity';
 import { ValueUpdateDto } from './dto/valueUpdate.dto';
 import { FrameDto } from './dto/frame.dto';
 import { CashList } from './entity/cashList.entity';
-import { CashActivity } from './entity/cashactivity.entity';
 import { ListBoard } from 'src/Boards/dto/listBoard.dto';
 import { CashbookCreateDto } from './dto/cashbookCreate.dto';
 import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
@@ -27,10 +26,7 @@ export class CashbookService {
     private readonly cashbookEntity: Repository<Cashbook>,
     @InjectRepository(CashList)
     private readonly cashListEntity: Repository<CashList>,
-    @InjectRepository(CashActivity)
-    private readonly cashactivityEntity: Repository<CashActivity>,
-    @InjectEntityManager()
-    private entityManager: EntityManager,
+    private dataSource : DataSource
   ) {}
 
   async getcashbookAndDetail(cashbook: GetByCashbookIdDto): Promise<Cashbook> {
@@ -58,7 +54,7 @@ export class CashbookService {
       .getMany();
   }
 
-  async postDetail(postDetailDto: PostDetailDto): Promise<any> {
+  async postDetail(postDetailDto: PostDetailDto, queryRunner : QueryRunner): Promise<any> {
     console.log(postDetailDto, 'postDetail');
     const query = this.cashDetailEntity.create(postDetailDto);
 
@@ -67,17 +63,20 @@ export class CashbookService {
       cashbookId: postDetailDto.cashbookId,
       cashDetailValue: Number(postDetailDto.cashDetailValue),
     };
-    return await this.cashDetailEntity.save(query);
+    await queryRunner.manager.save(query)
   }
 
-  async deleteDetail(getByCashDetailId: GetByCashDetailIdDto): Promise<any> {
+  async deleteDetail(getByCashDetailId: GetByCashDetailIdDto, queryRunner : QueryRunner): Promise<any> {
     try {
-      return await this.cashDetailEntity
-        .createQueryBuilder('cashDetail')
+      return await queryRunner.manager
+        .createQueryBuilder()
         .delete()
+        .from('cashDetail')
         .where('cashDetail.cashDetailId=:cashDetailId', getByCashDetailId)
         .execute();
-    } catch (e) {}
+    } catch(e) {
+
+    }
   }
 
   async getCashbookByDate(
@@ -87,24 +86,24 @@ export class CashbookService {
     try {
       const result = await this.cashbookEntity.query(
         `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
-              FROM Cashbook 
-              WHERE DATE(cashbookCreatedAt) = DATE(?)
-              AND userId = ? 
-              GROUP BY cashbookCategory 
-              ORDER BY cashbookCreatedAt DESC`,
+            FROM Cashbook 
+            WHERE DATE(cashbookCreatedAt) = DATE(?)
+            AND userId = ? 
+            GROUP BY cashbookCategory 
+            ORDER BY cashbookCreatedAt DESC`,
         [date.date, userId],
-      ); 
+      );  
       return result; 
     } catch(e) {
       throw new ReadFail(e.stack)
     }
   } 
 
-  async addValue(valueUpdate: ValueUpdateDto): Promise<any> {
+  async addValue(valueUpdate: ValueUpdateDto, queryRunner : QueryRunner): Promise<any> {
     try {
-      await this.cashbookEntity
-        .createQueryBuilder('cashbook')
-        .update()
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update('Cashbook')
         .set({
           cashbookNowValue: () =>
             `cashbookNowValue + ${valueUpdate.cashDetailValue}`,
@@ -203,24 +202,9 @@ export class CashbookService {
     }
   }
 
-  async frameActivityCreate(cashEntity: CashList) {
+  async cashbookCreate(cashbookList: any, queryRunner?: QueryRunner) {
     try {
-      let date = new Date();
-      const query = this.cashactivityEntity.create({
-        cashListId: cashEntity,
-        cashRestartDate: date,
-        cashUpdateDate: date,
-      });
-      return await this.cashactivityEntity.save(query);
-
-    } catch(e) {
-      throw new CreateFail(e.stack)
-    }
-  }
-
-  async cashbookCreate(cashbookList: any) {
-    try {
-      if (cashbookList.length >= 0) {
+      if (Array.isArray(cashbookList)) {
         for (let i = 0; cashbookList.length > i; i++) {
           const query = this.cashbookEntity.create({
             cashbookCategory: cashbookList[i].cashCategory,
@@ -230,7 +214,7 @@ export class CashbookService {
             cashListId: cashbookList[i],
           });
           await this.cashbookEntity.save(query);
-        }
+        } 
       } else {
         const query = this.cashbookEntity.create({
           cashbookCategory: cashbookList.cashbookCategory,
@@ -239,35 +223,27 @@ export class CashbookService {
           userId: cashbookList.userId,
           cashListId: cashbookList,
         });
-        await this.cashbookEntity.save(query);
+        await queryRunner.manager.save(query);
     }
     } catch(e) {
       throw new CreateFail(e.stack)
     }
   }
 
-  async frameCreate(frameDto: FrameDto) {
+  async frameCreate(frameDto: FrameDto, queryRunner: QueryRunner) : Promise<CashList> {
     try {
       const frame = this.cashListEntity.create(frameDto);
-      const query: any = await this.cashListEntity.save(frame);
-      await this.frameActivityCreate(query);
-      let cashbookCreateDto = new CashbookCreateDto();
-      cashbookCreateDto = {
-        cashbookCategory: frameDto.cashCategory,
-        cashbookName: frameDto.cashName,
-        cashbookGoalValue: frameDto.cashListGoalValue,
-        userId: frameDto.userId,
-        cashListId: query.cashListId,
-      };
-      console.log(cashbookCreateDto);
-      await this.cashbookCreate(cashbookCreateDto);
-      return frame;
+      const query = await queryRunner.manager.save(frame);
+      return query;
     } catch(e) {
       throw new CreateFail(e.stack)
     }
   }
 
   async frameUpdate(cashbook: GetByCashbookIdDto, frameDto: FrameDto) {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
     try {
       const cashList = await this.cashbookEntity
                       .createQueryBuilder('cashbook')
@@ -277,10 +253,9 @@ export class CashbookService {
                       })
                       .getOne();
       const cashListId = cashList.cashListId.cashListId;
-
-      await this.cashListEntity
-      .createQueryBuilder('cashList')
-      .update()
+      await queryRunner.manager
+      .createQueryBuilder()
+      .update('CashList')
       .set({
         cashListGoalValue: frameDto.cashListGoalValue,
         cashCategory: frameDto.cashCategory,
@@ -289,52 +264,55 @@ export class CashbookService {
       .where('cashListId=:cashListId', { cashListId })
       .execute();
 
-      const result = await this.cashbookEntity
-                    .createQueryBuilder('cashbook')
-                    .update()
-                    .set({
-                      cashbookGoalValue: frameDto.cashListGoalValue,
-                      cashbookCategory: frameDto.cashCategory,
-                      cashbookName: frameDto.cashName,
-                    })
-                    .where('cashbookId=:cashbookId', {
-                      cashbookId: Number(cashbook.cashbookId),
-                    })
-                    .execute();
-    return result;
+      await queryRunner.manager
+      .createQueryBuilder()
+      .update('Cashbook')
+      .set({ 
+        cashbookGoalValue: frameDto.cashListGoalValue,
+        cashbookCategory: frameDto.cashCategory,
+        cashbookName: frameDto.cashName,
+      })
+      .where('cashbookId=:cashbookId', {
+        cashbookId: Number(cashbook.cashbookId),
+      })
+      .execute();
+      await queryRunner.commitTransaction();
     } catch(e) {
+        await queryRunner.rollbackTransaction();
         throw new UpdateFail(e.stack)
+    } finally {
+        await queryRunner.release();
     }
   }
 
   async frameDelete(cashbook: GetByCashbookIdDto) {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
     try {
       const cashList = await this.cashbookEntity
-        .createQueryBuilder('cashbook')
-        .leftJoinAndSelect('cashbook.cashListId', 'cashList')
-        .where('cashbookId=:cashbookId', {
-          cashbookId: Number(cashbook.cashbookId),
-        })
-        .getOne();
+      .createQueryBuilder('cashbook')
+      .leftJoinAndSelect('cashbook.cashListId', 'cashList')
+      .where('cashbookId=:cashbookId', {
+        cashbookId: Number(cashbook.cashbookId),
+      })
+      .getOne();
       const cashListId = cashList.cashListId.cashListId;
 
-      const result = await this.cashbookEntity
-        .createQueryBuilder('cashbook')
-        .delete()
-        .where('cashbookId=:cashbookId', {
-          cashbookId: Number(cashbook.cashbookId),
-        })
-        .execute();
+      await queryRunner.manager
+      .createQueryBuilder()
+      .delete()
+      .from('CashList')
+      .where('cashListId=:cashListId', { cashListId })
+      .execute();
 
-      await this.cashListEntity
-        .createQueryBuilder('cashList')
-        .delete()
-        .where('cashListId=:cashListId', { cashListId })
-        .execute();
-
-      return result;
+      await queryRunner.commitTransaction()
     } catch(e) {
-        throw new DeleteFail(e.stack)
+      await queryRunner.rollbackTransaction()
+      throw new DeleteFail(e.stack)
+    } finally {
+      console.log('출력')
+      await queryRunner.release()
     }
   }
 

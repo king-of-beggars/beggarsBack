@@ -8,3 +8,4 @@ export class PostCashbookDto extends PickType(CashbookDto, [
   'cashbookName',
   'cashbookGoalValue',
 ] as const) {}
+ 

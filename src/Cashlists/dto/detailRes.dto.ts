@@ -21,7 +21,7 @@ export class DetailResDto extends PickType(CashbookDto, [
         cashDetailValue: 500,
         cashDetailCreatedAt: '2023-06-26T01:34:16.570Z',
       },
-    ],
+    ], 
     description: '캐시 디테일',
   })
   public detail?: DetailValueDto[];

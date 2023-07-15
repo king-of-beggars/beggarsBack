@@ -4,7 +4,6 @@ import {
   Req,
   Res,
   Body,
-  HttpCode,
   UseGuards,
   Get,
   Query,
@@ -17,12 +16,9 @@ import { CashbookService } from 'src/Cashlists/cashbook.service';
 import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 import { PostBoardDto } from './dto/postBoard.dto';
 import { PaginationDto } from './dto/pagination.dto';
-import { ListBoard } from './dto/listBoard.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { UserService } from 'src/Users/service/user.service';
 import { CommentService } from 'src/Comments/comment.service';
-import { AuthService } from 'src/Users/service/oauth2.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -33,11 +29,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BoardResDto } from './dto/boardRes.dto';
-import { BoardDetailDTO } from './dto/boardDetail.dto';
 import { BoardDetailResDto } from './dto/boarDetailRes.dto';
 import { GetByCashbookIdDto } from 'src/Cashlists/dto/getByCashbookId.dto';
-import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { GetByBoardIdDto } from './dto/getByBoardId.dto';
+import { DataSource, QueryRunner } from 'typeorm';
+import { PointValue } from 'src/Utils/pointValue.enum';
+import { HttpException } from '@nestjs/common/exceptions';
+import { HttpStatus } from '@nestjs/common/enums';
 
 @Controller('api/board')
 @ApiTags('게시물 API')
@@ -49,6 +47,7 @@ export class BoardController {
     private readonly commentService: CommentService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private dataSource: DataSource,
   ) {}
 
   @Get('noway')
@@ -100,30 +99,37 @@ export class BoardController {
     @Body() postBoardDto: PostBoardDto,
     @Req() req: any,
   ) {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    let message: string;
     try {
       let boardTypes: number;
-      let message: string;
       let { user } = req;
       const cashbook = await this.cashbookService.getcashbookAndDetail(
         getByCashbookIdDto,
       );
-      console.log(cashbook);
+      console.log(cashbook); 
       cashbook.cashbookNowValue > cashbook.cashbookGoalValue
         ? (boardTypes = 1)
-        : (boardTypes = 0);
+        : (boardTypes = 0); 
       postBoardDto.userId = user.userId;
       postBoardDto.boardTypes = boardTypes;
       postBoardDto.cashbookId = cashbook;
-      await this.boardService.postBoard(postBoardDto);
+      await this.boardService.postBoard(postBoardDto, queryRunner);
       cashbook.cashbookNowValue > cashbook.cashbookGoalValue
-        ? await this.userService.pointInput(user.userId, 3)
-        : await this.userService.pointInput(user.userId, 20);
+        ? await this.userService.pointInput(user.userId, PointValue.nowayPoint, queryRunner)
+        : await this.userService.pointInput(user.userId, PointValue.goodjobPoint, queryRunner);
       boardTypes == 0
-        ? (message = `자랑하기 등록이 완료됐습니다`)
+        ? (message = `자랑하기 등록이 완료됐습니다`) 
         : (message = `혼나러가기 등록이 완료됐습니다`);
-      return { message };
+      await queryRunner.commitTransaction()
     } catch (e) {
-      throw new Error(e);
+      await queryRunner.rollbackTransaction()
+      throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+    } finally {
+      await queryRunner.release()  
+      return { message };
     }
   }
 

@@ -36,7 +36,7 @@ export class BoardResDto extends PickType(BoardDto, [
     type: BoardCashbookDto,
     example: {
       cashbookId: 188,
-      cashbookCategory: '식비',
+      cashbookCategory: '식비', 
       cashbookName: 'asdsdfsdf',
       cashbookNowValue: 0,
       cashbookGoalValue: 3000,

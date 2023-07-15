@@ -12,16 +12,12 @@ import {
   BeforeUpdate,
   OneToMany,
 } from 'typeorm';
-import { CashActivity } from './cashactivity.entity';
 import { Cashbook } from './cashbook.entity';
 
 @Entity('CashList')
 export class CashList {
   @PrimaryGeneratedColumn()
-  @OneToOne(() => CashActivity, {
-    cascade: true,
-  })
-  public cashListId: number;
+  public cashListId: number; 
 
   @Column()
   public cashCategory: string;

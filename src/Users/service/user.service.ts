@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import User from '../user.entity';
-import { Repository, In } from 'typeorm';
+import { Repository, In, QueryRunner, DataSource } from 'typeorm';
 import { SignupDto } from '../dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { SocialSignupDto } from '../dto/socialSignup.dto';
@@ -12,6 +12,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private dataSource: DataSource
   ) {}
 
   //회원가입 서비스
@@ -77,15 +78,12 @@ export class UserService {
     return Number(result.userPoint);
   }
 
-  async pointInput(getByUserIdDto: GetByUserIdDto, point: number) {
-    console.log(getByUserIdDto);
+  async pointInput(getByUserIdDto: GetByUserIdDto, point: number, queryRunner : QueryRunner) {
     let userPoint: number = await this.pointCheck(getByUserIdDto);
-    console.log(userPoint);
     userPoint = userPoint + point;
-    console.log(userPoint);
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .update()
+    return await queryRunner.manager
+      .createQueryBuilder()
+      .update('User')
       .set({ userPoint: userPoint })
       .where('userId = :userId', { userId: getByUserIdDto })
       .execute();

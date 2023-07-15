@@ -11,7 +11,6 @@ import { Comment } from './Comments/entity/comment.entity';
 import { Like } from './Comments/entity/like.entity';
 import { Cashbook } from './Cashlists/entity/cashbook.entity';
 import { CashList } from './Cashlists/entity/cashList.entity';
-import { CashActivity } from './Cashlists/entity/cashactivity.entity';
 import { CashDetail } from './Cashlists/entity/cashDetail.entity';
 import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
@@ -49,7 +48,6 @@ import { ExceptionService } from './exception/exception.service';
         Comment,
         Cashbook,
         CashList,
-        CashActivity,
         CashDetail,
         Like,
         //HotDeal

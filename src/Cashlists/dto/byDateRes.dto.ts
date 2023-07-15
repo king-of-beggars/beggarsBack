@@ -14,3 +14,4 @@ export class ByDateResDto extends PickType(CashbookDto, [
   })
   public writeCheck: Number;
 }
+ 

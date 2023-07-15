@@ -42,3 +42,4 @@ class MainPageResDto {
 }
 
 export { MainPageResDto as MainPageDto };
+ 
