@@ -85,7 +85,7 @@ export class UserService {
       .createQueryBuilder()
       .update('User')
       .set({ userPoint: userPoint })
-      .where('userId = :userId', { userId: getByUserIdDto })
+      .where('userId = :userId', { userId: getByUserIdDto.userId })
       .execute();
   }
 

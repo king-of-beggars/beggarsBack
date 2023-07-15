@@ -22,6 +22,7 @@ import { UserService } from 'src/Users/service/user.service';
 import { DataSource } from 'typeorm';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
+import { CommentTextDto } from './dto/commentText.dto';
 
 @ApiTags('댓글/좋아요 API')
 @Controller('api/board/:boardId/comment')
@@ -41,7 +42,7 @@ export class CommentController {
   @ApiParam({ name: 'boardId', type: 'number' })
   async postComment(
     @Param() getByBoardIdDto: GetByBoardIdDto,
-    @Body() commentText: string,
+    @Body() commentTextDto: CommentTextDto,
     @Req() req: any,
   ) {
     const queryRunner = this.dataSource.createQueryRunner()
@@ -54,8 +55,8 @@ export class CommentController {
       postCommentDto = {
         userId: user.userId,
         boardId: getByBoardIdDto,
-        commentText: commentText,
-      };
+        commentText : commentTextDto.commentText
+      }; 
       let getByUserIdDto = new GetByUserIdDto()
       getByUserIdDto = {
         userId : user.userId 

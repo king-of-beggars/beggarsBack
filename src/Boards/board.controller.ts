@@ -36,6 +36,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { PointValue } from 'src/Utils/pointValue.enum';
 import { HttpException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
+import { GetByUserIdDto } from 'src/Users/dto/getByUserId.dto';
 
 @Controller('api/board')
 @ApiTags('게시물 API')
@@ -73,13 +74,17 @@ export class BoardController {
     description: '자랑하기 게시물 정보',
   })
   async goodjobList(@Query() paginationDto: PaginationDto) {
-    paginationDto.boardTypes = 0;
-    const result: BoardResDto[] = await this.boardService.getListAll(
-      paginationDto,
-    );
-    return {
-      data: result,
-    };
+    try {
+      paginationDto.boardTypes = 0;
+      const result: BoardResDto[] = await this.boardService.getListAll(
+        paginationDto,
+      );
+      return {
+        data: result,
+      };
+    } catch(e) {
+
+    }
   }
 
   //NAME 추가
@@ -117,9 +122,14 @@ export class BoardController {
       postBoardDto.boardTypes = boardTypes;
       postBoardDto.cashbookId = cashbook;
       await this.boardService.postBoard(postBoardDto, queryRunner);
+
+      let getByUserIdDto = new GetByUserIdDto()
+      getByUserIdDto = {
+        userId : user.userId
+      }
       cashbook.cashbookNowValue > cashbook.cashbookGoalValue
-        ? await this.userService.pointInput(user.userId, PointValue.nowayPoint, queryRunner)
-        : await this.userService.pointInput(user.userId, PointValue.goodjobPoint, queryRunner);
+        ? await this.userService.pointInput(getByUserIdDto, PointValue.nowayPoint, queryRunner)
+        : await this.userService.pointInput(getByUserIdDto, PointValue.goodjobPoint, queryRunner);
       boardTypes == 0
         ? (message = `자랑하기 등록이 완료됐습니다`) 
         : (message = `혼나러가기 등록이 완료됐습니다`);
@@ -141,48 +151,50 @@ export class BoardController {
     @Param() getByBoardIdDto: GetByBoardIdDto,
     @Req() req: Request,
   ) {
-    let result: any = await this.boardService.getBoardDetail(getByBoardIdDto);
-    let token = req.headers.cookie;
-    if (token) {
-      token = token.split(';')[1];
-      token = token.split('=')[1];
-    }
-
-    //commentId 배열에 저장
-    console.log(result);
-    let likeCheck = {};
-    //댓글이 있을 경우
-    if (result.comments.length > 0) {
-      const like = result.comments.map((comment) => comment.commentId);
-      //토큰에서 유저정보 추출
-      //좋아요 개수
-      const likeList = await this.commentService.getLikeList(like);
-
+    try {
+      let result: any = await this.boardService.getBoardDetail(getByBoardIdDto);
+      let token = req.headers.cookie;
       if (token) {
-        const user = this.jwtService.verify(token, {
-          secret: this.configService.get('SECRET_KEY'),
-        });
-        user
-          ? (likeCheck = await this.commentService.getLikeCheck(
-              like,
-              user.userId,
-            ))
-          : {};
+        token = token.split(';')[1];
+        token = token.split('=')[1];
       }
+      //commentId 배열에 저장
+      let likeCheck = {};
+      //댓글이 있을 경우
+      if (result.comments.length > 0) {
+        const like = result.comments.map((comment) => comment.commentId);
+        //토큰에서 유저정보 추출
+        //좋아요 개수
+        const likeList = await this.commentService.getLikeList(like);
 
-      for (let i = 0; result.comments.length > i; i++) {
-        result.comments[i].likeCount =
-          Number(likeList[result.comments[i].commentId]) || 0;
-        result.comments[i].likeCheck =
-          likeCheck[result.comments[i].commentId] || 0;
+        if (token) {
+          const user = this.jwtService.verify(token, {
+            secret: this.configService.get('SECRET_KEY'),
+          });
+          user
+            ? (likeCheck = await this.commentService.getLikeCheck(
+                like,
+                user.userId,
+              ))
+            : {};
+        }
+
+        for (let i = 0; result.comments.length > i; i++) {
+          result.comments[i].likeCount =
+            Number(likeList[result.comments[i].commentId]) || 0;
+          result.comments[i].likeCheck =
+            likeCheck[result.comments[i].commentId] || 0;
+        }
       }
-    }
-    const detail = await this.boardService.getDetailByBoardId(getByBoardIdDto);
-    result['cashbookDetail'] = detail;
-    return {
-      data: result,
-    };
-  }
+      const detail = await this.boardService.getDetailByBoardId(getByBoardIdDto);
+      result['cashbookDetail'] = detail;
+      return {
+        data: result,
+      };
+    } catch(e) { 
+      throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+    }//end catch
+  }//end method
 
   @ApiResponse({ type: String })
   @Delete(':boardId')
