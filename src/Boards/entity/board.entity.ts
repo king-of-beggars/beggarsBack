@@ -5,8 +5,6 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
@@ -44,7 +42,9 @@ export class Board {
   })
   public comments?: Comment[];
 
-  @OneToOne(() => Cashbook, (cashbook: Cashbook) => cashbook.cashbookId)
+  @OneToOne(() => Cashbook, (cashbook: Cashbook) => cashbook.cashbookId, {
+    onDelete :'CASCADE'
+  }) 
   @JoinColumn({ name: 'cashbookId' })
   public cashbookId: Cashbook;
 

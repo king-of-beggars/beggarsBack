@@ -31,4 +31,10 @@ export class DetailResDto extends PickType(CashbookDto, [
     description: '무지출데이 체킹 관련'
   })
   public consumption?: boolean;
+
+  @ApiProperty({
+    example : 0, 
+    description: '게시글 쓰기 여부, 0이면 쓰지 않았고 나머지 값은 보드id 번호'
+  }) 
+  public writeCheck?: number;
 }

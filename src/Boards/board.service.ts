@@ -21,9 +21,6 @@ export class BoardService {
     ){} 
     
     async postBoard(postBoardDto : PostBoardDto, queryRunner : QueryRunner) : Promise<any> {
-        if(!postBoardDto) {
-            throw new Error('올바르지 않은 데이터입니다')
-        }
         const query = this.boardRepository.create(
             postBoardDto
         )  
@@ -64,10 +61,18 @@ export class BoardService {
         .leftJoinAndSelect('board.comments','comment')
         .leftJoinAndSelect('comment.userId','commentUser')
         .leftJoinAndSelect('comment.likes','like')
-        .select(['board','comment','comment.userId','user.userId','user.userNickname','user.userName','commentUser.userId','commentUser.userName','commentUser.userNickname'])
+        .select([
+        'board',
+        'comment',
+        'comment.userId',
+        'user.userId',
+        'user.userNickname',
+        'user.userName',
+        'commentUser.userId',
+        'commentUser.userName',
+        'commentUser.userNickname'])
         .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
         .getOne()
-
     }
 
     async getDetailByBoardId(getByBoardIdDto : GetByBoardIdDto) : Promise<Cashbook> {
@@ -82,9 +87,6 @@ export class BoardService {
     }
 
     async BoardCheck(cashbookIds : number[]) {
-        if(cashbookIds.length===0) {
-            throw new Error('날짜가 비어 있는 배열입니다')
-        } 
         try {
             const query = await this.boardRepository
             .createQueryBuilder('board')

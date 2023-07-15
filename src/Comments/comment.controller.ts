@@ -83,15 +83,20 @@ export class CommentController {
     @Param() getByCommentIdDto: GetByCommentIdDto,
     @Req() req: any,
   ) {
-    let { user } = req;
-    let getByUserIdDto = new GetByUserIdDto()
-    getByUserIdDto = {
-      userId : user.userId
-    }
-    await this.commentService.deleteComment(
-      getByCommentIdDto,
-      getByUserIdDto 
-    );
-    return `삭제가 완료되었습니다`;
-  }
-}
+    try {
+      let { user } = req;
+      let getByUserIdDto = new GetByUserIdDto()
+      getByUserIdDto = {
+        userId : user.userId
+      }
+      await this.commentService.deleteComment(
+        getByCommentIdDto,
+        getByUserIdDto 
+      );
+      return `삭제가 완료되었습니다`;
+    } catch(e) { 
+      console.log(e.stack)
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }//end catch
+  }//end method
+}//end class

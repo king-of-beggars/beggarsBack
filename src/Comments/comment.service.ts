@@ -9,6 +9,7 @@ import { EntityManager } from 'typeorm';
 import { Like } from './entity/like.entity';
 import { GetByUserIdDto } from 'src/Users/dto/getByUserId.dto';
 import { GetByCommentIdDto } from './dto/getByCommentId.dto';
+import { CreateFail, DeleteFail, ReadFail } from 'src/Utils/exception.service';
 
 @Injectable()
 export class CommentService {
@@ -23,78 +24,102 @@ export class CommentService {
   ) {}
 
   async postComment(postCommentDto: PostCommentDto, queryRunner : QueryRunner) {
-    const query = this.commentEntity.create(postCommentDto);
-    return await queryRunner.manager.save(query)
+    try {
+      const query = this.commentEntity.create(postCommentDto);
+      return await queryRunner.manager.save(query)
+    } catch(e) { 
+      throw new CreateFail(e.stack)
+    }
   }
 
   async deleteComment(getByCommentIdDto: GetByCommentIdDto, getByUserIdDto: GetByUserIdDto) {
-    return await this.commentEntity
-      .createQueryBuilder('comment')
-      .delete()
-      .where('comment.commentId=:commentId', {
-        commentId: getByCommentIdDto.commentId,
-      })
-      .andWhere('comment.userId=:userId', { userId : getByUserIdDto.userId })
-      .execute();
+    try {
+      return await this.commentEntity
+        .createQueryBuilder('comment')
+        .delete()
+        .where('comment.commentId=:commentId', {
+          commentId: getByCommentIdDto.commentId,
+        })
+        .andWhere('comment.userId=:userId', { userId : getByUserIdDto.userId })
+        .execute();
+    } catch(e) {
+      throw new DeleteFail(e.stack)
+    }
   }
 
   async postLike(userId: User, commentId: Comment) {
-    let query = await this.likeEntity
-      .createQueryBuilder('like')
-      .select()
-      .where('like.userId=:userId', { userId })
-      .andWhere('like.commentId', { commentId })
-      .getOne();
-    if (!query) {
-      query = this.likeEntity.create({
-        userId: userId,
-        commentId: commentId,
-      });
-    } else {
-      query.likeCheck === 1 ? (query.likeCheck = 0) : (query.likeCheck = 1);
+    try {
+      let query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select()
+        .where('like.userId=:userId', { userId })
+        .andWhere('like.commentId', { commentId })
+        .getOne();
+      if (!query) {
+        query = this.likeEntity.create({
+          userId: userId,
+          commentId: commentId,
+        });
+      } else {
+        query.likeCheck === 1 ? (query.likeCheck = 0) : (query.likeCheck = 1);
+      } 
+      return this.likeEntity.save(query);
+    } catch(e) {
+      throw new CreateFail(e.stack)
     }
-    return this.likeEntity.save(query);
   }
 
   async getLike(commentId: Comment) {
-    const result: number = await this.likeEntity.query(
-      `SELECT count(*) FROM Like
-            WHERE likeCheck=1
-            AND WHERE commentId = ?`,
-      [commentId],
-    );
-    return result;
+    try {
+      const result: number = await this.likeEntity.query(
+        `SELECT count(*) FROM Like
+              WHERE likeCheck=1
+              AND WHERE commentId = ?`,
+        [commentId],
+      );
+      return result;
+    } catch(e) {
+      throw new ReadFail(e.stack)
+    }
   }
 
   async getLikeList(commentId: number[]) {
-    const query = await this.likeEntity
-      .createQueryBuilder('like')
-      .select('like.commentId', 'commentId')
-      .addSelect('COUNT(like.likeId)', 'likeCount')
-      .where('like.commentId IN (:...commentId)', { commentId })
-      .groupBy('like.commentId')
-      .getRawMany();
+    try {
+      const query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select('like.commentId', 'commentId')
+        .addSelect('COUNT(like.likeId)', 'likeCount')
+        .where('like.commentId IN (:...commentId)', { commentId })
+        .groupBy('like.commentId')
+        .getRawMany();
 
-    const result = {};
-    for (let i = 0; query.length > i; i++) {
-      result[query[i].commentId] = query[i].likeCount;
+      const result = {};
+      for (let i = 0; query.length > i; i++) {
+        result[query[i].commentId] = query[i].likeCount;
+      }
+      return result;
+    } catch(e) {
+      throw new ReadFail(e.stack)  
     }
-    return result;
   }
   async getLikeCheck(commentId: number[], userId: number) {
-    const query = await this.likeEntity
-      .createQueryBuilder('like')
-      .select('like.commentId', 'commentId')
-      .addSelect('like.likeCheck', 'likeCheck')
-      .where('like.userId=:userId', { userId })
-      .andWhere('like.commentId IN (:...commentId)', { commentId })
-      .andWhere('like.likeCheck=1')
-      .getRawMany();
+    try {
+      const query = await this.likeEntity
+        .createQueryBuilder('like')
+        .select('like.commentId', 'commentId')
+        .addSelect('like.likeCheck', 'likeCheck')
+        .where('like.userId=:userId', { userId })
+        .andWhere('like.commentId IN (:...commentId)', { commentId })
+        .andWhere('like.likeCheck=1')
+        .getRawMany();
 
-    const result = {};
-    for (let i = 0; query.length > i; i++) {
-      result[query[i].commentId] = query[i].likeCheck;
+      const result = {};
+      for (let i = 0; query.length > i; i++) {
+        result[query[i].commentId] = query[i].likeCheck;
+      }
+      return result;
+    } catch(e) {
+      throw new ReadFail(e.stack)
     }
-    return result;
   }
 }

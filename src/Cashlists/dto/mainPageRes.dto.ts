@@ -20,12 +20,12 @@ class MainPageResDto {
 
   @ApiProperty({
     example: { '2022-04-01': 0, '2022-04-02': 1 },
-    description: 'null : 실패,  0 : 부분성공,  1 : 완전성공',
+    description: 'null : 없는날짜,  0 : 실패,  1 : 부분성공, 2: 완전성공',
   })
   public twoweek: object;
 
   @ApiProperty({
-    example: {
+    example: { 
       cashCategory: '식비',
       cashbookNowValue: 5000,
       cashbookGoalValue: 8000,

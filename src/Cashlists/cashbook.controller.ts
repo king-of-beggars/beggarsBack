@@ -98,13 +98,14 @@ export class CashbookContoller {
         try {
             const { user } = req
             let frameDto = new FrameDto()
+
             frameDto = {
                 cashCategory : body.cashCategory,
                 cashName : body.cashName,
                 cashListGoalValue : body.cashListGoalValue,
                 userId : user.userId
             }
-            //이 부분 트랜잭션 해야하는데 어떡하지
+
             const query = await this.cashbookService.frameCreate(frameDto, queryRunner)
             let cashbookCreateDto = new CashbookCreateDto();
             cashbookCreateDto = {
@@ -171,10 +172,12 @@ export class CashbookContoller {
     @ApiResponse({type:[ByDateResDto], description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() date : QueryDate, @Req() req : any) {
+        try {
             const regex = /\d{4}-\d{2}-\d{2}/;
             if(!regex.test(date.toString())) {
-                console.log('dfgdfg')
-            } 
+                throw new HttpException('날짜 형식 에러', HttpStatus.BAD_REQUEST)
+            }
+
             const { user } = req
             console.log(date) 
             let result : any = await this.cashbookService.getCashbookByDate(date,user.userId)
@@ -190,10 +193,10 @@ export class CashbookContoller {
             return {
                 data :byDateResDto
             }
-        // } catch(e) {
-        //     console.log(e.stack)
-        //     throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
-        // }
+        } catch(e) {
+            console.log(e.stack)
+            throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     @Get(':cashbookId')
@@ -201,37 +204,41 @@ export class CashbookContoller {
     @ApiResponse({type:DetailResDto, description : 'data 객체 내부에 생성'})
     @ApiOperation({ summary: '특정 카드의 디테일 정보', description: '카드이름, 카드카테고리, 디테일정보// 무지출 consumption : false' })
     async cashDetail(@Param() getByCashbookIdDto : GetByCashbookIdDto) {
-        const detail = await this.cashbookService.getDetail(getByCashbookIdDto)
-        if(!detail) {
-            throw new HttpException('디테일 데이터가 없습니다',HttpStatus.BAD_REQUEST)
-        }
-        let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)
-        const {cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
-        if(detail.length===0) {
-            let result = new DetailResDto()
-            cashbookNowValue===0 ? result['consumption'] = true : result['consumption']=false
-            result['cashbookCategory'] = cashbookCategory
-            result['cashbookName'] = cashbookName
-            result['cashbookGoalValue'] = cashbookGoalValue
-
+        try {
+            const detail = await this.cashbookService.getDetail(getByCashbookIdDto)
+            console.log(detail)
+            let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)
+            const {cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
             const Checkdate = await this.boardService.BoardCheck([cashbookId])
- 
-            result['writeCheck'] = Number(Checkdate[cashbookId]) || 0
-            return { data : {
+            if(detail.length===0) {
+                let result = new DetailResDto()
+                cashbookNowValue===0 ? result['consumption'] = true : result['consumption']=false
+                result['cashbookCategory'] = cashbookCategory
+                result['cashbookName'] = cashbookName
+                result['cashbookGoalValue'] = cashbookGoalValue
+                result['writeCheck'] = Number(Checkdate[cashbookId]) || 0
+                return { data : {
+                    result
+                }}
+            //end if    
+            } else {
+            const result : DetailResDto = {
+                cashbookName,
+                cashbookCategory,
+                cashbookGoalValue,
+                writeCheck : Number(Checkdate[cashbookId]) || 0,
+                detail 
+            }
+            return {data : {
                 result
-            }
-            }
-        } else {
-        const result : DetailResDto = {
-            cashbookName,
-            cashbookCategory,
-            cashbookGoalValue,
-            detail
-        }
-        return {data : {
-            result
-        }}
-    }}
+            }}
+        }//end else    
+        //end try
+        } catch(e) {
+            console.log(e.stack)
+            throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        }//end catch 
+    }//end method
  
     @Post(":cashbookId")
     @UseGuards(AccessAuthenticationGuard)
@@ -313,7 +320,8 @@ export class CashbookContoller {
             await this.cashbookService.inputConsume(cashbookId)
             return '무지출 지출 전환 완료'
         } catch(e) {
-
+            console.log(e.stack) 
+            throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
     
