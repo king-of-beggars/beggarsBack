@@ -88,14 +88,13 @@ export class CashbookService {
         `SELECT cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue 
             FROM Cashbook 
             WHERE DATE(cashbookCreatedAt) = DATE(?)
-            AND userId = ? 
-            GROUP BY cashbookCategory 
+            AND userId = ?
             ORDER BY cashbookCreatedAt DESC`,
-        [date.date, userId],
+        [date.date, userId], 
       );  
       return result; 
     } catch(e) {
-      throw new ReadFail(e.stack)
+      throw new ReadFail(e.stack) 
     }
   }
 

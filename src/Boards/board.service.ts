@@ -10,6 +10,7 @@ import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
 import { GetByCashbookIdDto } from "src/Cashlists/dto/getByCashbookId.dto";
 import { BoardResDto } from "./dto/boardRes.dto";
 import { GetByBoardIdDto } from "./dto/getByBoardId.dto";
+import { DeleteFail, ReadFail } from "src/Utils/exception.service";
 
 @Injectable()
 export class BoardService {
@@ -32,57 +33,68 @@ export class BoardService {
             return this.boardRepository.createQueryBuilder()
             .delete()
             .where({boardId:boardId})
-        } catch(e) {
-            throw new Error('DB접속에러')
+        } catch(e) { 
+            throw new DeleteFail(e.stack)
         }
         
     }
 
     async getListAll(paginationDto : PaginationDto) : Promise<BoardResDto[]> {
-        const result =  await this.boardRepository
-        .createQueryBuilder('board')
-        .leftJoin('board.cashbookId','cashbook')
-        //.innerJoinAndSelect('cashbookId.cashbookId','cashdetail')
-        .leftJoin('board.userId','user')
-        .select(['board','cashbook','user.userNickname','user.userName'])
-        .where('board.boardTypes=:boardTypes', {boardTypes:paginationDto.boardTypes})
-        .orderBy('board.boardCreatedAt',"DESC")
-        .skip((paginationDto.page-1)*paginationDto.limit)
-        .take(paginationDto.limit) 
-        .getMany()
-
-        return result;
+        try {
+            const result =  await this.boardRepository
+            .createQueryBuilder('board')
+            .leftJoin('board.cashbookId','cashbook')
+            //.innerJoinAndSelect('cashbookId.cashbookId','cashdetail')
+            .leftJoin('board.userId','user')
+            .select(['board','cashbook','user.userNickname','user.userName'])
+            .where('board.boardTypes=:boardTypes', {boardTypes:paginationDto.boardTypes})
+            .orderBy('board.boardCreatedAt',"DESC")
+            .skip((paginationDto.page-1)*paginationDto.limit)
+            .take(paginationDto.limit) 
+            .getMany()
+            return result;
+        } catch(e) { 
+            throw new ReadFail(e.stack)
+        }
     }
 
     async getBoardDetail(getByBoardIdDto : GetByBoardIdDto) : Promise<Board> {
-        return await this.boardRepository
-        .createQueryBuilder('board')
-        .leftJoinAndSelect('board.userId','user')
-        .leftJoinAndSelect('board.comments','comment')
-        .leftJoinAndSelect('comment.userId','commentUser')
-        .leftJoinAndSelect('comment.likes','like')
-        .select([
-        'board',
-        'comment',
-        'comment.userId',
-        'user.userId',
-        'user.userNickname',
-        'user.userName',
-        'commentUser.userId',
-        'commentUser.userName',
-        'commentUser.userNickname'])
-        .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
-        .getOne()
+        try {
+            return await this.boardRepository
+            .createQueryBuilder('board')
+            .leftJoinAndSelect('board.userId','user')
+            .leftJoinAndSelect('board.comments','comment')
+            .leftJoinAndSelect('comment.userId','commentUser')
+            .leftJoinAndSelect('comment.likes','like')
+            .select([
+            'board',
+            'comment',
+            'comment.userId',
+            'user.userId',
+            'user.userNickname',
+            'user.userName',
+            'commentUser.userId',
+            'commentUser.userName',
+            'commentUser.userNickname'])
+            .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
+            .getOne()
+        } catch(e) {
+            throw new ReadFail(e.stack)
+        }
     }
 
     async getDetailByBoardId(getByBoardIdDto : GetByBoardIdDto) : Promise<Cashbook> {
-        const boards = await this.boardRepository
-        .createQueryBuilder('board')
-        .leftJoinAndSelect('board.cashbookId','cashbook')
-        .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
-        .getOne()
-        const cashbookId : GetByCashbookIdDto = boards.cashbookId
-        return await this.cashbookService.getcashbookAndDetail(cashbookId)
+        try {
+            const boards = await this.boardRepository
+            .createQueryBuilder('board')
+            .leftJoinAndSelect('board.cashbookId','cashbook')
+            .where('board.boardId=:boardId',{boardId : getByBoardIdDto.boardId})
+            .getOne()
+            const cashbookId : GetByCashbookIdDto = boards.cashbookId
+            return await this.cashbookService.getcashbookAndDetail(cashbookId)
+        } catch(e) {
+            throw new ReadFail(e.stack)
+        }
         
     }
 
@@ -100,8 +112,7 @@ export class BoardService {
             }
             return result;
         } catch(e) {
-            
-
+            throw new ReadFail(e.stack)
         }
 
     }

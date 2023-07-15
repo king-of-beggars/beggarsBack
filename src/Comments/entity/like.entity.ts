@@ -3,9 +3,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  Timestamp,
+  ManyToOne, 
   JoinColumn,
   BeforeInsert,
 } from 'typeorm';
@@ -17,7 +15,9 @@ export class Like {
   @PrimaryGeneratedColumn()
   public likeId: string;
 
-  @ManyToOne(() => Comment, (comment: Comment) => comment.commentId)
+  @ManyToOne(() => Comment, (comment: Comment) => comment.commentId, {
+    onDelete: 'CASCADE',
+  }) 
   @JoinColumn({ name: 'commentId' })
   public commentId: Comment;
 
