@@ -97,7 +97,27 @@ export class CashbookService {
     } catch(e) {
       throw new ReadFail(e.stack)
     }
-  } 
+  }
+
+  async getCashbookGroupByCate(
+    date: QueryDate,
+    userId: Number,
+  ): Promise<Cashbook[]> {
+    try { 
+      const result = await this.cashbookEntity.query(
+        `SELECT cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
+            FROM Cashbook 
+            WHERE DATE(cashbookCreatedAt) = DATE(?)
+            AND userId = ?   
+            GROUP BY cashbookCategory 
+            ORDER BY cashbookCreatedAt DESC`,
+        [date.date, userId],
+      );  
+      return result; 
+    } catch(e) {
+      throw new ReadFail(e.stack)
+    }
+  }
 
   async addValue(valueUpdate: ValueUpdateDto, queryRunner : QueryRunner): Promise<any> {
     try {

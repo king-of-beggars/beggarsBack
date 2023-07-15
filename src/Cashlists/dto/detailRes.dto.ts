@@ -25,4 +25,10 @@ export class DetailResDto extends PickType(CashbookDto, [
     description: '캐시 디테일',
   })
   public detail?: DetailValueDto[];
+
+  @ApiProperty({
+    example : false, 
+    description: '무지출데이 체킹 관련'
+  })
+  public consumption?: boolean;
 }

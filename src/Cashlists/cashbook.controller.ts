@@ -55,20 +55,19 @@ export class CashbookContoller {
             //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
             let query = new QueryDate()
             query = {
-                date : nowdate2
+                date : nowdate2 
             }
-            const totalValue : GetCategory[] = await this.cashbookService.getCashbookByDate(query,user.userId)
+            const totalValue : GetCategory[] = await this.cashbookService.getCashbookGroupByCate(query,user.userId)
             
-            let total = {
+            let total = { 
                 cashbookNowValue : 0,
-                cashbookGoalValue : 0
-            } 
+                cashbookGoalValue : 0 
+            }  
             for(let i=0; totalValue.length>i; i++) {
-                console.log(totalValue[i].cashbookGoalValue)
-                total.cashbookNowValue += totalValue[i].cashbookNowValue
-                total.cashbookGoalValue += totalValue[i].cashbookGoalValue
+                total.cashbookNowValue += Number(totalValue[i].cashbookNowValue)
+                total.cashbookGoalValue += Number(totalValue[i].cashbookGoalValue)
             }
-
+  
             let mainPageDto = new MainPageDto()
             mainPageDto = {
                 signupDay : dateValue,
@@ -207,19 +206,19 @@ export class CashbookContoller {
             throw new HttpException('디테일 데이터가 없습니다',HttpStatus.BAD_REQUEST)
         }
         let result2 = await this.cashbookService.cashbookById(getByCashbookIdDto)
-        const {cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
+        const {cashbookId, cashbookName, cashbookCategory, cashbookNowValue, cashbookGoalValue} = result2
         if(detail.length===0) {
-            const result = {}
+            let result = new DetailResDto()
             cashbookNowValue===0 ? result['consumption'] = true : result['consumption']=false
-            let detailResDto = new DetailResDto()
-            detailResDto = {
-                cashbookGoalValue : cashbookGoalValue,
-                cashbookName : cashbookName,
-                cashbookCategory : cashbookCategory
-            }
+            result['cashbookCategory'] = cashbookCategory
+            result['cashbookName'] = cashbookName
+            result['cashbookGoalValue'] = cashbookGoalValue
+
+            const Checkdate = await this.boardService.BoardCheck([cashbookId])
+ 
+            result['writeCheck'] = Number(Checkdate[cashbookId]) || 0
             return { data : {
-                result,
-                detailResDto
+                result
             }
             }
         } else {
