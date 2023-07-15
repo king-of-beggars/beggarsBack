@@ -173,8 +173,8 @@ export class CashbookContoller {
     @ApiOperation({ summary: '특정 날짜 가계부 get', description: '2022-04-05 형식으로 쿼리스트링 하여 request 요구' })
     async cashList(@Query() date : QueryDate, @Req() req : any) {
         try {
-            const regex = /\d{4}-\d{2}-\d{2}/;
-            if(!regex.test(date.toString())) {
+            const regex = /\d{4}-\d{2}-\d{2}/; 
+            if(!regex.test(date.date.toString())) {
                 throw new HttpException('날짜 형식 에러', HttpStatus.BAD_REQUEST)
             }
 
