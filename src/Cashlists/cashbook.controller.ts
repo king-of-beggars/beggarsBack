@@ -45,7 +45,8 @@ export class CashbookContoller {
             let tempdate = moment().tz("Asia/Seoul")
             let nowdate = tempdate.toDate()
             let nowdate2 = new Date()
-            nowdate2.setHours(nowdate.getHours() + 9 - 24)
+            nowdate2.setHours(nowdate2.getHours() + 9 - 24)
+            console.log(nowdate2) 
             //1. 몇 일 째 되는 날
             const dateValue : number = await this.userService.userSignupDate(user.userId)
             
@@ -57,7 +58,7 @@ export class CashbookContoller {
             query = {
                 date : nowdate2 
             }
-            const totalValue : GetCategory[] = await this.cashbookService.getCashbookGroupByCate(query,user.userId)
+            const totalValue  = await this.cashbookService.getCashbookGroupByCate(query,user.userId)
             
             let total = { 
                 cashbookNowValue : 0,
@@ -298,9 +299,9 @@ export class CashbookContoller {
                 throw new Error('dfgdfg')
             }
             let valueUpdateDto = new ValueUpdateDto()
-            const cashbook = await this.cashbookService.cashbookById(detail.cashbookId)
+            const cashbook = await this.cashbookService.cashbookById({cashbookId:Number(detail.cashbookId)})
             console.log(cashbook)
-            valueUpdateDto = { 
+            valueUpdateDto = {  
                 cashbookId : cashbook,
                 cashDetailValue : -Number(detail.cashDetailValue)
             }

@@ -23,6 +23,7 @@ import { DataSource } from 'typeorm';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
 import { CommentTextDto } from './dto/commentText.dto';
+import { PointValue } from 'src/Utils/pointValue.enum';
 
 @ApiTags('댓글/좋아요 API')
 @Controller('api/board/:boardId/comment')
@@ -56,21 +57,21 @@ export class CommentController {
         userId: user.userId,
         boardId: getByBoardIdDto,
         commentText : commentTextDto.commentText
-      }; 
+      };  
       let getByUserIdDto = new GetByUserIdDto()
       getByUserIdDto = {
         userId : user.userId 
       }
       console.log(getByUserIdDto,'dfgdfgdfgdfg')
       await this.commentService.postComment(postCommentDto, queryRunner)
-      await this.userService.pointInput(getByUserIdDto, 1, queryRunner);
+      await this.userService.pointInput(getByUserIdDto, PointValue.commentPoint, queryRunner);
       await queryRunner.commitTransaction()
-      return '댓글 입력에 성공하였습니다';
     } catch(e) {
         await queryRunner.rollbackTransaction()
         throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
     } finally {
         await queryRunner.release()
+        return '댓글 입력에 성공하였습니다';
     }
   }
 

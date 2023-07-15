@@ -26,7 +26,7 @@ export class CommentService {
   async postComment(postCommentDto: PostCommentDto, queryRunner : QueryRunner) {
     try {
       const query = this.commentEntity.create(postCommentDto);
-      return await queryRunner.manager.save(query)
+      await queryRunner.manager.save(query)
     } catch(e) { 
       throw new CreateFail(e.stack)
     }

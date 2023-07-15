@@ -14,6 +14,8 @@ import { GetByCashbookIdDto } from './dto/getByCashbookId.dto';
 import { GetByCashDetailIdDto } from './dto/getByCashDetailId.dto';
 import { QueryDate } from './dto/queryDate.dto';
 import { CreateFail, DeleteFail, ReadFail, UpdateFail } from 'src/Utils/exception.service';
+import { CashbookDto } from './dto/cashbook.dto';
+import { GetCategory } from './dto/getCategory.dto';
 //import * as moment from 'moment-timezone';
 const moment = require('moment-timezone');
 
@@ -101,9 +103,9 @@ export class CashbookService {
   async getCashbookGroupByCate(
     date: QueryDate,
     userId: Number,
-  ): Promise<Cashbook[]> {
+  ): Promise<GetCategory[]> {
     try { 
-      const result = await this.cashbookEntity.query(
+      const result : GetCategory[] = await this.cashbookEntity.query(
         `SELECT cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
             FROM Cashbook 
             WHERE DATE(cashbookCreatedAt) = DATE(?)
@@ -111,7 +113,13 @@ export class CashbookService {
             GROUP BY cashbookCategory 
             ORDER BY cashbookCreatedAt DESC`,
         [date.date, userId],
-      );  
+      );
+
+      result.forEach(item => {
+        item.cashbookNowValue = Number(item.cashbookNowValue);
+        item.cashbookGoalValue = Number(item.cashbookGoalValue);
+      });
+
       return result; 
     } catch(e) {
       throw new ReadFail(e.stack)
@@ -211,7 +219,7 @@ export class CashbookService {
               FROM cashDetail
               WHERE cashDetailId = ?
               `,
-        [Number(getByCashbookId.cashDetailId)],
+        [getByCashbookId.cashDetailId],
       );
 
     return result[0];
@@ -232,7 +240,7 @@ export class CashbookService {
             userId: cashbookList[i].userId,
             cashListId: cashbookList[i],
           });
-          return await this.cashbookEntity.save(query);
+          await this.cashbookEntity.save(query);
         } 
       } else {
         const query = this.cashbookEntity.create({
@@ -242,7 +250,7 @@ export class CashbookService {
           userId: cashbookList.userId, 
           cashListId: cashbookList.cashListId,
         });
-        return await queryRunner.manager.save(query);
+        await queryRunner.manager.save(query);
     }
     } catch(e) {
       throw new CreateFail(e.stack)
@@ -357,6 +365,7 @@ export class CashbookService {
   async cashbookById(
     getByCashbookIdDto: GetByCashbookIdDto,
   ): Promise<Cashbook> {
+    console.log(getByCashbookIdDto)
     try {
       return await this.cashbookEntity
         .createQueryBuilder()

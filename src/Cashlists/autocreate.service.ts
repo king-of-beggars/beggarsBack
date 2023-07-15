@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Cashbook } from './entity/cashbook.entity';
 import { CashbookService } from './cashbook.service';
@@ -14,7 +14,11 @@ export class AutoCreateService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async autoCashbook() {
+    try {
+    console.log('sdfgdfgf')
     const list: CashList[] = await this.cashbookService.allCashlist();
     await this.cashbookService.cashbookCreate(list);
-  }
+  } catch(e) {
+    throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+  }}
 }

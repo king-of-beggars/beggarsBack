@@ -72,19 +72,20 @@ export class UserService {
   async pointCheck(getByUserIdDto: GetByUserIdDto): Promise<number> {
     const result = await this.userRepository
       .createQueryBuilder('user')
-      .select(['user.userPoint'])
-      .where('user.userId = :userId', { userId: getByUserIdDto })
-      .getOne();
+      .select(['userPoint'])
+      .where('userId = :userId', { userId: getByUserIdDto.userId })
+      .getOne(); 
     return Number(result.userPoint);
   }
 
   async pointInput(getByUserIdDto: GetByUserIdDto, point: number, queryRunner : QueryRunner) {
-    let userPoint: number = await this.pointCheck(getByUserIdDto);
-    userPoint = userPoint + point;
     return await queryRunner.manager
       .createQueryBuilder()
       .update('User')
-      .set({ userPoint: userPoint })
+      .set({
+        userPoint: () =>
+          `userPoint + ${point}`,
+      })
       .where('userId = :userId', { userId: getByUserIdDto.userId })
       .execute();
   }
