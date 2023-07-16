@@ -199,7 +199,7 @@ export class UserController {
     );
     res.setHeader('userNickname', nickname);
 
-    return res.redirect(`http://localhost:3000/`);
+    return res.send('카카오 로그인이 완료되었습니다')
   }
 
   @Post('signup/social')
@@ -247,9 +247,9 @@ export class UserController {
         user.userNickname,
       );
       res.setHeader('userNickname', nickname); 
-      return res.redirect(`http://localhost:3000/`);
-    } catch (err) {
-      throw new Error(err);
+      return res.send('회원가입이 완료되었습니다')
+    } catch (err) { 
+      throw new Error(err); 
     }
   }
 }
