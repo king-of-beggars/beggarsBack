@@ -91,6 +91,7 @@ export class CommentService {
         .select('like.commentId', 'commentId')
         .addSelect('COUNT(like.likeId)', 'likeCount')
         .where('like.commentId IN (:...commentId)', { commentId })
+        .andWhere('like.likeCheck=1')
         .groupBy('like.commentId')
         .getRawMany();
 

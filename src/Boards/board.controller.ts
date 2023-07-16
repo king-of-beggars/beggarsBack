@@ -167,7 +167,7 @@ export class BoardController {
         //좋아요 개수
         const likeList = await this.commentService.getLikeList(like);
 
-        if (token) {
+        if (token) { 
           const user = this.jwtService.verify(token, {
             secret: this.configService.get('SECRET_KEY'),
           });
