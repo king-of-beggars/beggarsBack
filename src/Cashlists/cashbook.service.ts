@@ -105,6 +105,7 @@ export class CashbookService {
     userId: Number,
   ): Promise<GetCategory[]> {
     try { 
+      console.log(date) 
       const result : GetCategory[] = await this.cashbookEntity.query(
         `SELECT cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
             FROM Cashbook 
@@ -114,12 +115,12 @@ export class CashbookService {
             ORDER BY cashbookCreatedAt DESC`,
         [date.date, userId],
       );
-
+      console.log(result)
       result.forEach(item => {
         item.cashbookNowValue = Number(item.cashbookNowValue);
         item.cashbookGoalValue = Number(item.cashbookGoalValue);
       });
-
+      console.log(result)
       return result; 
     } catch(e) {
       throw new ReadFail(e.stack)
@@ -149,9 +150,14 @@ export class CashbookService {
       const day: number = endDate.getDay() + 7 + 1;
       let startDate = new Date();
       startDate.setDate(endDate.getDate() - day);
+      startDate.setHours(startDate.getHours() + 9)
       endDate.setDate(endDate.getDate() + 2);
+      endDate.setHours(endDate.getHours() + 9)
       const query = await this.cashbookEntity.query(
-        `SELECT DATE(cashbookCreatedAt) AS dt, cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
+        `SELECT CONVERT_TZ(DATE(cashbookCreatedAt), @@session.time_zone, '+09:00') AS dt,
+         cashbookCategory, 
+         sum(cashbookNowValue) as cashbookNowValue, 
+         sum(cashbookGoalValue) as cashbookGoalValue
               FROM Cashbook
               WHERE DATE(cashbookCreatedAt) >= DATE(?)
               AND DATE(cashbookCreatedAt) < DATE(?)
@@ -159,9 +165,8 @@ export class CashbookService {
               GROUP BY dt, cashbookCategory
               ORDER BY DATE(cashbookCreatedAt)`,
         [startDate, endDate, userId],
-      );
-      console.log(query);
-
+      ); 
+      console.log(query)
       let array = new Array(14).fill(null);
       moment.tz.setDefault('Asia/Seoul');
       let lastSunday = moment().startOf('week');
