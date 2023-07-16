@@ -215,11 +215,11 @@ export class UserController {
     @Req() req,
     @Res() res: Response,
   ) {
-    console.log(body)
+    console.log(body) 
     try { 
       const nickCheck = await this.userService.userByNickname(
-        body
-      ); 
+        body.userNickname 
+      );  
       console.log(nickCheck);
       if (nickCheck) {
         throw new Error('다른 닉네임을 지정해주세요');
