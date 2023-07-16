@@ -13,7 +13,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       callbackURL: 'https://poorkingapi.shop/api/user/login/kakao',
       //callbackURL: 'http://localhost:3000/api/user/login/kakao'
     }); 
-  }
+  } 
   async validate(
     accessToken: string,
     refreshToken: string,

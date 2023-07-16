@@ -101,19 +101,20 @@ export class CashbookService {
   }
 
   async getCashbookGroupByCate(
-    date: QueryDate,
+    date: QueryDate, 
     userId: Number,
   ): Promise<GetCategory[]> {
-    try { 
-      console.log(date) 
+    try {
+      const yesterday = date.date
+      yesterday.setHours(yesterday.getHours() - 9)
       const result : GetCategory[] = await this.cashbookEntity.query(
         `SELECT cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
             FROM Cashbook 
             WHERE DATE(cashbookCreatedAt) = DATE(?)
             AND userId = ?   
-            GROUP BY cashbookCategory 
+            GROUP BY cashbookCategory
             ORDER BY cashbookCreatedAt DESC`,
-        [date.date, userId],
+        [yesterday, userId],  
       );
       console.log(result)
       result.forEach(item => {

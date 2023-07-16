@@ -153,11 +153,7 @@ export class BoardController {
   ) {
     try {
       let result: any = await this.boardService.getBoardDetail(getByBoardIdDto);
-      let token = req.headers.cookie;
-      if (token) {
-        token = token.split(';')[1];
-        token = token.split('=')[1];
-      }
+      let token = req.cookies.accessToken;
       //commentId 배열에 저장
       let likeCheck = {};
       //댓글이 있을 경우
@@ -167,13 +163,13 @@ export class BoardController {
         //좋아요 개수
         const likeList = await this.commentService.getLikeList(like);
 
-        if (token) { 
+        if (token) {  
           const user = this.jwtService.verify(token, {
             secret: this.configService.get('SECRET_KEY'),
           });
           user
             ? (likeCheck = await this.commentService.getLikeCheck(
-                like,
+                like, 
                 user.userId,
               ))
             : {};

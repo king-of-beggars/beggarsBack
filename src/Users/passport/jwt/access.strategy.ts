@@ -17,32 +17,31 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          let token = request.headers.cookie;
-          if (token) {
-            token = token.split(';')[1];
-            token = token.split('=')[1];
-          }
-          console.log(token);
-          // let token = request.headers['set-cookie'][0]
-          // if(token) {
-          //     //token = token.split(',')[1]
-          //     token = token.split('=')[1]
-          //     token = token.split(' ')[0]
-          //     token = token.replace(';','')
-          // }
-          // console.log(token)
-          const test = jwtService.verify(token, {
-            secret: this.configService.get('SECRET_KEY'),
-          });
-          return token;
+            console.log(request.cookies.accessToken)
+            let token = request.cookies.accessToken;
+            // if (token) {
+            //   token = token.split(';')[1];
+            //   token = token.split('=')[1];
+            // }
+            // let token = request.headers['set-cookie'][0]
+            // if(token) {
+            //     //token = token.split(',')[1]
+            //     token = token.split('=')[1]
+            //     token = token.split(' ')[0]
+            //     token = token.replace(';','')
+            // }
+            // console.log(token)
+            const test = jwtService.verify(token, {
+              secret: this.configService.get('SECRET_KEY'),
+            });
+            return token; 
+           
         },
       ]),
       secretOrKey: process.env.SECRET_KEY,
     });
   }
-  async validate(payload: any) {
-    console.log('유효성실행');
-    console.log(this.userService.userByName(payload.userName));
+  async validate(payload: any) { 
     return this.userService.userByName(payload.userName);
   }
 }

@@ -34,6 +34,7 @@ import {
 import { IdCheckDto } from './dto/idCheck.dto';
 import { NickCheckDto } from './dto/nickCheck.dto';
 import { LoginDto } from './dto/login.dto';
+import { SocialInfoDto } from './dto/socialInfo.dto';
 
 @Controller('/api/user')
 @ApiTags('유저 API')
@@ -128,21 +129,6 @@ export class UserController {
     const accessToken = await this.authService.setAccessToken(tokenDto);
 
     await this.authService.setCookie(res, accessToken, refreshToken);
-    // res.cookie('refreshToken', refreshToken, {
-    //     domain : 'poorkingapi.shop',
-    //     sameSite : 'none',
-    //     secure : true,
-    //     httpOnly : false,
-    //     path : '/'
-    // })
-
-    // res.cookie('accessToken', accessToken, {
-    //     domain : 'poorkingapi.shop',
-    //     sameSite : 'none',
-    //     secure : true,
-    //     httpOnly : false,
-    //     path : '/'
-    // })
     res.setHeader('userId', user.userId);
 
     const nickname: string = await this.userService.encodeNick(
@@ -192,14 +178,23 @@ export class UserController {
     const refreshToken = await this.authService.setRefreshToken(user);
     const accessToken = await this.authService.setAccessToken(user);
     await this.authService.setCookie(res, accessToken, refreshToken);
-    await res.setHeader('userId', user.userId);
+    res.cookie('userId', user.userId, {
+      sameSite: 'none', 
+      secure: true,
+      httpOnly: false,
+    });
 
     const nickname: string = await this.userService.encodeNick(
       user.userNickname,
-    );
-    await res.setHeader('userNickname', nickname); 
+    ) 
+    res.cookie('userNickname', nickname, {
+      sameSite: 'none', 
+      secure: true,
+      httpOnly: false,
+    });
+    
  
-    return res.redirect('http://localhost:3000')
+    return res.redirect('http://localhost:3000?loginSuccess=true')
   }
 
   @Post('signup/social')
@@ -251,5 +246,23 @@ export class UserController {
     } catch (err) { 
       throw new Error(err); 
     }
+  }
+
+  @Get('login/getInfo')
+  @UseGuards(AccessAuthenticationGuard)
+  @ApiOperation({
+    summary: '소셜 로그인 시 데이터',
+    description: 'data : socialInfoDto',
+  }) 
+  @HttpCode(200) 
+  async getIdAndNickname(@Req() req:any) {
+    let socialInfoDto = new SocialInfoDto()
+    socialInfoDto = {
+      userId : req.cookies.userId,
+      userNickname :req.cookies.userNickname
+    }
+    return { 
+      data : socialInfoDto   
+    }   
   }
 }
