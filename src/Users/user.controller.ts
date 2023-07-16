@@ -179,7 +179,7 @@ export class UserController {
     if (!user) {
       throw new Error('잘못된 접근입니다');
     }
-    if (!user.userId) {
+    if (!user) { 
       const loginSuccess = false;
       res.cookie('userName', user, {
         sameSite: 'none',
@@ -215,7 +215,7 @@ export class UserController {
     @Req() req,
     @Res() res: Response,
   ) {
-    console.log(body) 
+    console.log(body,'bodyyyyyyyyyyyyyyyyy')  
     try { 
       const nickCheck = await this.userService.userByNickname(
         body.userNickname 
