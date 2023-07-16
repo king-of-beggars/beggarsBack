@@ -192,14 +192,14 @@ export class UserController {
     const refreshToken = await this.authService.setRefreshToken(user);
     const accessToken = await this.authService.setAccessToken(user);
     await this.authService.setCookie(res, accessToken, refreshToken);
-    res.setHeader('userId', user.userId);
+    await res.setHeader('userId', user.userId);
 
     const nickname: string = await this.userService.encodeNick(
       user.userNickname,
     );
-    res.setHeader('userNickname', nickname);
-
-    return res.send('카카오 로그인이 완료되었습니다')
+    await res.setHeader('userNickname', nickname); 
+ 
+    return res.redirect('http://localhost:3000')
   }
 
   @Post('signup/social')
