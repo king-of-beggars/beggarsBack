@@ -12,7 +12,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       clientID: '2ad53ec39ebaac5ba8a250967f431977',
       callbackURL: 'https://poorkingapi.shop/api/user/login/kakao',
       //callbackURL: 'http://localhost:3000/api/user/login/kakao'
-    });
+    }); 
   }
   async validate(
     accessToken: string,
@@ -22,14 +22,14 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
     done: Function,
   ): Promise<any> {
     const user = await this.userService.userByName(id_token.id);
-
     let tokenDto: TokenDto;
     if (user) {
       tokenDto = {
         userId: user.userId,
         userName: user.userName,
         userNickname: user.userNickname,
-      };
+      }; 
+      return tokenDto; 
     } else {
       return id_token.id;
     }
