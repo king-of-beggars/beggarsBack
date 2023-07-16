@@ -179,17 +179,17 @@ export class UserController {
     if (!user) {
       throw new Error('잘못된 접근입니다');
     }
-    if (!user) { 
+    if (!user.userId) { 
       const loginSuccess = false;
       res.cookie('userName', user, {
-        sameSite: 'none',
+        sameSite: 'none', 
         secure: true,
         httpOnly: false,
       });
 
       return res.redirect(`http://localhost:3000?loginSuccess=false`);
     }
-
+ 
     const refreshToken = await this.authService.setRefreshToken(user);
     const accessToken = await this.authService.setAccessToken(user);
     await this.authService.setCookie(res, accessToken, refreshToken);
