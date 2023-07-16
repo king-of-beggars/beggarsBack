@@ -7,7 +7,7 @@ import { GetByBoardIdDto } from 'src/Boards/dto/getByBoardId.dto';
 
 export class PostCommentDto extends PickType(CommentDto, [
   'userId',
-  'commentText',
+  'commentText'
 ]) {
   @ApiProperty({})
   public boardId: GetByBoardIdDto;

@@ -19,8 +19,8 @@ import { AuthService } from 'src/Users/service/oauth2.service';
     TypeOrmModule.forFeature([User, Board, Comment, Like]),
     PassportModule,
   ],
-  controllers: [CommentController],
-  providers: [CommentService, UserService],
+  controllers: [CommentController, LikeController],
+  providers: [CommentService, UserService], 
   exports: [CommentService],
 })
 export class CommentModule {}

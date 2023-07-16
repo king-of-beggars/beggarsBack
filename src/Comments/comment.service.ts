@@ -37,34 +37,35 @@ export class CommentService {
       return await this.commentEntity
         .createQueryBuilder('comment')
         .delete()
-        .where('comment.commentId=:commentId', {
+        .where('commentId=:commentId', {
           commentId: getByCommentIdDto.commentId,
         })
-        .andWhere('comment.userId=:userId', { userId : getByUserIdDto.userId })
+        .andWhere('userId=:userId', { userId : getByUserIdDto.userId })
         .execute();
-    } catch(e) {
+    } catch(e) { 
       throw new DeleteFail(e.stack)
     }
   }
 
-  async postLike(userId: User, commentId: Comment) {
+  async postLike(getByUserIdDto: GetByUserIdDto, getByCommentIdDto: GetByCommentIdDto) {
     try {
       let query = await this.likeEntity
         .createQueryBuilder('like')
         .select()
-        .where('like.userId=:userId', { userId })
-        .andWhere('like.commentId', { commentId })
+        .where('userId=:userId', { userId : getByUserIdDto.userId })
+        .andWhere('commentId=:commentId', { commentId : getByCommentIdDto.commentId})
         .getOne();
-      if (!query) {
+      if (!query) { 
         query = this.likeEntity.create({
-          userId: userId,
-          commentId: commentId,
+          userId: getByUserIdDto,
+          commentId: getByCommentIdDto
         });
       } else {
         query.likeCheck === 1 ? (query.likeCheck = 0) : (query.likeCheck = 1);
       } 
       return this.likeEntity.save(query);
     } catch(e) {
+      console.log(e)
       throw new CreateFail(e.stack)
     }
   }
