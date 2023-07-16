@@ -173,7 +173,6 @@ export class UserController {
     description: '최초가입시 닉네임 기입창으로',
   })
   async kakaoLogin(@Query() code, @Req() req: any, @Res() res: Response) {
-    console.log('dfgdfgdgdf')
     const { user } = req;
     console.log(user);
     if (!user) {
@@ -216,18 +215,18 @@ export class UserController {
     @Res() res: Response,
   ) {
     console.log(body,'bodyyyyyyyyyyyyyyyyy')  
-    try { 
+    try {  
       const nickCheck = await this.userService.userByNickname(
         body.userNickname 
-      );  
+      );   
       console.log(nickCheck);
       if (nickCheck) {
         throw new Error('다른 닉네임을 지정해주세요');
       }
-      let SignupDto: SocialSignupDto;
+      let SignupDto: SocialSignupDto; 
 
       SignupDto = {
-        userName: body.userName,
+        userName: req.cookies.userName,
         userNickname: body.userNickname,
         userLoginType: 'kakao',
         userType: 1,
@@ -238,7 +237,7 @@ export class UserController {
       tokenDto.userId = user.userId;
       tokenDto.userName = user.userName;
       tokenDto.userNickname = user.userNickname;
-
+      res.clearCookie('userName')
       const refreshToken = await this.authService.setRefreshToken(tokenDto);
       const accessToken = await this.authService.setAccessToken(tokenDto);
       await this.authService.setCookie(res, accessToken, refreshToken);
@@ -247,7 +246,7 @@ export class UserController {
       const nickname: string = await this.userService.encodeNick(
         user.userNickname,
       );
-      res.setHeader('userNickname', nickname);
+      res.setHeader('userNickname', nickname); 
       return res.redirect(`http://localhost:3000/`);
     } catch (err) {
       throw new Error(err);
