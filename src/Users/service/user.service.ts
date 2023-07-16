@@ -57,13 +57,13 @@ export class UserService {
   }
 
   //유저닉네임으로 db체크
-  async userByNickname(userNickname: string): Promise<User> {
-    if (!userNickname) {
+  async userByNickname(user: SocialSignupDto): Promise<User> {
+    if (!user) {
       throw new Error('닉네임이 넘어오지 않음');
     }
-    console.log(userNickname);
+    console.log(user);
     const query = await this.userRepository.findOne({
-      where: { userNickname },
+      where: { userNickname : user.userNickname },
     });
 
     return query;

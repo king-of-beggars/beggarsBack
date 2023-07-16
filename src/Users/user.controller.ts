@@ -173,6 +173,7 @@ export class UserController {
     description: '최초가입시 닉네임 기입창으로',
   })
   async kakaoLogin(@Query() code, @Req() req: any, @Res() res: Response) {
+    console.log('dfgdfgdgdf')
     const { user } = req;
     console.log(user);
     if (!user) {
@@ -181,16 +182,11 @@ export class UserController {
     if (!user.userId) {
       const loginSuccess = false;
       res.cookie('userName', user, {
-        domain: 'poorkingapi.shop',
         sameSite: 'none',
         secure: true,
         httpOnly: false,
       });
 
-      res.setHeader(
-        'Set-Cookie',
-        `userName=${user}; Path=/; host=http://localhost:3000/; sameSite=None; secure=false; httpOnly=false;`,
-      );
       return res.redirect(`http://localhost:3000?loginSuccess=false`);
     }
 
@@ -219,12 +215,11 @@ export class UserController {
     @Req() req,
     @Res() res: Response,
   ) {
-    console.log('#######', req);
-    console.log('#######', res);
-    try {
+    console.log(body)
+    try { 
       const nickCheck = await this.userService.userByNickname(
-        body.userNickname,
-      );
+        body
+      ); 
       console.log(nickCheck);
       if (nickCheck) {
         throw new Error('다른 닉네임을 지정해주세요');
