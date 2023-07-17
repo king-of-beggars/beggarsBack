@@ -30,11 +30,13 @@ import {
   ApiResponse,
   ApiBody,
   ApiQuery,
+  ApiProduces,
 } from '@nestjs/swagger';
 import { IdCheckDto } from './dto/idCheck.dto';
 import { NickCheckDto } from './dto/nickCheck.dto';
 import { LoginDto } from './dto/login.dto';
 import { SocialInfoDto } from './dto/socialInfo.dto';
+import { RefreshAuthenticationGuard } from './passport/refresh/refresh.guard';
 
 @Controller('/api/user')
 @ApiTags('유저 API')
@@ -255,14 +257,34 @@ export class UserController {
     description: 'data : socialInfoDto',
   }) 
   @HttpCode(200) 
-  async getIdAndNickname(@Req() req:any) {
+  async getIdAndNickname(@Req() req:any , @Res() res :Response) {
     let socialInfoDto = new SocialInfoDto()
     socialInfoDto = {
       userId : req.cookies.userId,
       userNickname :req.cookies.userNickname
     }
+    res.clearCookie('userId')
+    res.clearCookie('userNickname')
     return { 
       data : socialInfoDto   
     }   
+  }
+
+  @Get('refresh')
+  @UseGuards(RefreshAuthenticationGuard)
+  @ApiOperation({
+    summary: '리프레시 토큰 요청'
+  }) 
+  async refresh(@Req() req : any, @Res() res:Response) {
+    const { user } = req 
+    let tokenDto = new TokenDto();
+    tokenDto = {
+      userId : user.userId,
+      userName : user.userName,
+      userNickname : user.userNickname
+    }  
+    const accessToken = await this.authService.setAccessToken(tokenDto);
+    await this.authService.setCookie(res, accessToken);
+    return res.send('액세스 토큰 발급 완료')
   }
 }
