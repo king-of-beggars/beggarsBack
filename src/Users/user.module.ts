@@ -10,6 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './passport/local/local.strategy';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { AccessStrategy } from './passport/jwt/access.strategy';
+import { RefreshStrategy } from './passport/refresh/refresh.strategy';
 // import { RedisService } from './redis.service';
 @Module({
   imports: [
@@ -24,10 +25,11 @@ import { AccessStrategy } from './passport/jwt/access.strategy';
     UserService,
     AuthService,
     JwtService,
-    ConfigService,
+    ConfigService, 
     LocalStrategy,
     KakaoStrategy,
     AccessStrategy,
+    RefreshStrategy
   ],
   exports: [UserService, AuthService, JwtService],
 })
