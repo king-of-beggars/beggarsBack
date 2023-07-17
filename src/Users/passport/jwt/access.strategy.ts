@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserService } from 'src/Users/service/user.service';
@@ -17,31 +17,29 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-            console.log(request.cookies.accessToken)
+            console.log(request.cookies.accessToken);
             let token = request.cookies.accessToken;
-            // if (token) {
-            //   token = token.split(';')[1];
-            //   token = token.split('=')[1];
-            // }
-            // let token = request.headers['set-cookie'][0]
-            // if(token) {
-            //     //token = token.split(',')[1]
-            //     token = token.split('=')[1]
-            //     token = token.split(' ')[0]
-            //     token = token.replace(';','')
-            // }
-            // console.log(token)
-            const test = jwtService.verify(token, {
+            if(!token) {
+              throw new HttpException('액세스 토큰이 없습니다',HttpStatus.UNAUTHORIZED)
+            }
+            try {
+              const test = jwtService.verify(token, {
               secret: this.configService.get('SECRET_KEY'),
-            });
-            return token; 
-           
+            }); 
+              return token;
+            } catch(e) {
+              throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
+            }
         },
       ]),
       secretOrKey: process.env.SECRET_KEY,
     });
   }
   async validate(payload: any) { 
-    return this.userService.userByName(payload.userName);
+    const user = this.userService.userByName(payload.userName);
+    if(!user) {
+      throw new HttpException('액세스 토큰 검증 실패',HttpStatus.UNAUTHORIZED)
+    }
+    return user;
   }
 }
