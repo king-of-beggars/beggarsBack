@@ -44,4 +44,17 @@ export class BoardResDto extends PickType(BoardDto, [
     },
   })
   public cashbookId: BoardCashbookDto;
+
+  @ApiProperty({ 
+    type: Number,
+    example : 2
+  })
+  public pageNum: number;
+
+  @ApiProperty({
+    type: Boolean,
+    example : true
+  })
+  public hasNextPage: boolean;
+
 }

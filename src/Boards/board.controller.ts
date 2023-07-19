@@ -9,6 +9,7 @@ import {
   Query,
   Delete,
   Param,
+  HttpCode,
 } from '@nestjs/common';
 import { AccessAuthenticationGuard } from 'src/Users/passport/jwt/access.guard';
 import { BoardService } from './board.service';
@@ -58,13 +59,18 @@ export class BoardController {
     description: '혼나러가기 게시물 목록',
   })
   async nowayList(@Query() paginationDto: PaginationDto) {
-    paginationDto.boardTypes = 1;
-    const result: BoardResDto[] = await this.boardService.getListAll(
-      paginationDto,
-    );
-    return {
-      data: result,
-    };
+    try {
+      paginationDto.boardTypes = 1;
+      const result = await this.boardService.getListAll(
+        paginationDto,
+      );
+      return {
+        data: result,
+      };
+    } catch(e) {
+      console.log(e.stack)
+      throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+    } 
   }
 
   @Get('goodjob')
@@ -76,14 +82,16 @@ export class BoardController {
   async goodjobList(@Query() paginationDto: PaginationDto) {
     try {
       paginationDto.boardTypes = 0;
-      const result: BoardResDto[] = await this.boardService.getListAll(
-        paginationDto,
-      );
-      return {
-        data: result,
+      const result = await this.boardService.getListAll(
+        paginationDto, 
+      ); 
+      console.log(result)
+      return { 
+        data: result, 
       };
-    } catch(e) {
-
+    } catch(e) { 
+        console.log(e.stack)
+        throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -196,13 +204,13 @@ export class BoardController {
   @Delete(':boardId')
   @UseGuards(AccessAuthenticationGuard)
   async boardDelete(@Param() GetByBoardIdDto: GetByBoardIdDto) {
-    const result = await this.boardService.deleteByboardId(
-      GetByBoardIdDto.boardId,
-    );
-    if (result) {
-      return `삭제에 성공하였습니다`;
-    } else {
-      throw new Error('존재하지 않는 게시글입니다');
+    try {
+      await this.boardService.deleteByboardId(
+        GetByBoardIdDto.boardId,
+      ); 
+    } catch(e) {
+      console.log(e.stack)
+      throw new HttpException(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 }
