@@ -61,7 +61,7 @@ export class BoardController {
   async nowayList(@Query() paginationDto: PaginationDto) {
     try {
       paginationDto.boardTypes = 1;
-      const result = await this.boardService.getListAll(
+      const result : BoardResDto[] = await this.boardService.getListAll(
         paginationDto,
       );
       return {
@@ -82,7 +82,7 @@ export class BoardController {
   async goodjobList(@Query() paginationDto: PaginationDto) {
     try {
       paginationDto.boardTypes = 0;
-      const result = await this.boardService.getListAll(
+      const result : BoardResDto[] = await this.boardService.getListAll(
         paginationDto, 
       ); 
       console.log(result)

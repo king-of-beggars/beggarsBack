@@ -41,7 +41,17 @@ export class BoardService {
 
     async getListAll(paginationDto : PaginationDto) {
         try {
-            const result : any = await this.boardRepository
+            const checkPage = await this.boardRepository
+            .createQueryBuilder('board')
+            .skip((paginationDto.page)*paginationDto.limit)
+            .take(paginationDto.limit)
+            .getMany()  
+            let hasNextPage = false
+            checkPage.length===0 ? hasNextPage=false : hasNextPage=true
+            const pageNum = paginationDto.page
+
+            const result : any = {
+            boards: await this.boardRepository
             .createQueryBuilder('board')
             .leftJoin('board.cashbookId','cashbook')
             //.innerJoinAndSelect('cashbookId.cashbookId','cashdetail')
@@ -51,18 +61,10 @@ export class BoardService {
             .orderBy('board.boardCreatedAt',"DESC")
             .skip((paginationDto.page-1)*paginationDto.limit)
             .take(paginationDto.limit) 
-            .getMany()
-
-            const checkPage = await this.boardRepository
-            .createQueryBuilder('board')
-            .skip((paginationDto.page)*paginationDto.limit)
-            .take(paginationDto.limit)
-            .getMany()  
-            let hasNextPage = false
-            checkPage.length===0 ? hasNextPage=false : hasNextPage=true
-            const pageNum = paginationDto.page
-            result['pageNum'] = pageNum  
-            result['hasNextPage'] = hasNextPage
+            .getMany(),
+            pageNum,
+            hasNextPage
+            }
             return result;
         } catch(e) { 
             throw new ReadFail(e.stack)

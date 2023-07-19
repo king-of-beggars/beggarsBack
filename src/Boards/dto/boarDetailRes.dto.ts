@@ -48,14 +48,4 @@ export class BoardDetailResDto extends PickType(BoardDto, [
     type: [BoardCommentResDto],
   })
   public comments?: BoardCommentResDto[];
-
-  @ApiProperty({
-    type: BoardUserResDto,
-  })
-  public userId: BoardUserResDto;
-
-  @ApiProperty({
-    type: CashbookDto,
-  })
-  public cashbookId: BoardCashDetailResDto;
 }
