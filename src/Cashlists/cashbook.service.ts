@@ -155,15 +155,15 @@ export class CashbookService {
       endDate.setDate(endDate.getDate() + 2);
       endDate.setHours(endDate.getHours() + 9)
       const query = await this.cashbookEntity.query(
-        `SELECT CONVERT_TZ(DATE(cashbookCreatedAt), @@session.time_zone, '+09:00') AS dt,
+        `SELECT cashbookId, CONVERT_TZ(DATE(cashbookCreatedAt), @@session.time_zone, '+09:00') AS dt,
          cashbookCategory, 
-         sum(cashbookNowValue) as cashbookNowValue, 
-         sum(cashbookGoalValue) as cashbookGoalValue
+         cashbookNowValue, 
+         cashbookGoalValue
               FROM Cashbook
-              WHERE DATE(cashbookCreatedAt) >= DATE(?)
+              WHERE DATE(cashbookCreatedAt) > DATE(?)
               AND DATE(cashbookCreatedAt) < DATE(?)
               AND userId = ?
-              GROUP BY dt, cashbookCategory
+              GROUP BY dt, cashbookCategory, cashbookId
               ORDER BY DATE(cashbookCreatedAt)`,
         [startDate, endDate, userId],
       ); 
@@ -188,23 +188,33 @@ export class CashbookService {
         (result, key, i) => ({ ...result, [key]: array[i] }),
         {},
       );
-      console.log(trueResult);
-
+      
+      //실패하면 실패한 날짜 갱신
       let flag = '';
+
+      //전부 다 0일 경우 flag
+      
+
       for (let a = 0; query.length > a; a++) {
         let tostring = query[a]['dt'].toISOString().split('T')[0];
+        if(query[a]['cashbookNowValue']===0) {
+          flag = tostring;
+          continue;
+        }
+
         if (
           Number(query[a]['cashbookGoalValue']) >=
           Number(query[a]['cashbookNowValue'])
+          || !query[a]['cashbookNowValue']
         ) {
-          flag != tostring
-            ? (trueResult[tostring] = 2)
-            : (trueResult[tostring] = 0);
+          flag === tostring
+            ? (trueResult[tostring] = 1)
+            : (trueResult[tostring] = 2); 
         } else if (
           Number(query[a]['cashbookGoalValue']) <
           Number(query[a]['cashbookNowValue'])
         ) {
-          trueResult[tostring] === 2
+          trueResult[tostring] === 1 || 2
             ? (trueResult[tostring] = 1)
             : (trueResult[tostring] = 0);
           flag = tostring;
