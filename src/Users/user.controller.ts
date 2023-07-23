@@ -96,7 +96,7 @@ export class UserController {
       throw new Error('예상치 못한 오류');
     }
   }
-
+ 
   @Post('nickCheck')
   @HttpCode(200)
   @ApiOperation({ summary: '닉네임 체크', description: '아이디 기입' })
@@ -132,10 +132,11 @@ export class UserController {
 
     await this.authService.setCookie(res, accessToken, refreshToken);
     res.setHeader('userId', user.userId);
-
+    res.setHeader('accessToken', accessToken)
+    res.setHeader('refreshToken', refreshToken)
     const nickname: string = await this.userService.encodeNick(
       user.userNickname,
-    );
+    ); 
     res.setHeader('userNickname', nickname);
     //return res.redirect('http://localhost:3000')
     res.send('완료');
@@ -263,8 +264,8 @@ export class UserController {
       userId : req.cookies.userId,
       userNickname :req.cookies.userNickname
     }
-    res.clearCookie('userId')
-    res.clearCookie('userNickname')
+    res.clearCookie('userId');
+    res.clearCookie('userNickname');
     return { 
       data : socialInfoDto   
     }   
@@ -285,6 +286,6 @@ export class UserController {
     }  
     const accessToken = await this.authService.setAccessToken(tokenDto);
     await this.authService.setCookie(res, accessToken);
-    return res.send('액세스 토큰 발급 완료')
+    return res.send('액세스 토큰 발급 완료');
   }
 }
