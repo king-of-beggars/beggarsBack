@@ -18,6 +18,7 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
             console.log(request.headers)
+
             // let token = request.cookies.accessToken;
             // if(!token) {
             //   throw new HttpException('액세스 토큰이 없습니다',HttpStatus.UNAUTHORIZED)
@@ -31,7 +32,8 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
             //   throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
             // }
             console.log()
-            return request.headers.accesstoken
+            const accessToken = request.headers.authorization.split(' ')[1]
+            return accessToken
         },
       ]),
       secretOrKey: process.env.SECRET_KEY,
