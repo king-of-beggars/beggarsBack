@@ -139,7 +139,9 @@ export class UserController {
     ); 
     res.setHeader('userNickname', nickname);
     //return res.redirect('http://localhost:3000')
-    res.send('완료');
+    res.send(
+      {'accessToken' : accessToken,
+       'refreshToken' : refreshToken});
   }
 
   @Post('logout')
