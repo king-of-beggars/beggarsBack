@@ -80,14 +80,14 @@ export class AuthService {
         //domain : 'poorkingapi.shop',
         sameSite: 'none',
         secure: true,
-        httpOnly: false,
+        httpOnly: true,
       });
     }
     res.cookie('accessToken', accessToken, {
       //domain : 'poorkingapi.shop',
       sameSite: 'none',
       secure: true,
-      httpOnly: false,
+      httpOnly: true,
     });
     return '쿠키 세팅 완료';
   }
