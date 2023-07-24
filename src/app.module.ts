@@ -16,7 +16,7 @@ import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HotdealModule } from './Hotdeal/hotdeal.module';
+//import { HotdealModule } from './Hotdeal/hotdeal.module';
 //import { HotDeal } from './Hotdeal/hotdeal.entity';
 @Module({
   imports: [
@@ -47,7 +47,7 @@ import { HotdealModule } from './Hotdeal/hotdeal.module';
         Board,
         Comment,
         Cashbook,
-        CashList,
+        CashList, 
         CashDetail,
         Like,
         //HotDeal
@@ -61,7 +61,7 @@ import { HotdealModule } from './Hotdeal/hotdeal.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    HotdealModule,
+    //HotdealModule,
     CacheModule.registerAsync({
       isGlobal : true,
       useFactory : async() => ({
