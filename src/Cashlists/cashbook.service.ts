@@ -113,7 +113,7 @@ export class CashbookService {
             WHERE DATE(cashbookCreatedAt) = DATE(?)
             AND userId = ?   
             GROUP BY cashbookCategory
-            ORDER BY cashbookCreatedAt DESC`,
+            ORDER BY cashbookNowValue DESC`,
         [yesterday, userId],  
       );
       console.log(result)
