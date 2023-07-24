@@ -251,7 +251,10 @@ export class UserController {
         user.userNickname,
       );
       res.setHeader('userNickname', nickname); 
-      return res.send('회원가입이 완료되었습니다')
+      return res.send({
+        accessToken : accessToken,
+        refreshToken : refreshToken
+      })
     } catch (e) { 
       throw new Error(e); 
     }

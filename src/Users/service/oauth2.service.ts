@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from './user.service';
 import { Response } from 'express';
+import { RedisService } from './redis.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
+    private readonly redisService: RedisService
   ) {}
 
   //패스워드 DB확인
@@ -58,7 +60,7 @@ export class AuthService {
 
   //리프레시 토큰 발급
   async setRefreshToken(tokenDto: TokenDto) {
-    console.log(`${tokenDto} 213`);
+
     const refreshToken = this.jwtService.sign(
       JSON.parse(JSON.stringify(tokenDto)),
       {
@@ -66,6 +68,7 @@ export class AuthService {
         expiresIn: process.env.REFRESH_TIME,
       },
     );
+    this.redisService.setRefresh(tokenDto.userName,refreshToken)
     return `${refreshToken}`;
   }
 

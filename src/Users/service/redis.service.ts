@@ -11,8 +11,8 @@ export class RedisService {
         @Inject(CACHE_MANAGER) private cacheManager : Cache
   ) {}
 
-    async getRefresh() {
-        const value = await this.cacheManager.get('key');
+    async getRefresh(userName : string) {
+       const value = await this.cacheManager.get(userName);
       return value
     }
 
@@ -23,8 +23,8 @@ export class RedisService {
       return value 
   }
 
-    async setRefresh(key : string, value : string) {
-        await this.cacheManager.set(key,value)
+    async setRefresh(userName : string, refreshToken : string) {
+        await this.cacheManager.set(userName,refreshToken)
     }
 
     async setCode(key : string, value : any) {

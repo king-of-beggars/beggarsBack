@@ -5,6 +5,7 @@ import { UserService } from 'src/Users/service/user.service';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RedisService } from 'src/Users/service/redis.service';
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 
@@ -12,22 +13,25 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
+        private readonly redisService: RedisService
       ) {
         super({
           jwtFromRequest: ExtractJwt.fromExtractors([
             (request: Request) => {
-                let token = request.cookies.refreshToken;
+                let token = request.headers.refreshtoken.toString()
                 if(!token) {
                     throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.FORBIDDEN)
-                }
+                } 
                 try {
                     const test = jwtService.verify(token, {
-                    secret: this.configService.get('SECRET_KEY'),
-                });
-                    return token;
-                } catch(e) {
-                    request.clearCookie('refreshToken')
-                    request.clearCookie('accessToken')
+                    secret: this.configService.get('SECRET_KEY')
+                    })
+                    const userName = this.redisService.getRefresh(test.userName)
+                    if(!userName) {
+                      throw new HttpException('리프레시 토큰이 DB에 없습니다', HttpStatus.FORBIDDEN)
+                    }
+                    return token; 
+                 } catch(e) {
                     throw new HttpException('리프레시 토큰이 유효하지 않습니다.',HttpStatus.FORBIDDEN)
                 }
             } 
