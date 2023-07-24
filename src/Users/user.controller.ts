@@ -10,6 +10,7 @@ import {
   Redirect,
   PayloadTooLargeException,
   Res,
+  HttpException,
 } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { TokenDto } from './dto/token.dto';
@@ -74,7 +75,10 @@ export class UserController {
         user.userNickname,
       );
       res.setHeader('userNickname', nickname);
-      res.send('회원가입이 완료되었습니다');
+      res.send({
+      'accessToken' : accessToken,
+      'refreshToken' : refreshToken
+    });
     } catch (err) {
       throw new Error(err);
     }
@@ -91,9 +95,9 @@ export class UserController {
       if (!byName) {
         return '사용 가능한 아이디 입니다';
       }
-      throw new Error('중복된 아이디입니다');
-    } catch (err) {
-      throw new Error('예상치 못한 오류');
+      throw new HttpException('중복된 아이디입니다', HttpStatus.BAD_REQUEST);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
  
@@ -109,10 +113,9 @@ export class UserController {
       if (!byNickname) {
         return '사용 가능한 닉네임입니다';
       }
-
-      throw new Error('중복된 닉네임입니다');
-    } catch (err) {
-      throw new Error(err);
+      throw new HttpException('중복된 닉네임입니다', HttpStatus.BAD_REQUEST);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -132,8 +135,6 @@ export class UserController {
 
     await this.authService.setCookie(res, accessToken, refreshToken);
     res.setHeader('userId', user.userId);
-    res.setHeader('accessToken', accessToken)
-    res.setHeader('refreshToken', refreshToken)
     const nickname: string = await this.userService.encodeNick(
       user.userNickname,
     ); 
@@ -141,7 +142,8 @@ export class UserController {
     //return res.redirect('http://localhost:3000')
     res.send(
       {'accessToken' : accessToken,
-       'refreshToken' : refreshToken});
+       'refreshToken' : refreshToken
+      });
   }
 
   @Post('logout')
@@ -197,8 +199,6 @@ export class UserController {
       secure: true,
       httpOnly: false,
     });
-    
- 
     return res.redirect('http://localhost:3000?loginSuccess=true')
   }
 
@@ -248,8 +248,8 @@ export class UserController {
       );
       res.setHeader('userNickname', nickname); 
       return res.send('회원가입이 완료되었습니다')
-    } catch (err) { 
-      throw new Error(err); 
+    } catch (e) { 
+      throw new Error(e); 
     }
   }
 
@@ -269,7 +269,7 @@ export class UserController {
     res.clearCookie('userId');
     res.clearCookie('userNickname');
     return { 
-      data : socialInfoDto   
+      data : socialInfoDto
     }   
   }
 
@@ -288,6 +288,8 @@ export class UserController {
     }  
     const accessToken = await this.authService.setAccessToken(tokenDto);
     await this.authService.setCookie(res, accessToken);
-    return res.send('액세스 토큰 발급 완료');
+    return res.send({
+      'accessToken' : accessToken
+    });
   }
 }
