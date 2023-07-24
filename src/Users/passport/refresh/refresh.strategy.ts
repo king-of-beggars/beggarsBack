@@ -20,13 +20,13 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
             (request: Request) => {
                 try 
                   {
-                    console.log(request.headers)
                     if(!request.headers.refreshtoken) {
                         throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
                     }
-                    console.log(request.headers.refreshtoken)
-                    const token = request.headers.refreshtoken
-                    console.log('token--------', token)
+                    const token = request.headers.refreshToken
+                    if(!token) {
+                      throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
+                    }
                     const test = jwtService.verify(token, {
                     secret: this.configService.get('SECRET_KEY')
                     })
