@@ -276,6 +276,7 @@ export class UserController {
       userNickname : user.userNickname
     }
     return res.send({
+      socialInfoDto,
       'accessToken' : accessToken,
       'refreshToken' : refreshToken
     })   

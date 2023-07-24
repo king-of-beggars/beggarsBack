@@ -42,7 +42,7 @@ export class RedisService {
 
     async setCode(key : string, value : any) {
       try {
-        await this.cacheManager.set(key,value,10000)
+        await this.cacheManager.set(key,value,1000000)
         const result = await this.cacheManager.get(key)
         console.log(result, '--setCode')
       } catch(e) {
