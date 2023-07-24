@@ -1,8 +1,9 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject} from '@nestjs/common';
 import { Cache } from 'cache-manager'
 import { HttpService } from '@nestjs/axios';
 import TokenDto from '../dto/token.dto';
+import { CreateFail, ReadFail } from 'src/Utils/exception.service';
 
 @Injectable()
 export class RedisService {
@@ -12,25 +13,41 @@ export class RedisService {
   ) {}
 
     async getRefresh(userName : string) {
-       const value = await this.cacheManager.get(userName);
-      return value
+      try {
+        const value = await this.cacheManager.get(userName);
+        return value
+      } catch(e) {
+        throw new ReadFail(e.stack)
+      }
     }
 
     async getCode(code : string) {
-      console.log('Service - code -- ',code)
-      const value : TokenDto = await this.cacheManager.get(code);
-      console.log('value -- value', value)
-      return value 
+      try {
+        console.log('Service - code -- ',code)
+        const value : TokenDto = await this.cacheManager.get(code);
+        console.log('value -- value', value)
+        return value
+      } catch(e) {
+        throw new ReadFail(e.stack)
+      }
   }
 
     async setRefresh(userName : string, refreshToken : string) {
-        await this.cacheManager.set(userName,refreshToken)
+        try {
+          await this.cacheManager.set(userName,refreshToken)
+        } catch(e) {
+          throw new CreateFail(e.stack)
+        }
     }
 
     async setCode(key : string, value : any) {
-        await this.cacheManager.set(key,value)
+      try {
+        await this.cacheManager.set(key,value,10000)
         const result = await this.cacheManager.get(key)
         console.log(result, '--setCode')
+      } catch(e) {
+        throw new CreateFail(e.stack)
+      }
     }
     
   

@@ -81,8 +81,8 @@ export class UserController {
       'accessToken' : accessToken,
       'refreshToken' : refreshToken
     });
-    } catch (err) {
-      throw new Error(err);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -141,7 +141,6 @@ export class UserController {
       user.userNickname,
     ); 
     res.setHeader('userNickname', nickname);
-    //return res.redirect('http://localhost:3000')
     res.send(
       {
        'accessToken' : accessToken,
@@ -203,8 +202,8 @@ export class UserController {
     });
     const { code } = query
     await this.redisService.setCode(code,user)
-    //return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
-    return res.redirect(`http://testbeggars.ap-northeast-2.elasticbeanstalk.com?loginSuccess=true&code=${code}`)
+    return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
+    //return res.redirect(`http://testbeggars.ap-northeast-2.elasticbeanstalk.com?loginSuccess=true&code=${code}`)
   }
 
   @Post('signup/social')
@@ -236,7 +235,6 @@ export class UserController {
         userLoginType: 'kakao',
         userType: 1,
       };
-
       const user = await this.userService.socialSignup(SignupDto);
       let tokenDto = new TokenDto();
       tokenDto.userId = user.userId;
@@ -247,7 +245,6 @@ export class UserController {
       const accessToken = await this.authService.setAccessToken(tokenDto);
       await this.authService.setCookie(res, accessToken, refreshToken);
       res.setHeader('userId', user.userId);
-
       const nickname: string = await this.userService.encodeNick(
         user.userNickname,
       );
@@ -267,7 +264,7 @@ export class UserController {
     description: 'data : socialInfoDto',
   }) 
   @HttpCode(200) 
-  async getIdAndNickname(@Req() req:any , @Res() res :Response, @Query() query : any) {
+  async getIdAndNickname(@Query() query : any, @Res() res:Response) {
     
     const user : TokenDto = await this.redisService.getCode(query.code)
     console.log(user)
@@ -278,11 +275,10 @@ export class UserController {
       userId : user.userId,
       userNickname : user.userNickname
     }
-    return {
-      data : socialInfoDto,
-      refreshToken : refreshToken, 
-      accessToken :accessToken
-    }   
+    return res.send({
+      'accessToken' : accessToken,
+      'refreshToken' : refreshToken
+    })   
   }
 
   @Get('refresh')

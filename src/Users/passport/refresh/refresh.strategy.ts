@@ -18,17 +18,18 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         super({
           jwtFromRequest: ExtractJwt.fromExtractors([
             (request: Request) => {
-                let token = request.headers.refreshtoken.toString()
-                if(!token) {
-                    throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.FORBIDDEN)
-                } 
-                try {
+                try 
+                  {
+                    let token = request.headers.refreshtoken.toString()
+                    if(!token) {
+                        throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
+                    } 
                     const test = jwtService.verify(token, {
                     secret: this.configService.get('SECRET_KEY')
                     })
                     const userName = this.redisService.getRefresh(test.userName)
                     if(!userName) {
-                      throw new HttpException('리프레시 토큰이 DB에 없습니다', HttpStatus.FORBIDDEN)
+                      throw new HttpException('리프레시 토큰이 DB에 없습니다', HttpStatus.BAD_REQUEST)
                     }
                     return token; 
                  } catch(e) {

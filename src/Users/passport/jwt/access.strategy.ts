@@ -17,23 +17,18 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-            console.log(request.headers)
-
-            // let token = request.cookies.accessToken;
-            // if(!token) {
-            //   throw new HttpException('액세스 토큰이 없습니다',HttpStatus.UNAUTHORIZED)
-            // } 
-            // try {
-            //   const test = jwtService.verify(token, {
-            //   secret: this.configService.get('SECRET_KEY'),
-            // }); 
-            //   return token;
-            // } catch(e) {
-            //   throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
-            // }
-            console.log()
-            const accessToken = request.headers.authorization.split(' ')[1]
-            return accessToken
+            try {
+              const accessToken = request.headers.authorization.split(' ')[1]
+              if(!accessToken) { 
+                throw new HttpException('액세스 토큰이 없습니다',HttpStatus.BAD_REQUEST)
+              } 
+              const test = jwtService.verify(accessToken, {
+              secret: this.configService.get('SECRET_KEY'),
+              }); 
+              return accessToken;
+            } catch(e) {
+              throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
+            }
         },
       ]),
       secretOrKey: process.env.SECRET_KEY,
@@ -42,7 +37,7 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
   async validate(payload: any) { 
     const user = this.userService.userByName(payload.userName);
     if(!user) {
-      throw new HttpException('액세스 토큰 검증 실패',HttpStatus.UNAUTHORIZED)
+      throw new HttpException('액세스 토큰 검증 실패',HttpStatus.BAD_REQUEST)
     }
     return user;
   }

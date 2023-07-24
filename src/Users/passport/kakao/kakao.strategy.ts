@@ -11,9 +11,9 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
       //clientID: process.env.KAKAO_ID,
       clientID: '2ad53ec39ebaac5ba8a250967f431977',
       //callbackURL: 'https://poorkingapi.shop/api/user/login/kakao',
-      //callbackURL: 'http://localhost:3000/api/user/login/kakao'
-      callbackURL: 'http://testbeggars.ap-northeast-2.elasticbeanstalk.com/api/user/login/kakao'
-    }); 
+      callbackURL: 'http://localhost:3000/api/user/login/kakao'
+      //callbackURL: 'http://testbeggars.ap-northeast-2.elasticbeanstalk.com/api/user/login/kakao'
+    });  
   } 
   async validate(
     accessToken: string,
