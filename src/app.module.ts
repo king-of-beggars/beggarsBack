@@ -15,8 +15,8 @@ import { CashDetail } from './Cashlists/entity/cashDetail.entity';
 import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
-import { ConfigModule } from '@nestjs/config';
-import { ExceptionService } from './exception/exception.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HotdealModule } from './Hotdeal/hotdeal.module';
 //import { HotDeal } from './Hotdeal/hotdeal.entity';
 @Module({
   imports: [
@@ -61,19 +61,22 @@ import { ExceptionService } from './exception/exception.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    //CommentModule
-    // CacheModule.registerAsync({
-    //   useFactory : async() => ({
-    //       store: await redisStore({
-    //         socket : {
-    //           host:process.env.REDIS_HOST,
-    //           port:6379
-    //         }
-    //       })
-    //     })
-    // })
+    HotdealModule,
+    CacheModule.registerAsync({
+      isGlobal : true,
+      useFactory : async() => ({
+          store: await redisStore({
+            socket : {
+              host:process.env.REDIS_HOST,
+              //host:'redis',
+              port:6379
+            } 
+          })
+        })
+    })
   ],
+  
   controllers: [AppController],
-  providers: [AppService, ExceptionService],
+  providers: [AppService],
 })
 export class AppModule {}

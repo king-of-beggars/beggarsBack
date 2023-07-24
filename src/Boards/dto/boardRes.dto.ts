@@ -4,6 +4,7 @@ import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { BoardDto } from './board.dto';
 import { UserDto } from 'src/Users/dto/user.dto';
 import { CashbookDto } from 'src/Cashlists/dto/cashbook.dto';
+import { IsNotEmpty } from 'class-validator';
 
 class BoardUserDto extends PickType(UserDto, ['userName', 'userNickname']) {}
 
@@ -49,12 +50,14 @@ export class BoardResDto extends PickType(BoardDto, [
     type: Number,
     example : 2
   })
+  @IsNotEmpty()
   public pageNum: number;
 
   @ApiProperty({
     type: Boolean,
     example : true
   })
+  @IsNotEmpty()
   public hasNextPage: boolean;
 
 }

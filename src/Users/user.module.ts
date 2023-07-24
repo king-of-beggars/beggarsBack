@@ -11,7 +11,9 @@ import { LocalStrategy } from './passport/local/local.strategy';
 import { KakaoStrategy } from './passport/kakao/kakao.strategy';
 import { AccessStrategy } from './passport/jwt/access.strategy';
 import { RefreshStrategy } from './passport/refresh/refresh.strategy';
-// import { RedisService } from './redis.service';
+import { RedisService } from './service/redis.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
@@ -29,8 +31,9 @@ import { RefreshStrategy } from './passport/refresh/refresh.strategy';
     LocalStrategy,
     KakaoStrategy,
     AccessStrategy,
-    RefreshStrategy
+    RefreshStrategy,
+    RedisService
   ],
-  exports: [UserService, AuthService, JwtService],
+  exports: [UserService, AuthService, JwtService, RedisService],
 })
 export class UserModule {}

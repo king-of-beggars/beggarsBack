@@ -38,6 +38,7 @@ import { NickCheckDto } from './dto/nickCheck.dto';
 import { LoginDto } from './dto/login.dto';
 import { SocialInfoDto } from './dto/socialInfo.dto';
 import { RefreshAuthenticationGuard } from './passport/refresh/refresh.guard';
+import { RedisService } from './service/redis.service';
 
 @Controller('/api/user')
 @ApiTags('유저 API')
@@ -45,6 +46,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly redisService: RedisService
   ) {}
 
   @Post('signup')
@@ -141,7 +143,8 @@ export class UserController {
     res.setHeader('userNickname', nickname);
     //return res.redirect('http://localhost:3000')
     res.send(
-      {'accessToken' : accessToken,
+      {
+       'accessToken' : accessToken,
        'refreshToken' : refreshToken
       });
   }
@@ -165,7 +168,7 @@ export class UserController {
     summary: '카카오 로그인',
     description: '최초가입시 닉네임 기입창으로',
   })
-  async kakaoLogin(@Query() code, @Req() req: any, @Res() res: Response) {
+  async kakaoLogin(@Query() query, @Req() req: any, @Res() res: Response) {
     const { user } = req;
     console.log(user);
     if (!user) {
@@ -190,7 +193,6 @@ export class UserController {
       secure: true,
       httpOnly: false,
     });
-
     const nickname: string = await this.userService.encodeNick(
       user.userNickname,
     ) 
@@ -199,7 +201,9 @@ export class UserController {
       secure: true,
       httpOnly: false,
     });
-    return res.redirect('http://localhost:3000?loginSuccess=true')
+    const { code } = query
+    await this.redisService.setCode(code,user)
+    return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
   }
 
   @Post('signup/social')
@@ -214,7 +218,7 @@ export class UserController {
     @Req() req,
     @Res() res: Response,
   ) {
-    console.log(body,'bodyyyyyyyyyyyyyyyyy')  
+    console.log(body,'body')  
     try {  
       const nickCheck = await this.userService.userByNickname(
         body.userNickname 
@@ -254,22 +258,26 @@ export class UserController {
   }
 
   @Get('login/getInfo')
-  @UseGuards(AccessAuthenticationGuard)
   @ApiOperation({
     summary: '소셜 로그인 시 데이터',
     description: 'data : socialInfoDto',
   }) 
   @HttpCode(200) 
-  async getIdAndNickname(@Req() req:any , @Res() res :Response) {
+  async getIdAndNickname(@Req() req:any , @Res() res :Response, @Query() query : any) {
+    
+    const user : TokenDto = await this.redisService.getCode(query.code)
+    console.log(user)
+    const refreshToken = await this.authService.setRefreshToken(user);
+    const accessToken = await this.authService.setAccessToken(user);
     let socialInfoDto = new SocialInfoDto()
     socialInfoDto = {
-      userId : req.cookies.userId,
-      userNickname :req.cookies.userNickname
+      userId : user.userId,
+      userNickname : user.userNickname
     }
-    res.clearCookie('userId');
-    res.clearCookie('userNickname');
-    return { 
-      data : socialInfoDto
+    return {
+      data : socialInfoDto,
+      refreshToken : refreshToken, 
+      accessToken :accessToken
     }   
   }
 
