@@ -203,7 +203,8 @@ export class UserController {
     });
     const { code } = query
     await this.redisService.setCode(code,user)
-    return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
+    //return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
+    return res.redirect(`http://testbeggars.ap-northeast-2.elasticbeanstalk.com?loginSuccess=true&code=${code}`)
   }
 
   @Post('signup/social')
