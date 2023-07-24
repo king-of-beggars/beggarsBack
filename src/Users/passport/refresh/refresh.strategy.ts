@@ -33,6 +33,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
                     }
                     return token; 
                  } catch(e) {
+                    console.log(e)
                     throw new HttpException('리프레시 토큰이 유효하지 않습니다.',HttpStatus.FORBIDDEN)
                 }
             } 
