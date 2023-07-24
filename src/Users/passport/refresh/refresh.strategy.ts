@@ -24,7 +24,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
                         throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
                     }
                     const token = request.headers.refreshToken
-                    if(!token) {
+                    if(token===null) {
                       throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
                     }
                     const test = jwtService.verify(token, {

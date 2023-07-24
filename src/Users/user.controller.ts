@@ -151,10 +151,8 @@ export class UserController {
   @Post('logout')
   @HttpCode(200)
   @ApiResponse({ status: 200, description: '로그아웃 완료' })
-  @UseGuards(AccessAuthenticationGuard)
   @ApiOperation({ summary: '로그아웃', description: '쿠키 클리어' })
-  async userLogout(@Req() req: any, @Res() res: Response) {
-    const { user } = req;
+  async userLogout(@Res() res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     return res.send('로그아웃 완료');
@@ -236,14 +234,17 @@ export class UserController {
         userType: 1,
       };
       const user = await this.userService.socialSignup(SignupDto);
+
       let tokenDto = new TokenDto();
       tokenDto.userId = user.userId;
       tokenDto.userName = user.userName;
       tokenDto.userNickname = user.userNickname;
+
       res.clearCookie('userName')
       const refreshToken = await this.authService.setRefreshToken(tokenDto);
       const accessToken = await this.authService.setAccessToken(tokenDto);
       await this.authService.setCookie(res, accessToken, refreshToken);
+
       res.setHeader('userId', user.userId);
       const nickname: string = await this.userService.encodeNick(
         user.userNickname,
