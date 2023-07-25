@@ -18,10 +18,11 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
             try {
-              const accessToken = request.headers.authorization.split(' ')[1]
-              if(!accessToken) { 
+              let accessToken = request.headers.authorization
+              if(!accessToken || accessToken.length < 10) { 
                 throw new HttpException('액세스 토큰이 없습니다',HttpStatus.BAD_REQUEST)
-              } 
+              }
+              accessToken = accessToken.split(' ')[1]
               const test = jwtService.verify(accessToken, {
               secret: this.configService.get('SECRET_KEY'),
               }); 
