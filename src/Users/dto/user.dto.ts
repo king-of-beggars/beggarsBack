@@ -4,6 +4,7 @@ import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { Board } from 'src/Boards/entity/board.entity';
 import { Comment } from 'src/Comments/entity/comment.entity';
 import { Like } from 'src/Comments/entity/like.entity';
+import { IsOptional, MaxLength } from 'class-validator';
 
 export class UserDto {
   public userId: number;
@@ -12,18 +13,21 @@ export class UserDto {
     example: 'rlatmdcjf',
     description: '사용자 아이디',
   })
+  @MaxLength(20)
   public userName: string;
 
   @ApiProperty({
     example: '가나다라',
     description: '사용자 닉네임',
   })
+  @MaxLength(20)
   public userNickname: string;
 
   @ApiProperty({
     example: 'qwe123456',
     description: '유저 비밀번호',
   })
+  @MaxLength(20)
   public userPwd: string;
 
   @ApiProperty({
@@ -45,7 +49,10 @@ export class UserDto {
   @ApiProperty({
     example: 'sdfsfdgd.jpg',
     description: '사용자 이미지',
+    type: 'string',
+    format: 'binary',
   })
+  @IsOptional()
   public userImage: string;
 
   @ApiProperty({

@@ -150,12 +150,17 @@ export class UserController {
 
   @Post('logout')
   @HttpCode(200)
+  @UseGuards(AccessAuthenticationGuard)
   @ApiResponse({ status: 200, description: '로그아웃 완료' })
   @ApiOperation({ summary: '로그아웃', description: '쿠키 클리어' })
-  async userLogout(@Res() res: Response) {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-    return res.send('로그아웃 완료');
+  async userLogout(@Req() req : any) {
+    try {
+      const { user } = req
+      await this.redisService.deleteRefresh(user.userName)
+      return '로그아웃 완료'
+    } catch(e) {
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
   @Get('login/kakao')
@@ -172,14 +177,13 @@ export class UserController {
       throw new Error('잘못된 접근입니다');
     }
     if (!user.userId) { 
-      const loginSuccess = false;
       res.cookie('userName', user, {
         sameSite: 'none', 
         secure: true,
         httpOnly: false,
       });
 
-      return res.redirect(`http://localhost:3000?loginSuccess=false`);
+      return res.redirect(`https://beggars-front-eight.vercel.app?loginSuccess=false`);
     }
  
     const refreshToken = await this.authService.setRefreshToken(user);
@@ -200,7 +204,7 @@ export class UserController {
     });
     const { code } = query
     await this.redisService.setCode(code,user)
-    return res.redirect(`http://localhost:3000?loginSuccess=true&code=${code}`)
+    return res.redirect(`https://beggars-front-eight.vercel.app?loginSuccess=true&code=${code}`)
     //return res.redirect(`http://testbeggars.ap-northeast-2.elasticbeanstalk.com?loginSuccess=true&code=${code}`)
   }
 
