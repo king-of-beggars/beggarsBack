@@ -17,19 +17,21 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-            try {
               let accessToken = request.headers.authorization
               if(!accessToken || accessToken.length < 10) { 
                 throw new HttpException('액세스 토큰이 없습니다',HttpStatus.BAD_REQUEST)
               }
-              accessToken = accessToken.split(' ')[1]
-              const test = jwtService.verify(accessToken, {
-              secret: this.configService.get('SECRET_KEY'),
-              }); 
-              return accessToken;
-            } catch(e) {
-              throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
-            }
+              try {
+                accessToken = accessToken.split(' ')[1]
+                const test = jwtService.verify(accessToken, {
+                secret: this.configService.get('SECRET_KEY'),
+                }); 
+                return accessToken;
+              } catch(e) {
+                throw new HttpException('액세스 토큰이 유효하지 않습니다',HttpStatus.UNAUTHORIZED)
+              }
+                
+            
         },
       ]),
       secretOrKey: process.env.SECRET_KEY,

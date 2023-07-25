@@ -18,35 +18,31 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         super({
           jwtFromRequest: ExtractJwt.fromExtractors([
             (request: Request) => {
-                try 
-                  {
-                    const token = request.headers.refreshToken
-                    if(!token || token.length < 10) {
-                      throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
-                    }
-                    const test = jwtService.verify(token, {
-                    secret: this.configService.get('SECRET_KEY')
-                    })
-                    console.log(test)
-                    const userName = this.redisService.getRefresh(test.userName)
-                    if(!userName) {
-                      throw new HttpException('리프레시 토큰이 DB에 없습니다', HttpStatus.BAD_REQUEST)
-                    }
-                    return token; 
+                
+                  const token = request.headers.refreshToken
+                  if(!token || token.length < 10) {
+                    throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
+                  }
+                  try {
+                  const test = jwtService.verify(token, {
+                  secret: this.configService.get('SECRET_KEY')
+                  })
+                  return token; 
                  } catch(e) {
                     console.log(e)
                     throw new HttpException('리프레시 토큰이 유효하지 않습니다.',HttpStatus.FORBIDDEN)
-                }
+                 }
             } 
           ]),
           secretOrKey: process.env.SECRET_KEY,
         });
       } 
       async validate(payload: any) {
-        const user =  this.userService.userByName(payload.userName);
-        if(!user) {
-            throw new HttpException('리프레시 토큰 정보가 일치하지 않습니다',HttpStatus.FORBIDDEN)
-        }
+          const userName = this.redisService.getRefresh(payload.userName)
+          if(!userName) {
+          throw new HttpException('리프레시 토큰이 DB에 없습니다', HttpStatus.BAD_REQUEST)
+          }
+          const user = this.userService.userByName(payload.userName);
         return user;
     }
 }
