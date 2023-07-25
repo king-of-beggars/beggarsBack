@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Injectable, Inject} from '@nestjs/common';
 import { Cache } from 'cache-manager'
 import TokenDto from '../dto/token.dto';
-import { CreateFail, ReadFail } from 'src/Utils/exception.service';
+import { CreateFail, DeleteFail, ReadFail } from 'src/Utils/exception.service';
 
 @Injectable()
 export class RedisService {
@@ -46,6 +46,15 @@ export class RedisService {
         console.log(result, '--setCode')
       } catch(e) {
         throw new CreateFail(e.stack)
+      }
+    }
+
+    async deleteRefresh(key : string) {
+      try {
+        await this.cacheManager.del(key)
+
+      } catch(e) {
+        throw new DeleteFail(e.stack)
       }
     }
     
