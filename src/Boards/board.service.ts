@@ -43,6 +43,7 @@ export class BoardService {
         try {
             const checkPage = await this.boardRepository
             .createQueryBuilder('board')
+            .where('boardTypes=:boardTypes', {boardTypes:paginationDto.boardTypes})
             .skip((paginationDto.page)*paginationDto.limit)
             .take(paginationDto.limit)
             .getMany()  
