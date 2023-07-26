@@ -20,7 +20,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
             (request: Request) => {
                 
                   const token = request.headers.refreshToken
-                  if(!token || token.length < 10) {
+                  if(!token) {
                     throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
                   }
                   try {
