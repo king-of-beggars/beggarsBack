@@ -18,8 +18,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         super({
           jwtFromRequest: ExtractJwt.fromExtractors([
             (request: Request) => {
-                
-                  const token = request.headers.refreshToken
+                  const token = request.headers.refreshtoken
                   if(!token) {
                     throw new HttpException('리프레시 토큰이 없습니다.',HttpStatus.BAD_REQUEST)
                   }
