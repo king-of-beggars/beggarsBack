@@ -204,7 +204,9 @@ export class UserController {
     });
     const { code } = query
     await this.redisService.setCode(code,user)
-    return res.redirect(`https://beggars-front-eight.vercel.app?loginSuccess=true&code=${code}`)
+    return res.redirect(
+      `https://beggars-front-eight.vercel.app?loginSuccess=true&code=${code}`
+      )
     //return res.redirect(`http://testbeggars.ap-northeast-2.elasticbeanstalk.com?loginSuccess=true&code=${code}`)
   }
 

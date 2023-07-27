@@ -1,6 +1,4 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { User } from 'src/Users/user.entity';
-import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { BoardDto } from './board.dto';
 import { UserDto } from 'src/Users/dto/user.dto';
 import { CashbookDto } from 'src/Cashlists/dto/cashbook.dto';

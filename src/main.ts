@@ -14,7 +14,7 @@ async function bootstrap() {
       'https://deeplake-beggars-front.vercel.app',
       'https://dev-beggars-front-eight.vercel.app',
       'http://localhost:3000',
-    ],
+    ], 
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     exposedHeaders: ['Set-Cookie', 'userId', 'userNickname'],

@@ -93,6 +93,7 @@ export class CashbookContoller {
     @ApiOperation({ summary: '프레임 생성', description: '프레임 생성 및 가계부 섹션 오늘치 생성' })
     @ApiBody({type:FrameDto})
     async cashFrameCreate (@Body() body : FrameDto, @Req() req : any) {
+        //트랜잭션 스타트
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -100,6 +101,7 @@ export class CashbookContoller {
             const { user } = req
             let frameDto = new FrameDto()
 
+            //dto에 데이터 삽입
             frameDto = {
                 cashCategory : body.cashCategory,
                 cashName : body.cashName,
@@ -107,6 +109,7 @@ export class CashbookContoller {
                 userId : user.userId
             }
 
+            //프레임 생성
             const query = await this.cashbookService.frameCreate(frameDto, queryRunner)
             let cashbookCreateDto = new CashbookCreateDto();
             cashbookCreateDto = {
@@ -115,8 +118,12 @@ export class CashbookContoller {
                 cashbookGoalValue: frameDto.cashListGoalValue,
                 userId: frameDto.userId,
                 cashListId: query
-            }; 
+            };
+            
+            //당일자 가계부 생성
             await this.cashbookService.cashbookCreate(cashbookCreateDto, queryRunner)
+
+            //커밋
             await queryRunner.commitTransaction()
         } catch(e) {
             await queryRunner.rollbackTransaction()

@@ -4,11 +4,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Board } from "./entity/board.entity";
 import { PostBoardDto } from "./dto/postBoard.dto";
 import { PaginationDto } from "./dto/pagination.dto";
-import { CashDetail } from "src/Cashlists/entity/cashDetail.entity";
 import { CashbookService } from "src/Cashlists/cashbook.service";
 import { Cashbook } from "src/Cashlists/entity/cashbook.entity";
 import { GetByCashbookIdDto } from "src/Cashlists/dto/getByCashbookId.dto";
-import { BoardResDto } from "./dto/boardRes.dto";
 import { GetByBoardIdDto } from "./dto/getByBoardId.dto";
 import { DeleteFail, ReadFail } from "src/Utils/exception.service";
 

@@ -16,8 +16,9 @@ import { BoardModule } from './Boards/board.module';
 import { CashbookModule } from './Cashlists/cashbook.module';
 import { CommentModule } from './Comments/comment.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-//import { HotdealModule } from './Hotdeal/hotdeal.module';
-//import { HotDeal } from './Hotdeal/hotdeal.entity';
+import { HotdealModule } from './Hotdeal/hotdeal.module';
+import { Hotdeal } from './Hotdeal/hotdeal.entity';
+import { HotdealWiner } from './Hotdeal/hotdealWinner.entity';
 @Module({
   imports: [
     // ClusterModule.forRootAsync({
@@ -50,7 +51,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         CashList, 
         CashDetail,
         Like,
-        //HotDeal
+        Hotdeal,
+        HotdealWiner
       ],
       logging: true,
     }),
@@ -61,14 +63,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    //HotdealModule,
+    HotdealModule,
     CacheModule.registerAsync({
       isGlobal : true,
       useFactory : async() => ({
           store: await redisStore({
             socket : {
-              host:process.env.REDIS_HOST,
-              //host:'redis',
+              //host:process.env.REDIS_HOST,
+              host:'redis',
               port:6379
             } 
           })

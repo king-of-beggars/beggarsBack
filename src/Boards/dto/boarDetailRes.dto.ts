@@ -1,11 +1,8 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { BoardDto } from './board.dto';
-import { Cashbook } from 'src/Cashlists/entity/cashbook.entity';
 import { CommentDto } from 'src/Comments/dto/comment.dto';
-import { Comment } from 'src/Comments/entity/comment.entity';
 import { UserDto } from 'src/Users/dto/user.dto';
 import { CashDetailDto, CashbookDto } from 'src/Cashlists/dto/cashbook.dto';
-import { CashDetail } from 'src/Cashlists/entity/cashDetail.entity';
 
 class BoardCommentResDto extends PickType(CommentDto, [
   'commentId',

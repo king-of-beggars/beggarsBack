@@ -21,6 +21,7 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
               if(!accessToken || accessToken.length < 10) { 
                 throw new HttpException('액세스 토큰이 없습니다',HttpStatus.BAD_REQUEST)
               }
+              console.log(accessToken)
               try {
                 accessToken = accessToken.split(' ')[1]
                 const test = jwtService.verify(accessToken, {

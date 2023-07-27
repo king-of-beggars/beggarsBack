@@ -11,9 +11,8 @@ export class ErrorService extends Error {
 
 export class UpdateFail extends ErrorService {
   constructor(stack,message='데이터 업데이트에 실패했습니다') {
-    super(message, HttpStatus.INTERNAL_SERVER_ERROR);
-    this.stack = stack
-  }
+    super(stack,message, HttpStatus.INTERNAL_SERVER_ERROR);
+  } 
 
 }
 
@@ -33,5 +32,4 @@ export class CreateFail extends ErrorService {
   constructor(stack,message='데이터 생성에 실패했습니다') {
     super(stack,message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
-
 }
