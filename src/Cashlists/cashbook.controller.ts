@@ -42,32 +42,17 @@ export class CashbookContoller {
     async mainPage(@Req() req : any) {
         try {
             const { user } = req
-            let tempdate = moment().tz("Asia/Seoul")
-            let nowdate = tempdate.toDate()
-            let nowdate2 = new Date()
-            nowdate2.setHours(nowdate2.getHours() + 9 - 24)
-            console.log(nowdate2) 
             //1. 몇 일 째 되는 날
             const dateValue : number = await this.userService.userSignupDate(user.userId)
             
             //2. 2주 데이터, 남은 날은 null 처리
-            const twoweek = await this.cashbookService.getCashbookDuringDate(nowdate,user.userId)
+            const twoweek = await this.cashbookService.getCashbookDuringDate(user.userId)
         
             //3. 당일 유저 별, 섹션 별 총합목표, 총합소비
-            let query = new QueryDate()
-            query = {
-                date : nowdate2 
-            }
-            const totalValue  = await this.cashbookService.getCashbookGroupByCate(query,user.userId)
+            const totalValue  = await this.cashbookService.getCashbookGroupByCate(user.userId)
             
-            let total = { 
-                cashbookNowValue : 0,
-                cashbookGoalValue : 0 
-            }  
-            for(let i=0; totalValue.length>i; i++) {
-                total.cashbookNowValue += Number(totalValue[i].cashbookNowValue)
-                total.cashbookGoalValue += Number(totalValue[i].cashbookGoalValue)
-            }
+            //4. 유저 토탈 소비 합
+            const total = await this.cashbookService.totalValue(totalValue)
   
             let mainPageDto = new MainPageDto()
             mainPageDto = {

@@ -101,11 +101,18 @@ export class CashbookService {
   }
 
   async getCashbookGroupByCate(
-    date: QueryDate, 
     userId: Number,
   ): Promise<GetCategory[]> {
+
+    let nowdate2 = new Date()
+      nowdate2.setHours(nowdate2.getHours() + 9 - 24)
+      console.log(nowdate2) 
+      let query = new QueryDate()
+      query = {
+          date : nowdate2 
+      }
     try {
-      const yesterday = date.date
+      const yesterday = query.date
       yesterday.setHours(yesterday.getHours() - 9)
       const result : GetCategory[] = await this.cashbookEntity.query(
         `SELECT cashbookCategory, sum(cashbookNowValue) as cashbookNowValue, sum(cashbookGoalValue) as cashbookGoalValue
@@ -146,8 +153,10 @@ export class CashbookService {
     }
   }
 
-  async getCashbookDuringDate(endDate: Date, userId: User): Promise<any> {
+  async getCashbookDuringDate(userId: User): Promise<any> {
     try {
+      let tempdate = moment().tz("Asia/Seoul")
+      let endDate = tempdate.toDate()
       const day: number = endDate.getDay() + 7 + 1;
       let startDate = new Date();
       startDate.setDate(endDate.getDate() - day);
@@ -413,6 +422,23 @@ export class CashbookService {
         .execute();
     } catch(e) {
         throw new UpdateFail(e.stack)
+    }
+  }
+
+  async totalValue(totalValue : GetCategory[]) {
+    try {
+      let total = { 
+        cashbookNowValue : 0,
+        cashbookGoalValue : 0 
+      }
+      
+      for(let i=0; totalValue.length>i; i++) {
+        total.cashbookNowValue += Number(totalValue[i].cashbookNowValue)
+        total.cashbookGoalValue += Number(totalValue[i].cashbookGoalValue)
+      }
+      return total;
+    } catch(e) {
+      throw new ReadFail(e.stck)
     }
   }
 }
