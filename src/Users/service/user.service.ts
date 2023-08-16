@@ -19,9 +19,15 @@ export class UserService {
   async userSignup(SignupDto: SignupDto): Promise<any> {
     try {
       SignupDto.userPwd = await bcrypt.hash(SignupDto.userPwd, 12);
-      const query = this.userRepository.create(SignupDto);
-      await this.userRepository.save(query);
+
+      // const query = this.userRepository.create(SignupDto);
+      // await this.userRepository.save(query);
+      
+      const query = await this.userRepository.createQueryBuilder("user").insert().into(User)
+        .values({'userName':SignupDto.userName,'userPwd':SignupDto.userPwd,'userNickname':SignupDto.userNickname})
+        .execute();
       return query;
+
     } catch(e) {
       throw new CreateFail(e.stack)
     }
@@ -30,8 +36,13 @@ export class UserService {
   //소셜 회원가입 서비스
   async socialSignup(SignupDto: SocialSignupDto): Promise<any> {
     try {
-      const query = this.userRepository.create(SignupDto);
-      await this.userRepository.save(query);
+      // const query = this.userRepository.create(SignupDto);
+      // await this.userRepository.save(query);
+
+      const query = await this.userRepository.createQueryBuilder("user").insert().into(User)
+      .values({'userName':SignupDto.userName,'userNickname':SignupDto.userNickname,'userType':SignupDto.userType,'userLoginType':SignupDto.userLoginType,})
+      .execute();
+
       return query;
     } catch(e) {
       throw new CreateFail(e.stack)
@@ -69,10 +80,15 @@ export class UserService {
   //유저닉네임으로 db체크
   async userByNickname(userNickname : string): Promise<User> {
     try {
-      const query = await this.userRepository.findOne({
-        where: { userNickname },
-      }); 
+      // const query = await this.userRepository.findOne({
+      //   where: { userNickname },
+      // }); 
 
+      const query = await this.userRepository
+      .createQueryBuilder('user')
+      .where("user.userNickname = :userNickname", { 'userNickname': userNickname })
+      .getOne();
+        
       return query;
     } catch(e) {
       throw new ReadFail(e.stack)
@@ -94,15 +110,25 @@ export class UserService {
 
   async pointInput(getByUserIdDto: GetByUserIdDto, point: number, queryRunner : QueryRunner) {
     try {
-      return await queryRunner.manager
-      .createQueryBuilder()
-      .update('User')
-      .set({
-        userPoint: () =>
-          `userPoint + ${point}`,
-      })
-      .where('userId = :userId', { userId: getByUserIdDto.userId })
-      .execute();
+      // return await queryRunner.manager
+      // .createQueryBuilder()
+      // .update('User')
+      // .set({
+      //   userPoint: () =>
+      //     `userPoint + ${point}`,
+      // })
+      // .where('userId = :userId', { userId: getByUserIdDto.userId })
+      // .execute();
+
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .update('User')
+        .set({
+            userPoint: () =>
+              `userPoint + ${point}`,
+          })
+          .where('userId = :userId', { userId: getByUserIdDto.userId })
+          .execute();
     } catch(e) {
       throw new UpdateFail(e.stack)
     }
